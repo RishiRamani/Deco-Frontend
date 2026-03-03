@@ -1,0 +1,117 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=clash-display@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --orange: #f97316;
+  --orange-dim: #ea580c;
+  --bg: #0a0a0d;
+  --surface: #111115;
+  --border: #222228;
+  --text: #f1f1f3;
+  --muted: #6b6b7a;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Satoshi', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Clash Display', sans-serif;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* Glow effect */
+.glow {
+  box-shadow: 0 0 40px rgba(249, 115, 22, 0.15), 0 0 80px rgba(249, 115, 22, 0.05);
+}
+
+.glow-text {
+  text-shadow: 0 0 30px rgba(249, 115, 22, 0.5);
+}
+
+/* Animated gradient border */
+@keyframes borderGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(249,115,22,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up { animation: fadeUp 0.4s ease forwards; }
+.fade-up-1 { animation: fadeUp 0.4s 0.1s ease both; }
+.fade-up-2 { animation: fadeUp 0.4s 0.2s ease both; }
+.fade-up-3 { animation: fadeUp 0.4s 0.3s ease both; }
+
+@keyframes ticker {
+  0% { color: #f97316; }
+  50% { color: #fbbf24; }
+  100% { color: #f97316; }
+}
+
+.timer-active { animation: ticker 1s ease-in-out infinite; }
+
+@keyframes correctPulse {
+  0% { background: rgba(34,197,94,0); }
+  30% { background: rgba(34,197,94,0.15); }
+  100% { background: rgba(34,197,94,0); }
+}
+
+.correct-flash { animation: correctPulse 0.6s ease; }
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.wrong-shake { animation: wrongShake 0.4s ease; }
+
+/* Rank badges */
+.rank-1 { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #000; }
+.rank-2 { background: linear-gradient(135deg, #c0c0c0, #94a3b8); color: #000; }
+.rank-3 { background: linear-gradient(135deg, #cd7f32, #a16207); color: #fff; }
