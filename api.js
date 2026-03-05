@@ -7,6 +7,7 @@ export async function api(path, options = {}, token = null) {
   const res = await fetch(`${BASE}${path}`, {
     ...options,
     headers: { ...headers, ...options.headers },
+    credentials: "include"
   })
 
   const text = await res.text()
