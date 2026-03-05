@@ -7,9 +7,9 @@ function RoundsTab() {
   const api = useApi()
   const [rounds, setRounds] = useState([])
   const [loading, setLoading] = useState(true)
-  const [timeLimit, setTimeLimit] = useState('')
+  const [startedAt, setStartedAt] = useState('')
+  const [endsAt, setEndsAt] = useState('')
   const [creating, setCreating] = useState(false)
-  const [actionLoading, setActionLoading] = useState(null)
   const [msg, setMsg] = useState(null)
 
   const flash = (type, text) => {
@@ -28,25 +28,51 @@ function RoundsTab() {
   useEffect(() => { fetchRounds() }, [])
 
   const createRound = async () => {
+    if (!startedAt || !endsAt) {
+      flash('error', 'Both start and end times are required')
+      return
+    }
+    
+    const startDate = new Date(startedAt)
+    const endDate = new Date(endsAt)
+    
+    if (endDate <= startDate) {
+      flash('error', 'End time must be after start time')
+      return
+    }
+
     setCreating(true)
     try {
-      await api.post('/api/round', { timeLimit: timeLimit ? Number(timeLimit) : null })
-      setTimeLimit('')
+      await api.post('/api/round', { 
+        startedAt: startDate.toISOString(),
+        endsAt: endDate.toISOString()
+      })
+      
       flash('success', 'Round created!')
+      setStartedAt('')
+      setEndsAt('')
       fetchRounds()
     } catch (e) { flash('error', e.message) }
     finally { setCreating(false) }
   }
 
-  const doAction = async (roundId, action) => {
-    setActionLoading(`${roundId}-${action}`)
-    try {
-      if (action === 'activate') await api.patch(`/api/round/${roundId}/activate`)
-      if (action === 'close') await api.patch(`/api/round/${roundId}/close`)
-      flash('success', `Round ${action}d!`)
-      fetchRounds()
-    } catch (e) { flash('error', e.message) }
-    finally { setActionLoading(null) }
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return 'N/A'
+    const date = new Date(dateStr)
+    return date.toLocaleString()
+  }
+
+  const isRoundActive = (round) => {
+    const now = new Date()
+    const start = new Date(round.startedAt)
+    const end = new Date(round.endsAt)
+    return now >= start && now <= end
+  }
+
+  const isRoundCompleted = (round) => {
+    const now = new Date()
+    const end = new Date(round.endsAt)
+    return now > end
   }
 
   return (
@@ -56,16 +82,21 @@ function RoundsTab() {
       {/* Create */}
       <div className="card p-5">
         <h3 className="font-display text-white text-lg mb-4">Create Round</h3>
-        <div className="flex gap-3 items-end">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
           <Input
-            label="Time Limit (seconds, leave blank for unlimited)"
-            value={timeLimit}
-            onChange={e => setTimeLimit(e.target.value)}
-            placeholder="e.g. 300 for 5 minutes"
-            className="flex-1"
+            label="Start Time *"
+            type="datetime-local"
+            value={startedAt}
+            onChange={e => setStartedAt(e.target.value)}
           />
-          <Btn onClick={createRound} loading={creating}>+ Create</Btn>
+          <Input
+            label="End Time *"
+            type="datetime-local"
+            value={endsAt}
+            onChange={e => setEndsAt(e.target.value)}
+          />
         </div>
+        <Btn onClick={createRound} loading={creating} className="mt-4">+ Create Round</Btn>
       </div>
 
       {/* All rounds */}
@@ -83,40 +114,22 @@ function RoundsTab() {
             {rounds.map(r => (
               <div key={r.id} className="px-5 py-4 flex items-center gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-xs text-[#6b6b7a]">#{r.id}</span>
-                    <StatusBadge status={r.status} />
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-mono text-sm text-white font-semibold">Round #{r.id}</span>
+                    {isRoundActive(r) && <Badge variant="green">Active</Badge>}
+                    {isRoundCompleted(r) && <Badge variant="gray">Completed</Badge>}
+                    {!isRoundActive(r) && !isRoundCompleted(r) && <Badge variant="blue">Upcoming</Badge>}
                   </div>
-                  <div className="flex gap-4 text-xs text-[#6b6b7a]">
-                    <span>⏱ {r.timeLimit ? `${Math.floor(r.timeLimit / 60)}m ${r.timeLimit % 60}s` : 'Unlimited'}</span>
-                    <span>❓ {r.totalQuestions} questions</span>
-                    <span>👥 {r.totalParticipants} participants</span>
-                    <span>✅ {r.finishedCount} finished</span>
+                  <div className="flex flex-col gap-1 text-xs text-[#6b6b7a]">
+                    <span>📅 Starts: {formatDateTime(r.startedAt)}</span>
+                    <span>📅 Ends: {formatDateTime(r.endsAt)}</span>
+                    <span>❓ Questions: {r.totalQuestions || 0}</span>
+                    <span>📋 Participants: {r.totalParticipants || 0}</span>
+                    
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {r.status === 'UPCOMING' && (
-                    <Btn
-                      size="sm"
-                      onClick={() => doAction(r.id, 'activate')}
-                      loading={actionLoading === `${r.id}-activate`}
-                    >
-                      ▶ Activate
-                    </Btn>
-                  )}
-                  {r.status === 'ACTIVE' && (
-                    <Btn
-                      size="sm"
-                      variant="danger"
-                      onClick={() => doAction(r.id, 'close')}
-                      loading={actionLoading === `${r.id}-close`}
-                    >
-                      ■ Close
-                    </Btn>
-                  )}
-                  {r.status === 'COMPLETED' && (
-                    <span className="text-xs text-[#6b6b7a] px-3 py-1.5">Completed</span>
-                  )}
+                  <Btn size="sm" variant="ghost">View Details</Btn>
                 </div>
               </div>
             ))}

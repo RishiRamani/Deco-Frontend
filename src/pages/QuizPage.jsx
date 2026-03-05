@@ -2,44 +2,34 @@ import { useState, useEffect, useRef } from 'react'
 import { useApi } from '../hooks/useApi'
 import { Btn, Alert, Spinner, Badge } from '../components/UI'
 
-function QuestionCard({ question, response, index, onSubmit, submitting }) {
-  const [input, setInput] = useState(response?.submittedAnswer || '')
-  const [flash, setFlash] = useState(null) // 'correct' | 'wrong'
-  const cardRef = useRef(null)
-
+function QuestionCard({ question, response, index, total, onSubmit, submitting }) {
+  const [input, setInput] = useState('')
   const hasOptions = question.options && typeof question.options === 'object' && Object.keys(question.options).length > 0
   const optionEntries = hasOptions ? Object.entries(question.options) : []
   const isAnswered = !!response
 
+  // reset input when the question changes (new round or navigating)
+  useEffect(() => {
+    setInput('')
+  }, [question.id])
+
   const handleSubmit = async () => {
     if (!input.trim()) return
-    const result = await onSubmit(question.id, input)
-    if (result?.isCorrect) {
-      setFlash('correct')
-      setTimeout(() => setFlash(null), 800)
-    } else {
-      setFlash('wrong')
-      setTimeout(() => setFlash(null), 500)
+    // if this is an MCQ, convert the selected key to the actual text value
+    let answerToSend = input
+    if (hasOptions) {
+      const match = optionEntries.find(([k]) => k === input)
+      if (match) answerToSend = match[1]
     }
+    await onSubmit(question.id, answerToSend)
   }
 
   return (
-    <div
-      ref={cardRef}
-      className={`card p-5 transition-all ${
-        flash === 'correct' ? 'correct-flash border-green-500/40' :
-        flash === 'wrong' ? 'wrong-shake border-red-500/30' :
-        isAnswered
-          ? response.isCorrect
-            ? 'border-green-500/20'
-            : 'border-red-500/20'
-          : 'hover:border-white/10'
-      }`}
-    >
+    <div className="card p-5">
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-start gap-3 flex-1">
-          <span className="font-mono text-xs text-[#6b6b7a] bg-white/5 rounded-lg w-7 h-7 flex items-center justify-center flex-shrink-0 mt-0.5">
-            {index + 1}
+          <span className="font-mono text-xs text-[#6b6b7a] bg-white/5 rounded-lg w-10 h-7 flex items-center justify-center flex-shrink-0 mt-0.5">
+            {index + 1}/{total}
           </span>
           <div className="flex-1">
             <p className="text-white text-sm leading-relaxed">{question.text}</p>
@@ -52,71 +42,51 @@ function QuestionCard({ question, response, index, onSubmit, submitting }) {
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <Badge variant="yellow">+{question.reward} pts</Badge>
-          {isAnswered && (
-            response.isCorrect
-              ? <Badge variant="green">✓ Correct</Badge>
-              : <Badge variant="red">✗ Wrong</Badge>
-          )}
         </div>
       </div>
 
-      {/* MCQ Options */}
-      {hasOptions ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-          {optionEntries.map(([key, val]) => {
-            const isSelected = input === key || input === val
-            const isCorrectOpt = isAnswered && response.isCorrect && isSelected
-            const isWrongOpt = isAnswered && !response.isCorrect && isSelected
-            return (
-              <button
-                key={key}
-                onClick={() => !isAnswered && setInput(key)}
-                disabled={isAnswered}
-                className={`text-left px-4 py-2.5 rounded-xl border text-sm transition-all ${
-                  isCorrectOpt ? 'bg-green-500/15 border-green-500/40 text-green-300' :
-                  isWrongOpt ? 'bg-red-500/15 border-red-500/40 text-red-300' :
-                  isSelected ? 'bg-orange-500/15 border-orange-500/40 text-orange-300' :
-                  'bg-white/3 border-white/10 text-[#a0a0b0] hover:border-white/20 hover:text-white'
-                }`}
-              >
-                <span className="font-mono text-xs mr-2 opacity-60">{key}</span>{val}
-              </button>
-            )
-          })}
-        </div>
-      ) : (
-        /* Free text */
-        <div className="mb-4">
-          <input
-            value={input}
-            onChange={e => !isAnswered && setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && !isAnswered && handleSubmit()}
-            disabled={isAnswered}
-            placeholder="Type your answer..."
-            className={`w-full bg-[#111115] border rounded-xl px-3 py-2.5 text-sm placeholder-[#4b4b58] focus:outline-none transition-all ${
-              isAnswered
-                ? response.isCorrect
-                  ? 'border-green-500/30 text-green-300'
-                  : 'border-red-500/30 text-red-300'
-                : 'border-[#222228] text-white focus:border-orange-500/50'
-            }`}
-          />
-        </div>
+      {/* show input only when unanswered */}
+      {!isAnswered && (
+        <>
+          {hasOptions ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+              {optionEntries.map(([key, val]) => {
+                const isSelected = input === key
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setInput(key)}
+                    className={`text-left px-4 py-2.5 rounded-xl border text-sm transition-all ${
+                      isSelected
+                        ? 'bg-orange-500/15 border-orange-500/40 text-orange-300'
+                        : 'bg-white/3 border-white/10 text-[#a0a0b0] hover:border-white/20 hover:text-white'
+                    }`}
+                  >
+                    <span className="font-mono text-xs mr-2 opacity-60">{key}</span>{val}
+                  </button>
+                )
+              })}
+            </div>
+          ) : (
+            /* Free text */
+            <div className="mb-4">
+              <input
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+                placeholder="Type your answer..."
+                className="w-full bg-[#111115] border rounded-xl px-3 py-2.5 text-sm placeholder-[#4b4b58] focus:outline-none transition-all border-[#222228] text-white focus:border-orange-500/50"
+              />
+            </div>
+          )}
+
+          <Btn onClick={handleSubmit} loading={submitting === question.id} size="sm">
+            Submit Answer
+          </Btn>
+        </>
       )}
 
-      {/* Submit / status */}
-      {!isAnswered ? (
-        <Btn onClick={handleSubmit} loading={submitting === question.id} size="sm">
-          Submit Answer
-        </Btn>
-      ) : (
-        <div className="text-xs text-[#6b6b7a]">
-          Your answer: <span className="text-white font-medium">{response.submittedAnswer}</span>
-          {response.pointsEarned > 0 && (
-            <span className="ml-2 text-green-400">+{response.pointsEarned} pts earned</span>
-          )}
-        </div>
-      )}
+      {isAnswered && <div className="text-xs text-[#6b6b7a]">Answer recorded</div>}
     </div>
   )
 }
@@ -129,12 +99,34 @@ export default function QuizPage({ onNav }) {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(null)
   const [error, setError] = useState(null)
+  const [currentIndex, setCurrentIndex] = useState(0) // show one question at a time
 
   useEffect(() => {
     const init = async () => {
       try {
         const round = await api.get('/api/round/active')
         setActiveRound(round)
+
+        // make sure current user actually started this round
+        try {
+          const status = await api.get(`/api/round/status/${round.id}`)
+          if (!status.started) {
+            // redirect back to round page so they must hit start
+            setError('Please start the round before answering questions')
+            onNav('round')
+            setLoading(false)
+            return
+          }
+          if (status.finished) {
+            // already finished? send to leaderboard
+            onNav('leaderboard')
+            setLoading(false)
+            return
+          }
+        } catch {
+          // ignore status failure and proceed, backend will still protect
+        }
+
         const qData = await api.get(`/api/question/round/${round.id}`)
         const qs = qData?.data || qData || []
         setQuestions(qs)
@@ -149,6 +141,19 @@ export default function QuizPage({ onNav }) {
     }
     init()
   }, [])
+
+  // whenever questions or responses change, move index to first unanswered question
+  useEffect(() => {
+    if (questions.length > 0) {
+      const answeredIds = new Set(responses.map(r => r.questionId))
+      const nextIdx = questions.findIndex(q => !answeredIds.has(q.id))
+      if (nextIdx >= 0) {
+        setCurrentIndex(nextIdx)
+      } else if (questions.length > 0) {
+        setCurrentIndex(questions.length - 1)
+      }
+    }
+  }, [questions, responses])
 
   const submitAnswer = async (questionId, submittedAnswer) => {
     setSubmitting(questionId)
@@ -174,6 +179,21 @@ export default function QuizPage({ onNav }) {
     }
   }
 
+  const [finishing, setFinishing] = useState(false)
+  const finishRound = async () => {
+    if (!activeRound) return
+    setFinishing(true)
+    try {
+      await api.post(`/api/round/${activeRound.id}/finish`)
+      // navigate straight to leaderboard once finished
+      onNav('leaderboard')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setFinishing(false)
+    }
+  }
+
   const getResponse = (questionId) => responses.find(r => r.questionId === questionId)
 
   const answered = responses.length
@@ -194,6 +214,10 @@ export default function QuizPage({ onNav }) {
     </div>
   )
 
+  const currentQuestion = questions[currentIndex]
+  const isLast = currentIndex === questions.length - 1
+  const currentResponse = currentQuestion && getResponse(currentQuestion.id)
+
   return (
     <div className="space-y-6 fade-up">
       {/* Header */}
@@ -201,21 +225,7 @@ export default function QuizPage({ onNav }) {
         <div>
           <h1 className="text-3xl font-display text-white">Quiz</h1>
           <p className="text-[#6b6b7a] text-sm mt-1">Round #{activeRound.id}</p>
-        </div>
-        {/* Score mini-bar */}
-        <div className="flex gap-3">
-          <div className="card px-4 py-2.5 text-center min-w-[70px]">
-            <div className="text-xl font-display text-orange-400">{totalPoints}</div>
-            <div className="text-xs text-[#6b6b7a]">points</div>
-          </div>
-          <div className="card px-4 py-2.5 text-center min-w-[70px]">
-            <div className="text-xl font-display text-white">{answered}/{questions.length}</div>
-            <div className="text-xs text-[#6b6b7a]">answered</div>
-          </div>
-          <div className="card px-4 py-2.5 text-center min-w-[70px]">
-            <div className="text-xl font-display text-green-400">{correct}</div>
-            <div className="text-xs text-[#6b6b7a]">correct</div>
-          </div>
+          <p className="text-xs text-[#6b6b7a] mt-1">Question {answered + 1}/{questions.length}</p>
         </div>
       </div>
 
@@ -235,29 +245,41 @@ export default function QuizPage({ onNav }) {
         </div>
       )}
 
-      {/* Questions */}
-      {questions.length === 0 ? (
+      {/* current question */}
+      {currentQuestion ? (
+        <div className="space-y-3">
+          <QuestionCard
+            question={currentQuestion}
+            index={currentIndex}
+            total={questions.length}
+            response={currentResponse}
+            onSubmit={submitAnswer}
+            submitting={submitting}
+          />
+          {/* continue / finish button shown after response exists */}
+          {currentResponse && (
+            <div className="flex justify-end">
+              {isLast ? (
+                <Btn onClick={finishRound} loading={finishing}>
+                  🏁 Finish Round
+                </Btn>
+              ) : (
+                <Btn onClick={() => setCurrentIndex(i => i + 1)}>
+                  Continue →
+                </Btn>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
         <div className="card p-10 text-center">
           <div className="text-4xl mb-3">📭</div>
           <h2 className="text-xl font-display text-white mb-2">No questions yet</h2>
           <p className="text-[#6b6b7a] text-sm">The organizer hasn't added questions to this round.</p>
         </div>
-      ) : (
-        <div className="space-y-3">
-          {questions.map((q, i) => (
-            <QuestionCard
-              key={q.id}
-              question={q}
-              index={i}
-              response={getResponse(q.id)}
-              onSubmit={submitAnswer}
-              submitting={submitting}
-            />
-          ))}
-        </div>
       )}
 
-      {/* All done CTA */}
+      {/* All done CTA - keep for safety if user navigated backward */}
       {questions.length > 0 && answered === questions.length && (
         <div className="card p-6 text-center border-green-500/20 glow">
           <div className="text-4xl mb-3">🎉</div>

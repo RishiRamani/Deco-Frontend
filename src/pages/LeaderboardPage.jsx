@@ -64,7 +64,7 @@ export default function LeaderboardPage() {
 
       {/* My rank card */}
       {myEntry && (
-        <div className="card p-4 border-orange-500/20 glow">
+        <div className="card p-4 border-orange-500/20">
           <div className="text-xs text-[#6b6b7a] mb-2 font-medium uppercase tracking-widest">Your rank</div>
           <div className="flex items-center gap-4">
             <RankBadge rank={myEntry.rank} />
