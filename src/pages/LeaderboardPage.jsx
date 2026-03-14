@@ -24,45 +24,117 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [ activeRound, setActiveRound ] = useState(null)
+  const [ rounds, setRounds ] = useState([])
+  const [ selectedRoundId, setSelectedRoundId ] = useState('all')
 
-  const fetchLeaderboard = async (isRefresh = false) => {
+  const fetchActiveRound = async () => {
+    try {
+      const r = await api.get('/api/round/active')
+      setActiveRound(r)
+    } catch {
+      setActiveRound(null)
+    }
+  }
+
+  const loadMyRounds = async () => {
+    try {
+      const myRounds = await api.get('/api/round/me')
+      setRounds(Array.isArray(myRounds) ? myRounds : [])
+    } catch {
+      setRounds([])
+    }
+  }
+
+  const fetchLeaderboard = async (roundId = selectedRoundId, isRefresh = false) => {
     if (isRefresh) setRefreshing(true)
     try {
-      const res = await api.get('/api/leaderboard')
-      setData(res?.data || res || [])
       setError(null)
+      await fetchActiveRound()
+
+      if (roundId === 'all') {
+        const res = await api.get('/api/leaderboard')
+        setData(res?.data || res || [])
+        return
+      }
+
+      const round = rounds.find(r => r.id === Number(roundId))
+
+      if (!round) {
+        setData([])
+        setError('Round not found. Refresh and try again.')
+        return
+      }
+
+      if (!round.finished) {
+        setData([])
+        return
+      }
+
+      const res = await api.get(`/api/leaderboard/round/${roundId}`)
+      setData(res?.data || res || [])
     } catch (e) {
-      setError(e.message)
+      setError(e?.message || 'Could not load leaderboard')
     } finally {
       setLoading(false)
       setRefreshing(false)
     }
   }
 
-  useEffect(() => { fetchLeaderboard() }, [])
+  useEffect(() => {
+    const init = async () => {
+      setLoading(true)
+      await loadMyRounds()
+      await fetchActiveRound()
+      await fetchLeaderboard('all')
+    }
+    init()
+  }, [])
 
+  useEffect(() => {
+    if (!loading) {
+      fetchLeaderboard(selectedRoundId)
+    }
+  }, [selectedRoundId])
+
+  const selectedRound = selectedRoundId === 'all' ? null : rounds.find(r => r.id === Number(selectedRoundId))
+  const isRoundUnfinished = selectedRound && !selectedRound.finished
   const myEntry = data.find(d => d.email === user?.primaryEmailAddress?.emailAddress)
   const top3 = data.slice(0, 3)
-  const rest = data.slice(3)
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
   return (
     <div className="space-y-6 fade-up max-w-3xl mx-auto">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-display text-white">Leaderboard</h1>
           <p className="text-[#6b6b7a] text-sm mt-1">Final rankings — higher score & lower time wins</p>
         </div>
-        <Btn variant="secondary" onClick={() => fetchLeaderboard(true)} loading={refreshing} size="sm">
-          ↺ Refresh
-        </Btn>
+        <Btn onClick={() => fetchLeaderboard(selectedRoundId, true)} loading={refreshing} size="sm" variant="secondary">↺ Refresh</Btn>
       </div>
 
       {error && <Alert type="error">{error}</Alert>}
 
-      {/* My rank card */}
+      <div className="card bg-slate-900/70 p-4">
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="text-xs uppercase tracking-widest text-[#6b6b7a] font-medium">Show leaderboard for</div>
+          <select
+            value={selectedRoundId}
+            onChange={e => setSelectedRoundId(e.target.value)}
+            className="bg-[#111119] border border-[#2b2b37] rounded-md px-3 py-2 text-sm"
+          >
+            <option value="all">All completed rounds (global aggregate)</option>
+            {rounds.length === 0 && <option disabled value="none">No participated rounds yet</option>}
+            {rounds.map(round => (
+              <option key={round.id} value={round.id}>
+                Round #{round.id} — {round.status || (round.finished ? 'COMPLETED' : 'ACTIVE')}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {myEntry && (
         <div className="card p-4 border-orange-500/20">
           <div className="text-xs text-[#6b6b7a] mb-2 font-medium uppercase tracking-widest">Your rank</div>
@@ -80,22 +152,38 @@ export default function LeaderboardPage() {
         </div>
       )}
 
-      {data.length === 0 ? (
+      {selectedRoundId === 'all' && activeRound ? (
+        <div className="card p-10 text-center border-orange-500/20">
+          <div className="text-5xl mb-4">⏳</div>
+          <h2 className="text-xl font-display text-white mb-2">Live round in progress</h2>
+          <p className="text-[#6b6b7a] text-sm">
+            Global leaderboard is hidden while round #{activeRound.id} is active. Switch to a completed round to preview ranking.
+          </p>
+        </div>
+      ) : isRoundUnfinished ? (
+        <div className="card p-10 text-center border-yellow-500/20">
+          <div className="text-5xl mb-4">⏳</div>
+          <h2 className="text-xl font-display text-white mb-2">Round not finished yet</h2>
+          <p className="text-[#6b6b7a] text-sm">
+            This round has not completed, so leaderboard is not yet available. Wait until it ends and your results are recorded.
+          </p>
+        </div>
+      ) : data.length === 0 ? (
         <div className="card p-10 text-center">
           <div className="text-5xl mb-4">🏆</div>
           <h2 className="text-xl font-display text-white mb-2">No results yet</h2>
-          <p className="text-[#6b6b7a] text-sm">Leaderboard shows after rounds are completed</p>
+          <p className="text-[#6b6b7a] text-sm">No finished results found for this selection.</p>
         </div>
       ) : (
         <>
-          {/* Podium top 3 */}
           {top3.length >= 2 && (
             <div className="flex items-end justify-center gap-3 py-4">
-              {/* 2nd */}
               {top3[1] && (
                 <div className="flex flex-col items-center gap-2 w-28">
-                  <img src={top3[1].avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${top3[1].name}`}
-                    className="w-12 h-12 rounded-full ring-2 ring-[#c0c0c0]/40" alt="" />
+                  <img
+                    src={top3[1].avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${top3[1].name}`}
+                    className="w-12 h-12 rounded-full ring-2 ring-[#c0c0c0]/40" alt=""
+                  />
                   <div className="text-center">
                     <div className="text-xs text-white font-medium truncate w-full">{top3[1].name.split(' ')[0]}</div>
                     <div className="font-mono text-[#c0c0c0] font-bold">{top3[1].totalPoints}</div>
@@ -103,12 +191,13 @@ export default function LeaderboardPage() {
                   <div className="w-full h-16 rank-2 rounded-t-lg flex items-center justify-center text-2xl font-bold text-black">2</div>
                 </div>
               )}
-              {/* 1st */}
               {top3[0] && (
                 <div className="flex flex-col items-center gap-2 w-32">
                   <div className="text-2xl">👑</div>
-                  <img src={top3[0].avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${top3[0].name}`}
-                    className="w-16 h-16 rounded-full ring-4 ring-yellow-400/60" alt="" />
+                  <img
+                    src={top3[0].avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${top3[0].name}`}
+                    className="w-16 h-16 rounded-full ring-4 ring-yellow-400/60" alt=""
+                  />
                   <div className="text-center">
                     <div className="text-sm text-white font-medium truncate w-full">{top3[0].name.split(' ')[0]}</div>
                     <div className="font-mono text-yellow-400 font-bold text-lg">{top3[0].totalPoints}</div>
@@ -116,11 +205,12 @@ export default function LeaderboardPage() {
                   <div className="w-full h-24 rank-1 rounded-t-lg flex items-center justify-center text-3xl font-bold text-black">1</div>
                 </div>
               )}
-              {/* 3rd */}
               {top3[2] && (
                 <div className="flex flex-col items-center gap-2 w-28">
-                  <img src={top3[2].avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${top3[2].name}`}
-                    className="w-12 h-12 rounded-full ring-2 ring-[#cd7f32]/40" alt="" />
+                  <img
+                    src={top3[2].avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${top3[2].name}`}
+                    className="w-12 h-12 rounded-full ring-2 ring-[#cd7f32]/40" alt=""
+                  />
                   <div className="text-center">
                     <div className="text-xs text-white font-medium truncate w-full">{top3[2].name.split(' ')[0]}</div>
                     <div className="font-mono text-[#cd7f32] font-bold">{top3[2].totalPoints}</div>
@@ -131,7 +221,6 @@ export default function LeaderboardPage() {
             </div>
           )}
 
-          {/* Full table */}
           <div className="card overflow-hidden">
             <div className="grid grid-cols-[auto_1fr_auto_auto] gap-0 text-xs text-[#6b6b7a] font-medium uppercase tracking-widest px-4 py-3 border-b border-[#222228]">
               <span className="w-10">#</span>
@@ -139,7 +228,7 @@ export default function LeaderboardPage() {
               <span className="text-right pr-4">Time</span>
               <span className="text-right">Points</span>
             </div>
-            {data.map((entry, i) => {
+            {data.map(entry => {
               const isMe = entry.email === user?.primaryEmailAddress?.emailAddress
               return (
                 <div
