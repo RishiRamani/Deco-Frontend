@@ -16,6 +16,9 @@ export default function HomePage({ onNav, userRole }) {
       .finally(() => setLoading(false))
   }, [])
 
+  const activeRoundHasStarted = activeRound && new Date(activeRound.startedAt) <= new Date()
+  const activeRoundIsLive = activeRoundHasStarted && activeRound && new Date(activeRound.endsAt) >= new Date()
+
   return (
     <div className="space-y-10 fade-up">
       {/* Hero */}
@@ -45,19 +48,17 @@ export default function HomePage({ onNav, userRole }) {
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <StatusBadge status={activeRound.status} />
+                <StatusBadge status={activeRoundIsLive ? 'ACTIVE' : 'UPCOMING'} />
                 <span className="text-xs text-[#6b6b7a] font-mono">Round #{activeRound.id}</span>
               </div>
               <h2 className="text-2xl font-display text-white mb-1">
-                {activeRound.status === 'ACTIVE' ? 'A round is live right now!' : 'Round coming up'}
+                {activeRoundIsLive ? 'Round is live now!' : 'Upcoming round is scheduled'}
               </h2>
               <p className="text-[#6b6b7a] text-sm">
-                {activeRound.timeLimit
-                  ? `Time limit: ${Math.floor(activeRound.timeLimit / 60)}m ${activeRound.timeLimit % 60}s`
-                  : 'No time limit'}
+                Starts: {new Date(activeRound.startedAt).toLocaleString()} • Ends: {new Date(activeRound.endsAt).toLocaleString()}
               </p>
             </div>
-            {activeRound.status === 'ACTIVE' && (
+            {activeRoundIsLive && (
               <Btn onClick={() => onNav('quiz')} size="lg">
                 Join Now →
               </Btn>
