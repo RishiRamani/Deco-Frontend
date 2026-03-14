@@ -17,16 +17,17 @@ function RankBadge({ rank }) {
   return <span className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-sm font-mono text-[#6b6b7a] flex-shrink-0">{rank}</span>
 }
 
-export default function LeaderboardPage() {
+export default function LeaderboardPage({ userRole }) {
   const { user } = useUser()
   const api = useApi()
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
-  const [ activeRound, setActiveRound ] = useState(null)
-  const [ rounds, setRounds ] = useState([])
-  const [ selectedRoundId, setSelectedRoundId ] = useState('all')
+  const [activeRound, setActiveRound] = useState(null)
+  const [rounds, setRounds] = useState([])
+  const [selectedRoundId, setSelectedRoundId] = useState(null)
+  const isAdmin = userRole === 'ORGANIZER'
 
   const fetchActiveRound = async () => {
     try {
@@ -40,34 +41,47 @@ export default function LeaderboardPage() {
   const loadMyRounds = async () => {
     try {
       const myRounds = await api.get('/api/round/me')
-      setRounds(Array.isArray(myRounds) ? myRounds : [])
+      const roundList = Array.isArray(myRounds) ? myRounds : []
+      setRounds(roundList)
+
+      // Default to latest finished round for regular users; admins can keep latest round
+      const finishedRounds = roundList.filter(r => r.finished).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      const backupRounds = [...roundList].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      const defaultRound = isAdmin ? backupRounds[0] : finishedRounds[0] || null
+      const defaultId = defaultRound ? String(defaultRound.id) : null
+      setSelectedRoundId(defaultId)
+      return defaultId
     } catch {
       setRounds([])
+      setSelectedRoundId(null)
+      return null
     }
   }
 
   const fetchLeaderboard = async (roundId = selectedRoundId, isRefresh = false) => {
     if (isRefresh) setRefreshing(true)
+    setLoading(true)
     try {
       setError(null)
       await fetchActiveRound()
 
-      if (roundId === 'all') {
-        const res = await api.get('/api/leaderboard')
+      if (!roundId) {
+        setData([])
+        return
+      }
+
+      const round = rounds.find(r => String(r.id) === String(roundId))
+      if (!round) {
+        // If we can't find the expected round, fallback to fetch by id anyway
+        const res = await api.get(`/api/leaderboard/round/${roundId}`)
         setData(res?.data || res || [])
         return
       }
 
-      const round = rounds.find(r => r.id === Number(roundId))
-
-      if (!round) {
+      // Regular players: only show finished rounds
+      if (!isAdmin && !round.finished) {
         setData([])
-        setError('Round not found. Refresh and try again.')
-        return
-      }
-
-      if (!round.finished) {
-        setData([])
+        setError('Selected round is not finished yet. Choose a completed round.')
         return
       }
 
@@ -75,6 +89,7 @@ export default function LeaderboardPage() {
       setData(res?.data || res || [])
     } catch (e) {
       setError(e?.message || 'Could not load leaderboard')
+      setData([])
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -84,20 +99,23 @@ export default function LeaderboardPage() {
   useEffect(() => {
     const init = async () => {
       setLoading(true)
-      await loadMyRounds()
+      const firstId = await loadMyRounds()
       await fetchActiveRound()
-      await fetchLeaderboard('all')
+      if (firstId) {
+        await fetchLeaderboard(firstId)
+      }
+      setLoading(false)
     }
     init()
   }, [])
 
   useEffect(() => {
-    if (!loading) {
+    if (selectedRoundId) {
       fetchLeaderboard(selectedRoundId)
     }
   }, [selectedRoundId])
 
-  const selectedRound = selectedRoundId === 'all' ? null : rounds.find(r => r.id === Number(selectedRoundId))
+  const selectedRound = selectedRoundId ? rounds.find(r => String(r.id) === String(selectedRoundId)) : null
   const isRoundUnfinished = selectedRound && !selectedRound.finished
   const myEntry = data.find(d => d.email === user?.primaryEmailAddress?.emailAddress)
   const top3 = data.slice(0, 3)
@@ -106,7 +124,7 @@ export default function LeaderboardPage() {
 
   return (
     <div className="space-y-6 fade-up max-w-3xl mx-auto">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between animate-fade-in">
         <div>
           <h1 className="text-3xl font-display text-white">Leaderboard</h1>
           <p className="text-[#6b6b7a] text-sm mt-1">Final rankings — higher score & lower time wins</p>
@@ -120,17 +138,22 @@ export default function LeaderboardPage() {
         <div className="flex flex-wrap gap-2 items-center">
           <div className="text-xs uppercase tracking-widest text-[#6b6b7a] font-medium">Show leaderboard for</div>
           <select
-            value={selectedRoundId}
+            value={selectedRoundId || ''}
             onChange={e => setSelectedRoundId(e.target.value)}
             className="bg-[#111119] border border-[#2b2b37] rounded-md px-3 py-2 text-sm"
           >
-            <option value="all">All completed rounds (global aggregate)</option>
-            {rounds.length === 0 && <option disabled value="none">No participated rounds yet</option>}
-            {rounds.map(round => (
-              <option key={round.id} value={round.id}>
-                Round #{round.id} — {round.status || (round.finished ? 'COMPLETED' : 'ACTIVE')}
-              </option>
-            ))}
+            {rounds.length === 0 ? (
+              <option disabled value="">No participated rounds yet</option>
+            ) : (
+              <>
+                {isAdmin && <option hidden value="">Select a round</option>}
+                {(isAdmin ? rounds : rounds.filter(r => r.finished)).map(round => (
+                  <option key={round.id} value={round.id}>
+                    Round #{round.id} — {round.finished ? 'COMPLETED' : 'ACTIVE'}
+                  </option>
+                ))}
+              </>
+            )}
           </select>
         </div>
       </div>
@@ -152,13 +175,11 @@ export default function LeaderboardPage() {
         </div>
       )}
 
-      {selectedRoundId === 'all' && activeRound ? (
-        <div className="card p-10 text-center border-orange-500/20">
-          <div className="text-5xl mb-4">⏳</div>
-          <h2 className="text-xl font-display text-white mb-2">Live round in progress</h2>
-          <p className="text-[#6b6b7a] text-sm">
-            Global leaderboard is hidden while round #{activeRound.id} is active. Switch to a completed round to preview ranking.
-          </p>
+      {!selectedRound ? (
+        <div className="card p-10 text-center border-slate-700/30">
+          <div className="text-5xl mb-4">📌</div>
+          <h2 className="text-xl font-display text-white mb-2">Select a round to show rankings</h2>
+          <p className="text-[#6b6b7a] text-sm">Choose an eligible round from the dropdown above.</p>
         </div>
       ) : isRoundUnfinished ? (
         <div className="card p-10 text-center border-yellow-500/20">
@@ -228,12 +249,12 @@ export default function LeaderboardPage() {
               <span className="text-right pr-4">Time</span>
               <span className="text-right">Points</span>
             </div>
-            {data.map(entry => {
+            {data.map((entry, index) => {
               const isMe = entry.email === user?.primaryEmailAddress?.emailAddress
               return (
                 <div
                   key={entry.userId}
-                  className={`grid grid-cols-[auto_1fr_auto_auto] gap-0 items-center px-4 py-3 border-b border-[#222228] last:border-0 transition-colors ${
+                  className={`fade-up-${(index % 3) + 1} grid grid-cols-[auto_1fr_auto_auto] gap-0 items-center px-4 py-3 border-b border-[#222228] last:border-0 transition-colors ${
                     isMe ? 'bg-orange-500/5 border-l-2 border-l-orange-500' : 'hover:bg-white/2'
                   }`}
                 >

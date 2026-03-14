@@ -40,7 +40,7 @@ function AuthenticatedApp() {
       {page === 'home' && <HomePage onNav={navigate} userRole={userRole} />}
       {page === 'round' && <RoundPage onNav={navigate} />}
       {page === 'quiz' && <QuizPage onNav={navigate} />}
-      {page === 'leaderboard' && <LeaderboardPage />}
+      {page === 'leaderboard' && <LeaderboardPage userRole={userRole} />}
       {page === 'admin' && userRole === 'ORGANIZER' && <AdminPage />}
       {page === 'admin' && userRole !== 'ORGANIZER' && (
         <div className="text-center py-20 text-[#6b6b7a]">Access denied</div>
