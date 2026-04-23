@@ -1,0 +1,109 @@
+{
+  "sceneTheme": {
+    "frame": {
+      "background": "radial-gradient(circle at top right, rgba(236, 72, 153, 0.22), transparent 25%), radial-gradient(circle at left center, rgba(59, 130, 246, 0.18), transparent 35%), linear-gradient(180deg, #090b12 0%, #111827 45%, #020617 100%)"
+    },
+    "stage": {
+      "backgroundImage": "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0)), radial-gradient(circle at 50% 100%, rgba(168, 85, 247, 0.14), transparent 32%)"
+    },
+    "dialogueBox": {
+      "background": "linear-gradient(135deg, rgba(14, 116, 144, 0.95), rgba(15, 23, 42, 0.95))",
+      "border": "1px solid rgba(59, 130, 246, 0.30)",
+      "color": "#e2e8f0"
+    },
+    "questionBox": {
+      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(59, 130, 246, 0.90))",
+      "border": "1px solid rgba(59, 130, 246, 0.18)"
+    },
+    "answerRevealBox": {
+      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(168, 85, 247, 0.92))",
+      "border": "1px solid rgba(168, 85, 247, 0.24)"
+    }
+  },
+  "stageCharacters": {
+    "curator": {
+      "name": "Aurora",
+      "accent": "#e11d48",
+      "side": "left",
+      "size": "18rem",
+      "style": { "bottom": "1rem", "left": "2rem" }
+    },
+    "signal": {
+      "name": "Echo",
+      "accent": "#38bdf8",
+      "side": "right",
+      "size": "16rem",
+      "style": { "bottom": "1rem", "right": "2rem" }
+    }
+  },
+  "roundNarrative": {
+    "preQuestion": [
+      {
+        "id": "intro-aurora",
+        "type": "dialogue",
+        "speaker": "Aurora",
+        "characterId": "curator",
+        "text": "Welcome to Round 1. The arena is set and the questions will drop soon."
+      },
+      {
+        "id": "intro-echo",
+        "type": "voiceMemo",
+        "speaker": "Echo",
+        "characterId": "signal",
+        "label": "Incoming mission briefing",
+        "icon": "Waveform",
+        "text": "This round rewards speed and precision. Keep your answers sharp.",
+        "transcript": "You have one shot per question. Answer fast to stay ahead."
+      }
+    ],
+    "duringQuestion": [
+      {
+        "id": "during-{{questionNumber}}",
+        "type": "dialogue",
+        "speaker": "Echo",
+        "characterId": "signal",
+        "text": "Question {{questionNumber}} of {{totalQuestions}} — keep your focus."
+      },
+      {
+        "questionNumber": 3,
+        "id": "during-3-special",
+        "type": "dialogue",
+        "speaker": "Aurora",
+        "characterId": "curator",
+        "text": "This is a turning point question. Good timing matters more now."
+      }
+    ],
+    "afterAnswer": [
+      {
+        "id": "after-{{submittedAnswer}}",
+        "type": "dialogue",
+        "speaker": "Echo",
+        "characterId": "signal",
+        "text": "Saved: '{{submittedAnswer}}'. {{lastQuestionPhrase}}"
+      },
+      {
+        "questionNumber": 2,
+        "id": "after-2",
+        "type": "voiceMemo",
+        "speaker": "Aurora",
+        "characterId": "curator",
+        "label": "Second question complete",
+        "icon": "Waveform",
+        "text": "Nice work. The second question is locked in.",
+        "transcript": "Question two answer recorded. Keep the streak going."
+      }
+    ],
+    "finished": [
+      {
+        "id": "finished-1",
+        "type": "voiceMemo",
+        "speaker": "Aurora",
+        "characterId": "curator",
+        "label": "Round complete",
+        "icon": "Hourglass",
+        "text": "This run is finished. Check the leaderboard or wait for the next round.",
+        "transcript": "Your score was recorded. Prepare for the next round."
+      }
+    ]
+  }
+}

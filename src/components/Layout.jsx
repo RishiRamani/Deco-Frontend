@@ -1,50 +1,70 @@
-import { UserButton, useUser } from '@clerk/clerk-react'
+import { UserButton } from '@clerk/clerk-react'
+import { appCopy } from '../config/experience'
+
+const navItems = [
+  { id: 'home', label: 'Home' },
+  { id: 'about', label: 'About' },
+  { id: 'registration', label: 'Registration' },
+  { id: 'leaderboard', label: 'Leaderboard' },
+]
 
 export default function Layout({ children, page, onNav, userRole }) {
-  const { user } = useUser()
-
-  const navItems = [
-    { id: 'home', label: 'Home', icon: '⚡' },
-    { id: 'round', label: 'Round', icon: '🔄' },
-    { id: 'quiz', label: 'Quiz', icon: '❓' },
-    { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
-    ...(userRole === 'ORGANIZER' ? [{ id: 'admin', label: 'Admin', icon: '🛠' }] : []),
-  ]
+  const isActive = (id) => page === id
 
   return (
-    <div className="min-h-screen flex flex-col relative z-10">
-      {/* Top bar */}
-      <header className="sticky top-0 z-50 border-b border-[#222228] bg-[#0a0a0d]/90 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center text-sm font-bold text-black">Q</div>
-            <span className="font-display font-600 text-white tracking-tight">QuizArena</span>
-          </div>
+    <div className="min-h-screen text-slate-100">
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.18),transparent_24%),radial-gradient(circle_at_left,rgba(34,211,238,0.12),transparent_28%),linear-gradient(180deg,#020617_0%,#0f172a_40%,#020617_100%)]" />
+      <div className="fixed inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:36px_36px] opacity-20" />
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map(item => (
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/75 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <button className="flex items-center gap-3 text-left" onClick={() => onNav('home')}>
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400 font-black text-slate-950">
+              {appCopy.brand.mark}
+            </div>
+            <div>
+              <div className="font-display text-lg font-semibold text-white">{appCopy.brand.name}</div>
+              <div className="text-xs text-slate-400">{appCopy.brand.tagline}</div>
+            </div>
+          </button>
+
+          <nav className="hidden items-center gap-2 md:flex">
+            {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => onNav(item.id)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  page === item.id
-                    ? 'bg-orange-500/15 text-orange-400 border border-orange-500/30'
-                    : 'text-[#6b6b7a] hover:text-white hover:bg-white/5'
+                className={`rounded-full px-4 py-2 text-sm transition ${
+                  isActive(item.id)
+                    ? 'bg-white text-slate-950'
+                    : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                <span className="mr-1.5">{item.icon}</span>{item.label}
+                {item.label}
               </button>
             ))}
+            <button
+              onClick={() => onNav('round')}
+              className="rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-300"
+            >
+              Start
+            </button>
+            {userRole === 'ORGANIZER' && (
+              <button
+                onClick={() => onNav('admin')}
+                className={`rounded-full px-4 py-2 text-sm transition ${
+                  isActive('admin')
+                    ? 'bg-cyan-300 text-slate-950'
+                    : 'bg-cyan-400/10 text-cyan-200 hover:bg-cyan-400/20'
+                }`}
+              >
+                Admin
+              </button>
+            )}
           </nav>
 
           <div className="flex items-center gap-3">
             {userRole && (
-              <span className={`text-xs px-2 py-0.5 rounded-full border font-mono ${
-                userRole === 'ORGANIZER'
-                  ? 'text-purple-400 border-purple-500/30 bg-purple-500/10'
-                  : 'text-sky-400 border-sky-500/30 bg-sky-500/10'
-              }`}>
+              <span className="hidden rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300 sm:inline-flex">
                 {userRole}
               </span>
             )}
@@ -52,27 +72,26 @@ export default function Layout({ children, page, onNav, userRole }) {
           </div>
         </div>
 
-        {/* Mobile nav */}
-        <div className="md:hidden flex border-t border-[#222228] overflow-x-auto">
-          {navItems.map(item => (
+        <div className="flex gap-2 overflow-x-auto px-4 pb-3 md:hidden">
+          {[...navItems, { id: 'round', label: 'Start' }].map((item) => (
             <button
               key={item.id}
               onClick={() => onNav(item.id)}
-              className={`flex-1 min-w-0 py-2.5 text-xs font-medium transition-all whitespace-nowrap px-1 ${
-                page === item.id ? 'text-orange-400 border-b-2 border-orange-500' : 'text-[#6b6b7a]'
+              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${
+                isActive(item.id)
+                  ? 'bg-white text-slate-950'
+                  : item.id === 'round'
+                    ? 'bg-amber-400 text-slate-950'
+                    : 'bg-white/5 text-slate-300'
               }`}
             >
-              <div>{item.icon}</div>
-              <div>{item.label}</div>
+              {item.label}
             </button>
           ))}
         </div>
       </header>
 
-      {/* Page content */}
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
-        {children}
-      </main>
+      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">{children}</main>
     </div>
   )
 }

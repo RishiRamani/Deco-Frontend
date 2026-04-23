@@ -1,0 +1,109 @@
+{
+  "sceneTheme": {
+    "frame": {
+      "background": "radial-gradient(circle at top right, rgba(34,197,94,0.22), transparent 25%), radial-gradient(circle at left center, rgba(124,58,237,0.18), transparent 35%), linear-gradient(180deg, #020617 0%, #091421 45%, #050a18 100%)"
+    },
+    "stage": {
+      "backgroundImage": "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)), radial-gradient(circle at 50% 100%, rgba(34,197,94,0.14), transparent 32%)"
+    },
+    "dialogueBox": {
+      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(16, 185, 129, 0.92))",
+      "border": "1px solid rgba(34, 197, 94, 0.24)",
+      "color": "#e9f9f1"
+    },
+    "questionBox": {
+      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(34, 197, 94, 0.20))",
+      "border": "1px solid rgba(34, 197, 94, 0.15)"
+    },
+    "answerRevealBox": {
+      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(16, 185, 129, 0.92))",
+      "border": "1px solid rgba(16, 185, 129, 0.24)"
+    }
+  },
+  "stageCharacters": {
+    "curator": {
+      "name": "Nova",
+      "accent": "#22c55e",
+      "side": "left",
+      "size": "17rem",
+      "style": { "bottom": "1rem", "left": "1.5rem" }
+    },
+    "signal": {
+      "name": "Pulse",
+      "accent": "#7c3aed",
+      "side": "right",
+      "size": "17rem",
+      "style": { "bottom": "1rem", "right": "1.5rem" }
+    }
+  },
+  "roundNarrative": {
+    "preQuestion": [
+      {
+        "id": "intro-nova",
+        "type": "dialogue",
+        "speaker": "Nova",
+        "characterId": "curator",
+        "text": "Round 2 is live. Your answers must be sharp and strategic."
+      },
+      {
+        "id": "intro-pulse",
+        "type": "voiceMemo",
+        "speaker": "Pulse",
+        "characterId": "signal",
+        "label": "System check",
+        "icon": "Waveform",
+        "text": "Remember: every correct answer counts more in the final score.",
+        "transcript": "Pay attention to the questions and watch the timer."
+      }
+    ],
+    "duringQuestion": [
+      {
+        "id": "during-{{questionNumber}}",
+        "type": "dialogue",
+        "speaker": "Pulse",
+        "characterId": "signal",
+        "text": "Question {{questionNumber}} of {{totalQuestions}} — keep your focus."
+      },
+      {
+        "questionNumber": 1,
+        "id": "during-1-special",
+        "type": "dialogue",
+        "speaker": "Nova",
+        "characterId": "curator",
+        "text": "First one sets the pace. Choose wisely."
+      }
+    ],
+    "afterAnswer": [
+      {
+        "id": "after-{{submittedAnswer}}",
+        "type": "dialogue",
+        "speaker": "Nova",
+        "characterId": "curator",
+        "text": "Recorded: '{{submittedAnswer}}'. {{lastQuestionPhrase}}"
+      },
+      {
+        "questionNumber": 3,
+        "id": "after-3",
+        "type": "voiceMemo",
+        "speaker": "Pulse",
+        "characterId": "signal",
+        "label": "Third checkpoint",
+        "icon": "Waveform",
+        "text": "Question three complete. You're past the halfway point.",
+        "transcript": "Good job. Keep pushing through the second half."
+      }
+    ],
+    "finished": [
+      {
+        "id": "finished-2",
+        "type": "voiceMemo",
+        "speaker": "Nova",
+        "characterId": "curator",
+        "label": "Round complete",
+        "icon": "Hourglass",
+        "text": "That was Round 2. Great work — you’re one step closer to the top.",
+        "transcript": "Wait for the leaderboard or prepare the next round." 
+      }
+    ]
+  }
+}

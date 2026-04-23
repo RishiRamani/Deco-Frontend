@@ -1,41 +1,60 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-export default function Timer({ startedAt, timeLimit, onExpire }) {
-  const [remaining, setRemaining] = useState(null)
+function formatDuration(ms) {
+  const safe = Math.max(0, Math.floor(ms / 1000))
+  const hours = Math.floor(safe / 3600)
+  const minutes = Math.floor((safe % 3600) / 60)
+  const seconds = safe % 60
+
+  if (hours > 0) {
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  }
+
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+export default function Timer({
+  targetTime,
+  label = 'Time remaining',
+  accentClass = 'text-amber-300',
+  onExpire,
+}) {
+  const [remaining, setRemaining] = useState(() => new Date(targetTime).getTime() - Date.now())
+  const firedRef = useRef(false)
 
   useEffect(() => {
-    if (!startedAt || !timeLimit) return
+    firedRef.current = false
+
     const tick = () => {
-      const elapsed = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000)
-      const left = timeLimit - elapsed
-      setRemaining(Math.max(0, left))
-      if (left <= 0 && onExpire) onExpire()
+      const nextRemaining = new Date(targetTime).getTime() - Date.now()
+      setRemaining(nextRemaining)
+
+      if (nextRemaining <= 0 && !firedRef.current && onExpire) {
+        firedRef.current = true
+        onExpire()
+      }
     }
+
     tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [startedAt, timeLimit, onExpire])
+    const id = window.setInterval(tick, 1000)
+    return () => window.clearInterval(id)
+  }, [targetTime, onExpire])
 
-  if (remaining === null) return null
-
-  const mins = Math.floor(remaining / 60)
-  const secs = remaining % 60
-  const pct = timeLimit ? (remaining / timeLimit) * 100 : 100
-  const urgent = remaining <= 60 && remaining > 0
-  const done = remaining === 0
+  const progress = Math.max(0, Math.min(100, (remaining / (30 * 60 * 1000)) * 100))
+  const urgent = remaining <= 60 * 1000
 
   return (
-    <div className="flex flex-col items-end gap-1.5">
-      <div className={`font-mono text-2xl font-bold tabular-nums ${done ? 'text-red-400' : urgent ? 'text-orange-400 timer-active' : 'text-white'}`}>
-        {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
+    <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-4 shadow-[0_20px_80px_rgba(2,6,23,0.45)] backdrop-blur">
+      <div className="mb-2 text-xs uppercase tracking-[0.3em] text-slate-400">{label}</div>
+      <div className={`font-mono text-3xl font-semibold tabular-nums ${urgent ? 'text-rose-300' : accentClass}`}>
+        {formatDuration(remaining)}
       </div>
-      <div className="w-32 h-1.5 bg-white/10 rounded-full overflow-hidden">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
         <div
-          className={`h-full rounded-full transition-all duration-1000 ${done ? 'bg-red-500' : urgent ? 'bg-orange-500' : 'bg-green-500'}`}
-          style={{ width: `${pct}%` }}
+          className={`h-full rounded-full transition-all duration-1000 ${urgent ? 'bg-rose-400' : 'bg-cyan-300'}`}
+          style={{ width: `${progress}%` }}
         />
       </div>
-      {done && <span className="text-xs text-red-400 font-medium">Time's up!</span>}
     </div>
   )
 }
