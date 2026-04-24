@@ -10,12 +10,38 @@ import {
   stageCharacters,
 } from '../config/experience'
 
+// ─── localStorage helpers ─────────────────────────────────────────────────────
+function cacheKey(roundId) {
+  return `deco_draft_${roundId}`
+}
+
+function loadCache(roundId) {
+  try {
+    const raw = localStorage.getItem(cacheKey(roundId))
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
+function saveCache(roundId, drafts) {
+  try {
+    localStorage.setItem(cacheKey(roundId), JSON.stringify(drafts))
+  } catch {}
+}
+
+function clearCache(roundId) {
+  try {
+    localStorage.removeItem(cacheKey(roundId))
+  } catch {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 function normalizeOptions(options) {
   if (!options) return []
   if (Array.isArray(options)) {
     return options.map((value, index) => ({ key: String(index), label: String.fromCharCode(65 + index), value }))
   }
-
   return Object.entries(options).map(([key, value], index) => ({
     key,
     label: String.fromCharCode(65 + index),
@@ -53,11 +79,9 @@ function resolveNarrativeSequence(sequence, vars, questionNumber) {
   if (Array.isArray(sequence)) {
     return formatNarrativeItems(sequence.filter((item) => matchesQuestionNumber(item, questionNumber)), vars)
   }
-
   if (typeof sequence === 'function') {
     return formatNarrativeItems(sequence(vars), vars)
   }
-
   return []
 }
 
@@ -66,7 +90,6 @@ function getPlayableUntil(round) {
 }
 
 function StageCharacter({ character, visible }) {
-  // Extract customization or use defaults
   const customStyles = character.customStyles || {}
   const borderRadiusClass = customStyles.borderRadiusClass || 'rounded-[3rem]'
   const borderColor = customStyles.borderColor || `${character.accent}66`
@@ -126,11 +149,8 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
     }
   }
 
-  const handleAudioEnded = () => {
-    setIsPlaying(false)
-  }
+  const handleAudioEnded = () => setIsPlaying(false)
 
-  // Extract dialogue customization from sceneTheme or use defaults
   const dialogueCustom = sceneTheme.dialogueBox?.customStyles || {}
   const speakerClass = dialogueCustom.speakerClass || 'text-xs uppercase tracking-[0.3em] text-slate-500'
   const textClass = dialogueCustom.textClass || 'mt-4 text-base leading-8'
@@ -139,8 +159,6 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
   const voicePlayerBgClass = dialogueCustom.voicePlayerBgClass || 'mt-5 flex items-center gap-3 rounded-lg bg-slate-900/50 p-3'
   const playButtonClass = dialogueCustom.playButtonClass || 'flex-shrink-0 rounded-full bg-cyan-500 hover:bg-cyan-600 p-2 transition'
   const voiceTextClass = dialogueCustom.voiceTextClass || 'text-xs text-slate-400'
-
-  // NEW: Dialogue bubble customization
   const voiceMemoBoxClass = dialogueCustom.voiceMemoBoxClass || 'fixed bottom-12 left-1/2 -translate-x-1/2 z-30 max-w-2xl rounded-[2rem] border border-cyan-300/25 bg-cyan-100/95 p-6 text-left text-slate-900 shadow-[0_25px_80px_rgba(34,211,238,0.2)]'
   const normalBoxClass = dialogueCustom.normalBoxClass || 'fixed bottom-12 left-1/2 -translate-x-1/2 z-30 max-w-2xl rounded-[2rem] p-6 text-left shadow-[0_25px_80px_rgba(255,255,255,0.18)]'
   const bubbleContainerClass = sceneTheme.dialogueBox?.bubbleContainerClass || 'rounded-[2rem]'
@@ -155,11 +173,7 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
         <>
           {item.voiceFile && (
             <div className={voicePlayerBgClass}>
-              <button
-                type="button"
-                onClick={handlePlayAudio}
-                className={playButtonClass}
-              >
+              <button type="button" onClick={handlePlayAudio} className={playButtonClass}>
                 <span className="text-white font-bold">{isPlaying ? '⏸' : '▶'}</span>
               </button>
               <span className={voiceTextClass}>{isPlaying ? 'Playing...' : 'Play voice memo'}</span>
@@ -172,9 +186,7 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
               />
             </div>
           )}
-          <div className={transcriptClass}>
-            {item.transcript}
-          </div>
+          <div className={transcriptClass}>{item.transcript}</div>
         </>
       )}
       <div className={continueClass}>Click to continue</div>
@@ -206,9 +218,7 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
       onClick={onAdvance}
       className={`${normalBoxClass} ${bubbleContainerClass}`}
       style={{
-        background: bubbleImage 
-          ? `url(${bubbleImage})` 
-          : sceneTheme.dialogueBox.background,
+        background: bubbleImage ? `url(${bubbleImage})` : sceneTheme.dialogueBox.background,
         backgroundSize: bubbleImage ? 'cover' : undefined,
         backgroundPosition: bubbleImage ? 'center' : undefined,
         border: sceneTheme.dialogueBox.border,
@@ -236,7 +246,6 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
     onSubmit(answer)
   }
 
-  // Get custom text styles or use defaults
   const questionNumberClass = sceneTheme.questionBox.numberClass || 'text-xs uppercase tracking-[0.3em] text-cyan-200/80'
   const questionTitleClass = sceneTheme.questionBox.titleClass || 'mt-3 max-w-2xl text-2xl font-medium text-white'
   const optionClass = sceneTheme.questionBox.optionClass || 'rounded-[1.5rem] border px-4 py-4 text-left text-sm transition'
@@ -308,7 +317,6 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
 }
 
 function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, onFinish, sceneTheme }) {
-  // Get custom text styles or use defaults
   const answerLabelClass = sceneTheme.answerRevealBox.labelClass || 'text-xs uppercase tracking-[0.35em] text-cyan-100/70'
   const answerTextClass = sceneTheme.answerRevealBox.answerClass || 'mt-6 text-xl leading-8 text-white'
   const questionTextClass = sceneTheme.answerRevealBox.questionClass || 'mt-3 text-sm text-slate-300'
@@ -341,7 +349,10 @@ export default function RoundPage({ onNav }) {
   const [round, setRound] = useState(null)
   const [roundExperience, setRoundExperience] = useState(null)
   const [questions, setQuestions] = useState([])
+  // responses = answers confirmed in the DB
   const [responses, setResponses] = useState([])
+  // draftResponses = answers cached locally but not yet in DB (survives refresh, allows reattempt)
+  const [draftResponses, setDraftResponses] = useState({})
   const [currentIndex, setCurrentIndex] = useState(0)
   const [phase, setPhase] = useState('question')
   const [sequenceIndex, setSequenceIndex] = useState(0)
@@ -349,9 +360,7 @@ export default function RoundPage({ onNav }) {
   const [finishing, setFinishing] = useState(false)
   const finishTriggeredRef = useRef(false)
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // APPLY CUSTOM BODY ELEMENT STYLING
-  // ─────────────────────────────────────────────────────────────────────────────
+  // ─── BODY STYLING ──────────────────────────────────────────────────────────
   useEffect(() => {
     const styleTag = document.getElementById('round-custom-body-style')
     if (roundExperience?.sceneTheme?.bodyElement) {
@@ -368,10 +377,9 @@ export default function RoundPage({ onNav }) {
           background-size: ${customBody.gridPatternSize || '36px 36px'};
           opacity: ${customBody.gridPatternOpacity !== undefined ? customBody.gridPatternOpacity : 0.2};
           pointer-events: none;
-          z-index: -999;
+          z-index: 0;
         }
       `
-      
       if (styleTag) {
         styleTag.textContent = css
       } else {
@@ -380,7 +388,6 @@ export default function RoundPage({ onNav }) {
         newStyle.textContent = css
         document.head.appendChild(newStyle)
       }
-      
       document.body.classList.add('round-custom-mode')
       return () => {
         document.body.classList.remove('round-custom-mode')
@@ -391,6 +398,7 @@ export default function RoundPage({ onNav }) {
     }
   }, [roundExperience?.sceneTheme?.bodyElement])
 
+  // ─── BOOT ──────────────────────────────────────────────────────────────────
   const boot = useCallback(async () => {
     try {
       setLoading(true)
@@ -401,7 +409,6 @@ export default function RoundPage({ onNav }) {
       }
 
       const playableUntil = new Date(activeRound.endsAt).getTime() - ROUND_JOIN_BUFFER_MS
-
       if (Date.now() >= playableUntil) {
         onNav('waiting')
         return
@@ -426,8 +433,23 @@ export default function RoundPage({ onNav }) {
       const responseResult = await api.get(`/api/response/${activeRound.id}/me`)
       const loadedQuestions = questionResult?.data || []
       const loadedResponses = Array.isArray(responseResult) ? responseResult : []
-      const answeredIds = new Set(loadedResponses.map((item) => item.questionId))
-      const firstPendingIndex = loadedQuestions.findIndex((item) => !answeredIds.has(item.id))
+
+      // Load cached drafts from localStorage, but remove any that are already in DB
+      const dbAnsweredIds = new Set(loadedResponses.map((r) => r.questionId))
+      const cached = loadCache(activeRound.id)
+      const cleanedCache = Object.fromEntries(
+        Object.entries(cached).filter(([qId]) => !dbAnsweredIds.has(qId))
+      )
+      // Persist cleaned cache back
+      saveCache(activeRound.id, cleanedCache)
+      setDraftResponses(cleanedCache)
+
+      // Combine DB responses + draft responses to find first unanswered question
+      const allAnsweredIds = new Set([
+        ...loadedResponses.map((r) => r.questionId),
+        ...Object.keys(cleanedCache),
+      ])
+      const firstPendingIndex = loadedQuestions.findIndex((item) => !allAnsweredIds.has(item.id))
 
       setQuestions(loadedQuestions)
       setResponses(loadedResponses)
@@ -456,6 +478,7 @@ export default function RoundPage({ onNav }) {
     }
   }, [loading, round, error, onNav])
 
+  // ─── FINISH ────────────────────────────────────────────────────────────────
   const finishRound = useCallback(
     async ({ silent = false } = {}) => {
       if (!round || finishTriggeredRef.current) return
@@ -473,6 +496,8 @@ export default function RoundPage({ onNav }) {
         }
       }
 
+      clearCache(round.id)
+
       try {
         const upcomingRound = await api.get('/api/round/upcoming')
         if (upcomingRound) {
@@ -487,48 +512,46 @@ export default function RoundPage({ onNav }) {
     [api, onNav, round],
   )
 
+  // ─── DERIVED STATE ─────────────────────────────────────────────────────────
   const currentQuestion = questions[currentIndex]
+
+  // currentResponse: prefer DB response, fall back to draft
   const currentResponse = currentQuestion
-    ? responses.find((response) => response.questionId === currentQuestion.id)
+    ? responses.find((r) => r.questionId === currentQuestion.id) ||
+      (draftResponses[currentQuestion.id]
+        ? { questionId: currentQuestion.id, submittedAnswer: draftResponses[currentQuestion.id] }
+        : null)
     : null
 
-  const experience = roundExperience || {
-    sceneTheme,
-    stageCharacters,
-    roundNarrative,
-  }
-
+  const experience = roundExperience || { sceneTheme, stageCharacters, roundNarrative }
   const effectiveSceneTheme = experience.sceneTheme
   const effectiveStageCharacters = experience.stageCharacters
   const effectiveRoundNarrative = experience.roundNarrative
 
+  // Count answers for progress: DB responses + drafts (no double-count)
+  const dbAnsweredIds = new Set(responses.map((r) => r.questionId))
+  const allAnsweredIds = new Set([...dbAnsweredIds, ...Object.keys(draftResponses)])
+  const answeredCount = allAnsweredIds.size
+  const totalQuestions = questions.length
+  const playableUntil = round ? getPlayableUntil(round) : null
+  const progress = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0
+
   const preQuestionSequence = useMemo(() => {
     if (!currentQuestion) return []
-
-    const introItems = currentIndex === 0 && responses.length === 0
+    const introItems = currentIndex === 0 && answeredCount === 0
       ? resolveNarrativeSequence(effectiveRoundNarrative.preQuestion, {}, currentIndex + 1)
       : []
-
     const duringItems = resolveNarrativeSequence(
       effectiveRoundNarrative.duringQuestion,
-      {
-        questionNumber: currentIndex + 1,
-        totalQuestions: questions.length,
-      },
+      { questionNumber: currentIndex + 1, totalQuestions: questions.length },
       currentIndex + 1,
     )
-
-    return [
-      ...introItems,
-      ...duringItems,
-    ]
-  }, [currentIndex, currentQuestion, questions.length, responses.length, effectiveRoundNarrative])
+    return [...introItems, ...duringItems]
+  }, [currentIndex, currentQuestion, questions.length, answeredCount, effectiveRoundNarrative])
 
   const postAnswerSequence = useMemo(() => {
     if (!currentResponse) return []
-
     const lastQuestionPhrase = currentIndex === questions.length - 1 ? 'This was the final answer.' : 'Onwards.'
-
     return resolveNarrativeSequence(
       effectiveRoundNarrative.afterAnswer,
       {
@@ -547,26 +570,44 @@ export default function RoundPage({ onNav }) {
   const showQuestionCard = phase === 'question' && !activeDialogue && currentQuestion
   const showAnswerReveal = phase === 'answer' && !activeDialogue && currentQuestion && currentResponse
 
+  // ─── SUBMIT ────────────────────────────────────────────────────────────────
+  // Saves to localStorage immediately so refresh restores the answer without
+  // re-submitting. The DB POST is fire-and-forget after caching.
   const submitAnswer = async (submittedAnswer) => {
-    if (!currentQuestion) return
+    if (!currentQuestion || !round) return
     setSubmitting(true)
 
+    // 1. Cache locally first — this survives a refresh
+    const updatedDrafts = { ...draftResponses, [currentQuestion.id]: submittedAnswer }
+    setDraftResponses(updatedDrafts)
+    saveCache(round.id, updatedDrafts)
+
+    // 2. Optimistically move to answer-reveal phase
+    setPhase('answer')
+    setSequenceIndex(0)
+    setError(null)
+
+    // 3. Submit to DB in background
     try {
       await api.post('/api/response', {
         questionId: currentQuestion.id,
         submittedAnswer,
       })
-
-      const nextResponse = { questionId: currentQuestion.id, submittedAnswer }
+      // On success: add to DB responses and remove from drafts
+      const confirmedResponse = { questionId: currentQuestion.id, submittedAnswer }
       setResponses((prev) => {
         const withoutCurrent = prev.filter((item) => item.questionId !== currentQuestion.id)
-        return [...withoutCurrent, nextResponse]
+        return [...withoutCurrent, confirmedResponse]
       })
-      setPhase('answer')
-      setSequenceIndex(0)
-      setError(null)
+      setDraftResponses((prev) => {
+        const next = { ...prev }
+        delete next[currentQuestion.id]
+        saveCache(round.id, next)
+        return next
+      })
     } catch (err) {
-      setError(err.message)
+      // DB failed but draft is still cached — user can refresh and reattempt
+      setError(`Answer saved locally but failed to sync: ${err.message}. You can refresh to retry.`)
     } finally {
       setSubmitting(false)
     }
@@ -582,11 +623,7 @@ export default function RoundPage({ onNav }) {
     setSequenceIndex((value) => value + 1)
   }
 
-  const answeredCount = responses.length
-  const totalQuestions = questions.length
-  const playableUntil = round ? getPlayableUntil(round) : null
-  const progress = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0
-
+  // ─── RENDER ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="flex justify-center py-24">
@@ -606,28 +643,25 @@ export default function RoundPage({ onNav }) {
 
   return (
     <>
-      {/* Experience Layer - Characters and Dialogue at page level */}
+      {/* Experience Layer */}
       <StageCharacter character={effectiveStageCharacters.curator} visible={highlightedCharacter === 'curator'} />
       <StageCharacter character={effectiveStageCharacters.signal} visible={highlightedCharacter === 'signal'} />
       {activeDialogue && <SceneDialogue item={activeDialogue} onAdvance={advanceSequence} sceneTheme={effectiveSceneTheme} />}
 
-      {/* Background - Page level styling */}
+      {/* Background */}
       <div
         className="fixed inset-0 -z-50 pointer-events-none"
-        style={{
-          background: effectiveSceneTheme.frame.background,
-        }}
+        style={{ background: effectiveSceneTheme.frame.background }}
       />
       <div
         className="fixed inset-0 -z-40 pointer-events-none rounded-[2rem]"
         style={{ background: effectiveSceneTheme.stage.backgroundImage }}
       />
 
-      {/* Main Content - Progress and Q&A Overlay */}
+      {/* Main Content */}
       <div className="space-y-6">
         {error && <Alert type="error">{error}</Alert>}
 
-        {/* Header: Title on left, Timer on right */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="text-xs uppercase tracking-[0.35em] text-amber-200/80">Active round</div>
@@ -636,21 +670,17 @@ export default function RoundPage({ onNav }) {
           {playableUntil && <Timer targetTime={playableUntil} label="Playable until" onExpire={() => finishRound({ silent: true })} />}
         </div>
 
-        {/* Progress Bar - Compact on left */}
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
             <div className="text-xs uppercase tracking-[0.3em] text-slate-400 mb-2">Progress</div>
             <div className="text-lg font-semibold text-white">{progress}%</div>
-            <div className="text-xs text-slate-400 mt-1">
-              {answeredCount}/{totalQuestions}
-            </div>
+            <div className="text-xs text-slate-400 mt-1">{answeredCount}/{totalQuestions}</div>
             <div className="mt-2 w-32 h-2 overflow-hidden rounded-full bg-white/10">
               <div className="h-full rounded-full bg-amber-300 transition-all" style={{ width: `${progress}%` }} />
             </div>
           </div>
         </div>
 
-        {/* Q&A Overlay - Centered Modal */}
         <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
           <div className="pointer-events-auto">
             {currentQuestion ? (

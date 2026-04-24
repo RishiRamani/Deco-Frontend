@@ -60,9 +60,6 @@ export default function LeaderboardPage() {
         <div>
           <div className="text-xs uppercase tracking-[0.35em] text-amber-200/80">Leaderboard</div>
           <h1 className="mt-2 text-4xl font-semibold text-white">Cumulative standings</h1>
-          <p className="mt-3 text-sm leading-7 text-slate-300">
-            Totals come from `GET /api/leaderboard`, so this view combines all finished rounds.
-          </p>
         </div>
         <Btn variant="secondary" loading={refreshing} onClick={() => load(true)}>
           Refresh
