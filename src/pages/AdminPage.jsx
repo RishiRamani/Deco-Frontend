@@ -2,7 +2,48 @@ import { useState, useEffect } from 'react'
 import { useApi } from '../hooks/useApi'
 import { Btn, Input, Textarea, Alert, Spinner, StatusBadge, Badge } from '../components/UI'
 
-// ── Rounds Tab ──────────────────────────────────────────────────────────────
+// ── Maintenance Tab ──────────────────────────────────────────────────────────────
+function MaintenanceTab() {
+  const api = useApi()
+  const [truncating, setTruncating] = useState(false)
+  const [msg, setMsg] = useState(null)
+
+  const flash = (type, text) => {
+    setMsg({ type, text })
+    setTimeout(() => setMsg(null), 4000)
+  }
+
+  const truncateTables = async () => {
+    if (!confirm('Are you sure you want to truncate all question, response, round, and roundresult tables? This action cannot be undone.')) {
+      return
+    }
+    setTruncating(true)
+    try {
+      await api.post('/api/admin/truncate')
+      flash('success', 'Tables truncated successfully')
+    } catch (e) {
+      flash('error', e.message)
+    } finally {
+      setTruncating(false)
+    }
+  }
+
+  return (
+    <div className="space-y-5">
+      {msg && <Alert type={msg.type}>{msg.text}</Alert>}
+
+      <div className="card p-5">
+        <h3 className="font-display text-white text-lg mb-4">Database Maintenance</h3>
+        <p className="text-slate-300 mb-4">
+          Truncate all data from question, response, round, and roundresult tables. Use with caution.
+        </p>
+        <Btn onClick={truncateTables} loading={truncating} variant="danger">
+          Truncate All Tables
+        </Btn>
+      </div>
+    </div>
+  )
+}
 function RoundsTab() {
   const api = useApi()
   const [rounds, setRounds] = useState([])
@@ -177,26 +218,31 @@ function QuestionsTab() {
     if (!roundId || !form.text || !form.answer || !form.reward) return
     setSubmitting(true)
     try {
-
       const opts = form.options
         .split(",")
         .map(opt => opt.trim())
-        .filter(opt => opt.length > 0);
+        .filter(opt => opt.length > 0)
 
-      if (opts.length < 2) {
-        flash("error", "Enter at least 2 options separated by commas");
-        setSubmitting(false);
-        return;
-      }
-      
-      await api.post('/api/question', {
+      // Allow both MCQ (with options) and textual questions (without options)
+      const payload = {
         roundId: Number(roundId),
         text: form.text,
-        options: opts,
         answer: form.answer,
         ...(form.link && { link: form.link }),
         reward: Number(form.reward),
-      })
+      }
+
+      // Only add options if provided
+      if (opts.length > 0) {
+        if (opts.length < 2) {
+          flash("error", "MCQ must have at least 2 options. Leave blank for textual question.");
+          setSubmitting(false);
+          return;
+        }
+        payload.options = opts
+      }
+
+      await api.post('/api/question', payload)
       setForm({ text: '', options: '', answer: '', link: '', reward: '' })
       flash('success', 'Question created!')
       fetchQuestions()
@@ -262,10 +308,10 @@ function QuestionsTab() {
           <Input label="Reward (points) *" value={form.reward} onChange={e => setForm(f => ({ ...f, reward: e.target.value }))} placeholder="10" />
         </div>
         <Textarea
-          label='Options JSON (optional — for MCQ e.g. {"A":"Paris","B":"London"})'
+          label='Options (optional — for MCQ, comma-separated. Leave blank for textual question)'
           value={form.options}
           onChange={e => setForm(f => ({ ...f, options: e.target.value }))}
-          placeholder='Paris, London, Berlin, India'
+          placeholder='E.g., Paris, London, Berlin, India'
           rows={2}
         />
         <Input label="Reference link (optional)" value={form.link} onChange={e => setForm(f => ({ ...f, link: e.target.value }))} placeholder="https://..." />
@@ -331,6 +377,7 @@ export default function AdminPage() {
   const tabs = [
     { id: 'rounds', label: '🔄 Rounds' },
     { id: 'questions', label: '❓ Questions' },
+    { id: 'maintenance', label: '🛠️ Maintenance' },
   ]
 
   return (
@@ -356,6 +403,7 @@ export default function AdminPage() {
 
       {tab === 'rounds' && <RoundsTab />}
       {tab === 'questions' && <QuestionsTab />}
+      {tab === 'maintenance' && <MaintenanceTab />}
     </div>
   )
 }

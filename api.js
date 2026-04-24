@@ -14,6 +14,16 @@ export async function api(path, options = {}, token = null) {
   let data
   try { data = JSON.parse(text) } catch { data = { message: text } }
 
-  if (!res.ok) throw Object.assign(new Error(data?.message || 'Request failed'), { status: res.status, data })
+  if (!res.ok) {
+    let errorMessage = data?.message || 'Request failed'
+    if (res.status === 403) {
+      if (token) {
+        errorMessage = "Sorry, you're not in the allowed emails. Try registering if not logged in, otherwise it asks for login."
+      } else {
+        errorMessage = "Please log in to access this feature."
+      }
+    }
+    throw Object.assign(new Error(errorMessage), { status: res.status, data })
+  }
   return data
 }

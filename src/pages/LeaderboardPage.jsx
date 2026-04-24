@@ -54,7 +54,8 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-xs uppercase tracking-[0.35em] text-amber-200/80">Leaderboard</div>
@@ -143,5 +144,13 @@ export default function LeaderboardPage() {
         )}
       </Panel>
     </div>
+
+    <div className="mt-12 text-center">
+      <h2 className="text-2xl font-semibold text-white mb-4">Credits</h2>
+      <p className="text-slate-300 max-w-2xl mx-auto">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      </p>
+    </div>
+    </>
   )
 }

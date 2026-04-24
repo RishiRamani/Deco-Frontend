@@ -43,41 +43,54 @@ export default function WaitingPage({ onNav, forcedMessage }) {
     pollingRef.current = true
 
     try {
-      const activeResult = await apiRef.current.get('/api/round/active').then(
+      // Get comprehensive round info (current and next round)
+      const roundInfoResult = await apiRef.current.get('/api/round/info').then(
         (value) => ({ status: 'fulfilled', value }),
         (reason) => ({ status: 'rejected', reason }),
       )
 
-      let activeRoundData = null
-      let upcomingRoundData = null
+      let currentRound = null
+      let nextRound = null
       let errorMsg = null
 
-      if (activeResult.status === 'fulfilled') {
-        activeRoundData = activeResult.value
+      if (roundInfoResult.status === 'fulfilled') {
+        const info = roundInfoResult.value
+        currentRound = info?.current || null
+        nextRound = info?.next || null
       } else {
-        const err = activeResult.reason
-        if (err?.status === 404) {
-          const upcomingResult = await apiRef.current.get('/api/round/upcoming').then(
-            (value) => ({ status: 'fulfilled', value }),
-            (reason) => ({ status: 'rejected', reason }),
-          )
+        // Fallback to old behavior if new endpoint fails
+        const activeResult = await apiRef.current.get('/api/round/active').then(
+          (value) => ({ status: 'fulfilled', value }),
+          (reason) => ({ status: 'rejected', reason }),
+        )
 
-          if (upcomingResult.status === 'fulfilled') {
-            upcomingRoundData = upcomingResult.value
-          } else if (upcomingResult.reason?.status !== 404) {
-            errorMsg = upcomingResult.reason.message
-          }
+        if (activeResult.status === 'fulfilled') {
+          currentRound = activeResult.value
         } else {
-          errorMsg = err.message
+          const err = activeResult.reason
+          if (err?.status === 404) {
+            const upcomingResult = await apiRef.current.get('/api/round/upcoming').then(
+              (value) => ({ status: 'fulfilled', value }),
+              (reason) => ({ status: 'rejected', reason }),
+            )
+
+            if (upcomingResult.status === 'fulfilled') {
+              nextRound = upcomingResult.value
+            } else if (upcomingResult.reason?.status !== 404) {
+              errorMsg = upcomingResult.reason.message
+            }
+          } else {
+            errorMsg = err.message
+          }
         }
       }
 
       if (mountedRef.current) {
-        setActiveRound(activeRoundData)
-        setUpcomingRound(activeRoundData ? null : upcomingRoundData)
+        setActiveRound(currentRound)
+        setUpcomingRound(nextRound)
         setError(errorMsg)
 
-        if (isPlayable(activeRoundData)) {
+        if (isPlayable(currentRound)) {
           onNavRef.current('round')
         }
       }
@@ -114,19 +127,36 @@ export default function WaitingPage({ onNav, forcedMessage }) {
 
   const waitingReason = useMemo(() => {
     if (forcedMessage) return forcedMessage
-    if (!activeRound) return 'No active round is currently available. This screen will keep checking for one.'
-    return 'A round is active, but the join window is already inside the final five minutes, so new runs are paused.'
-  }, [activeRound, forcedMessage])
+    if (!activeRound && !upcomingRound) return 'No active or upcoming rounds available. This screen will keep checking for one.'
+    if (activeRound) return 'A round is active, but the join window is already inside the final five minutes, so new runs are paused.'
+    return 'No active round available. Waiting for the next round to start.'
+  }, [activeRound, upcomingRound, forcedMessage])
 
-  const timerTarget = !activeRound && upcomingRound ? upcomingRound.startedAt : activeRound ? activeRound.endsAt : null
-  const timerLabel = !activeRound && upcomingRound ? 'Next round starts in' : activeRound ? 'Current round ends in' : 'Waiting'
+  const timerTarget = upcomingRound ? upcomingRound.startedAt : null
+  const timerLabel = upcomingRound ? 'Next round starts in' : 'Waiting'
+
+  const formatDateTime = (date) => {
+    const d = new Date(date)
+    return d.toLocaleString()
+  }
+
+  const formatCountdown = (date) => {
+    const diff = new Date(date).getTime() - new Date().getTime()
+    const hours = Math.floor(diff / 3600000)
+    const mins = Math.floor((diff % 3600000) / 60000)
+    const secs = Math.floor((diff % 60000) / 1000)
+    if (hours > 0) return `${hours}h ${mins}m`
+    if (mins > 0) return `${mins}m ${secs}s`
+    return `${secs}s`
+  }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-      <Panel>
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-16">
+      <Panel className="max-w-3xl w-full">
         <div className="mb-3 text-xs uppercase tracking-[0.35em] text-cyan-200/80">Waiting</div>
         <h1 className="text-4xl font-semibold text-white">{appCopy.waiting.title}</h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">{waitingReason}</p>
+
         <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[linear-gradient(135deg,rgba(34,211,238,0.18),rgba(15,23,42,0.85))] p-8">
           <div className="mb-4 text-sm text-slate-100">{appCopy.waiting.description}</div>
           {timerTarget ? (
@@ -142,43 +172,16 @@ export default function WaitingPage({ onNav, forcedMessage }) {
             </div>
           )}
         </div>
-        <div className="mt-6 flex flex-wrap gap-3">
+
+        {error && <Alert type="error" className="mt-6">{error}</Alert>}
+
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Btn onClick={pollActiveRound}>Refresh now</Btn>
           <Btn variant="secondary" onClick={() => onNav('home')}>
             Back home
           </Btn>
         </div>
       </Panel>
-
-      <div className="space-y-6">
-        {error && <Alert type="error">{error}</Alert>}
-        <Panel>
-          <div className="text-lg font-medium text-white">Polling strategy</div>
-          <p className="mt-3 text-sm leading-7 text-slate-300">
-            The waiting screen polls `GET /api/round/active` every {ACTIVE_ROUND_POLL_MS / 1000} seconds and automatically redirects to the round once a playable window is available.
-          </p>
-        </Panel>
-        {activeRound && (
-          <Panel>
-            <div className="text-lg font-medium text-white">Current active round</div>
-            <div className="mt-4 text-sm leading-7 text-slate-300">
-              <div>Round #{activeRound.id}</div>
-              <div>Started: {new Date(activeRound.startedAt).toLocaleString()}</div>
-              <div>Ends: {new Date(activeRound.endsAt).toLocaleString()}</div>
-            </div>
-          </Panel>
-        )}
-        {!activeRound && upcomingRound && (
-          <Panel>
-            <div className="text-lg font-medium text-white">Next round</div>
-            <div className="mt-4 text-sm leading-7 text-slate-300">
-              <div>Round #{upcomingRound.id}</div>
-              <div>Starts: {new Date(upcomingRound.startedAt).toLocaleString()}</div>
-              <div>Ends: {new Date(upcomingRound.endsAt).toLocaleString()}</div>
-            </div>
-          </Panel>
-        )}
-      </div>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { SignedIn, SignedOut, useAuth } from '@clerk/clerk-react'
+import { useAuth } from '@clerk/clerk-react'
 import { api } from '../api'
 
 import Layout from './components/Layout'
@@ -20,7 +20,7 @@ function getHashPage() {
 }
 
 function AuthenticatedApp() {
-  const { getToken } = useAuth()
+  const { getToken, isSignedIn } = useAuth()
   const [page, setPage] = useState(getHashPage)
   const [userRole, setUserRole] = useState(null)
 
@@ -32,6 +32,10 @@ function AuthenticatedApp() {
 
   useEffect(() => {
     const fetchMe = async () => {
+      if (!isSignedIn) {
+        setUserRole(null)
+        return
+      }
       try {
         const token = await getToken()
         const data = await api('/api/auth/me', {}, token)
@@ -42,9 +46,15 @@ function AuthenticatedApp() {
     }
 
     fetchMe()
-  }, [getToken])
+  }, [getToken, isSignedIn])
 
   const navigate = useCallback((nextPage) => {
+    const requiresSignIn = ['round', 'waiting', 'admin']
+    if (requiresSignIn.includes(nextPage) && !isSignedIn) {
+      window.location.hash = 'signin'
+      return
+    }
+
     if (nextPage === 'admin' && userRole !== 'ORGANIZER') {
       return
     }
@@ -52,13 +62,14 @@ function AuthenticatedApp() {
     const target = nextPage || DEFAULT_PAGE
     window.location.hash = target
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [userRole])
+  }, [userRole, isSignedIn])
 
   const pages = useMemo(
     () => ({
-      home: <HomePage onNav={navigate} />,
+      home: <HomePage onNav={navigate} userRole={userRole} />,
       about: <AboutPage onNav={navigate} />,
       registration: <RegistrationPage onNav={navigate} />,
+      signin: <SignInPage />,
       round: <RoundPage onNav={navigate} userRole={userRole} />,
       waiting: <WaitingPage onNav={navigate} userRole={userRole} />,
       leaderboard: <LeaderboardPage />,
@@ -80,14 +91,5 @@ function AuthenticatedApp() {
 }
 
 export default function App() {
-  return (
-    <>
-      <SignedOut>
-        <SignInPage />
-      </SignedOut>
-      <SignedIn>
-        <AuthenticatedApp />
-      </SignedIn>
-    </>
-  )
+  return <AuthenticatedApp />
 }

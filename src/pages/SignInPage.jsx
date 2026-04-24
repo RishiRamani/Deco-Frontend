@@ -15,9 +15,9 @@ export default function SignInPage() {
           Real-time quiz competition
         </div>
         <h1 className="text-5xl font-display font-700 text-white tracking-tight">
-          Quiz<span className="text-orange-500">Arena</span>
+          Deco<span className="text-orange-500">Disaster</span>
         </h1>
-        <p className="text-[#6b6b7a] mt-2 text-base">Sign in to compete and climb the leaderboard</p>
+        <p className="text-[#6b6b7a] mt-2 text-base">Sign in to DecoDisaster</p>
       </div>
 
       <div className="relative z-10 fade-up-1">

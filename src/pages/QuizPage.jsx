@@ -720,19 +720,39 @@ export default function QuizPage({ onNav }) {
     const init = async () => {
       try {
         const round = await api.get('/api/round/active')
+        if (!round || !round?.id) {
+          onNav('waiting')
+          return
+        }
         setActiveRound(round)
+
         try {
           const status = await api.get(`/api/round/status/${round.id}`)
-          if (!status.started) { setError('Please start the round first'); onNav('round'); setLoading(false); return }
-          if (status.finished) { onNav('leaderboard'); setLoading(false); return }
-        } catch {}
+          if (!status.started) {
+            setError('Please start the round first')
+            onNav('round')
+            setLoading(false)
+            return
+          }
+          if (status.finished) {
+            onNav('leaderboard')
+            setLoading(false)
+            return
+          }
+        } catch (statusError) {
+          console.warn('Round status check failed', statusError)
+        }
+
         const qData = await api.get(`/api/question/round/${round.id}`)
         const qs = qData?.data || qData || []
         setQuestions(qs)
         const rData = await api.get(`/api/response/${round.id}/me`)
         setResponses(Array.isArray(rData) ? rData : [])
-      } catch (e) { setError(e.message) }
-      finally { setLoading(false) }
+      } catch (e) {
+        setError(e.message)
+      } finally {
+        setLoading(false)
+      }
     }
     init()
   }, [])

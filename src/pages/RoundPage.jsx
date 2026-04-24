@@ -66,20 +66,43 @@ function getPlayableUntil(round) {
 }
 
 function StageCharacter({ character, visible }) {
+  // Extract customization or use defaults
+  const customStyles = character.customStyles || {}
+  const borderRadiusClass = customStyles.borderRadiusClass || 'rounded-[3rem]'
+  const borderColor = customStyles.borderColor || `${character.accent}66`
+  const shadowClass = customStyles.shadowClass || 'shadow-[0_35px_100px_rgba(2,6,23,0.55)]'
+  const nameClass = customStyles.nameClass || 'text-lg font-medium text-white'
+  const nameBackgroundClass = customStyles.nameBackgroundClass || 'bg-transparent'
+  const containerTransition = customStyles.containerTransition || 'transition duration-500'
+  const imageClass = customStyles.imageClass || 'w-full h-full object-cover'
+
   return (
     <div
-      className={`pointer-events-none absolute z-10 hidden rounded-[3rem] border shadow-[0_35px_100px_rgba(2,6,23,0.55)] transition duration-500 lg:block ${
+      className={`pointer-events-none fixed border ${borderRadiusClass} ${shadowClass} ${containerTransition} ${
         visible ? 'opacity-100 translate-y-0' : 'opacity-35 translate-y-4'
       }`}
       style={{
-        borderColor: `${character.accent}66`,
-        background: `radial-gradient(circle at 50% 20%, ${character.accent}55, rgba(15,23,42,0.92) 55%)`,
+        borderColor: borderColor,
         width: character.size,
         height: `calc(${character.size} * 1.1)`,
         ...character.style,
       }}
     >
-      <div className="absolute inset-x-0 bottom-6 text-center text-lg font-medium text-white">{character.name}</div>
+      {character.image ? (
+        <img
+          src={character.image}
+          alt={character.name}
+          className={`${imageClass} ${borderRadiusClass}`}
+        />
+      ) : (
+        <div
+          className={`w-full h-full ${borderRadiusClass}`}
+          style={{
+            background: customStyles.fallbackBackground || `radial-gradient(circle at 50% 20%, ${character.accent}55, rgba(15,23,42,0.92) 55%)`,
+          }}
+        />
+      )}
+      <div className={`absolute inset-x-0 bottom-6 text-center ${nameClass} ${nameBackgroundClass}`}>{character.name}</div>
     </div>
   )
 }
@@ -87,16 +110,74 @@ function StageCharacter({ character, visible }) {
 function SceneDialogue({ item, onAdvance, sceneTheme }) {
   if (!item) return null
 
+  const [isPlaying, setIsPlaying] = useState(false)
+  const audioRef = useRef(null)
+
+  const handlePlayAudio = (e) => {
+    e.stopPropagation()
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+        setIsPlaying(false)
+      } else {
+        audioRef.current.play()
+        setIsPlaying(true)
+      }
+    }
+  }
+
+  const handleAudioEnded = () => {
+    setIsPlaying(false)
+  }
+
+  // Extract dialogue customization from sceneTheme or use defaults
+  const dialogueCustom = sceneTheme.dialogueBox?.customStyles || {}
+  const speakerClass = dialogueCustom.speakerClass || 'text-xs uppercase tracking-[0.3em] text-slate-500'
+  const textClass = dialogueCustom.textClass || 'mt-4 text-base leading-8'
+  const transcriptClass = dialogueCustom.transcriptClass || 'mt-5 rounded-[1.5rem] border border-white/10 bg-slate-950/10 px-4 py-3 text-sm leading-7 text-slate-700'
+  const continueClass = dialogueCustom.continueClass || 'mt-5 text-right text-xs uppercase tracking-[0.25em] text-slate-500'
+  const voicePlayerBgClass = dialogueCustom.voicePlayerBgClass || 'mt-5 flex items-center gap-3 rounded-lg bg-slate-900/50 p-3'
+  const playButtonClass = dialogueCustom.playButtonClass || 'flex-shrink-0 rounded-full bg-cyan-500 hover:bg-cyan-600 p-2 transition'
+  const voiceTextClass = dialogueCustom.voiceTextClass || 'text-xs text-slate-400'
+
+  // NEW: Dialogue bubble customization
+  const voiceMemoBoxClass = dialogueCustom.voiceMemoBoxClass || 'fixed bottom-12 left-1/2 -translate-x-1/2 z-30 max-w-2xl rounded-[2rem] border border-cyan-300/25 bg-cyan-100/95 p-6 text-left text-slate-900 shadow-[0_25px_80px_rgba(34,211,238,0.2)]'
+  const normalBoxClass = dialogueCustom.normalBoxClass || 'fixed bottom-12 left-1/2 -translate-x-1/2 z-30 max-w-2xl rounded-[2rem] p-6 text-left shadow-[0_25px_80px_rgba(255,255,255,0.18)]'
+  const bubbleContainerClass = sceneTheme.dialogueBox?.bubbleContainerClass || 'rounded-[2rem]'
+  const bubbleImage = sceneTheme.dialogueBox?.bubbleImage
+  const bubbleImageOpacity = sceneTheme.dialogueBox?.bubbleImageOpacity ?? 1
+
   const body = (
     <>
-      <div className="text-xs uppercase tracking-[0.3em] text-slate-500">{item.speaker}</div>
-      <p className="mt-4 text-base leading-8">{item.text}</p>
+      <div className={speakerClass}>{item.speaker}</div>
+      <p className={textClass}>{item.text}</p>
       {item.type === 'voiceMemo' && (
-        <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-slate-950/10 px-4 py-3 text-sm leading-7 text-slate-700">
-          {item.transcript}
-        </div>
+        <>
+          {item.voiceFile && (
+            <div className={voicePlayerBgClass}>
+              <button
+                type="button"
+                onClick={handlePlayAudio}
+                className={playButtonClass}
+              >
+                <span className="text-white font-bold">{isPlaying ? '⏸' : '▶'}</span>
+              </button>
+              <span className={voiceTextClass}>{isPlaying ? 'Playing...' : 'Play voice memo'}</span>
+              <audio
+                ref={audioRef}
+                src={item.voiceFile}
+                onEnded={handleAudioEnded}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+              />
+            </div>
+          )}
+          <div className={transcriptClass}>
+            {item.transcript}
+          </div>
+        </>
       )}
-      <div className="mt-5 text-right text-xs uppercase tracking-[0.25em] text-slate-500">Click to continue</div>
+      <div className={continueClass}>Click to continue</div>
     </>
   )
 
@@ -105,7 +186,14 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
       <button
         type="button"
         onClick={onAdvance}
-        className="relative z-30 w-full max-w-2xl rounded-[2rem] border border-cyan-300/25 bg-cyan-100/95 p-6 text-left text-slate-900 shadow-[0_25px_80px_rgba(34,211,238,0.2)]"
+        className={voiceMemoBoxClass}
+        style={{
+          ...(dialogueCustom.voiceMemoBoxStyle || {}),
+          backgroundImage: bubbleImage ? `url(${bubbleImage})` : undefined,
+          backgroundSize: bubbleImage ? 'cover' : undefined,
+          backgroundPosition: bubbleImage ? 'center' : undefined,
+          opacity: bubbleImage ? bubbleImageOpacity : undefined,
+        }}
       >
         {body}
       </button>
@@ -116,11 +204,17 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
     <button
       type="button"
       onClick={onAdvance}
-      className="relative z-30 w-full max-w-2xl rounded-[2rem] p-6 text-left shadow-[0_25px_80px_rgba(255,255,255,0.18)]"
+      className={`${normalBoxClass} ${bubbleContainerClass}`}
       style={{
-        background: sceneTheme.dialogueBox.background,
+        background: bubbleImage 
+          ? `url(${bubbleImage})` 
+          : sceneTheme.dialogueBox.background,
+        backgroundSize: bubbleImage ? 'cover' : undefined,
+        backgroundPosition: bubbleImage ? 'center' : undefined,
         border: sceneTheme.dialogueBox.border,
         color: sceneTheme.dialogueBox.color,
+        opacity: bubbleImage ? bubbleImageOpacity : 1,
+        ...(dialogueCustom.normalBoxStyle || {}),
       }}
     >
       {body}
@@ -142,23 +236,29 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
     onSubmit(answer)
   }
 
+  // Get custom text styles or use defaults
+  const questionNumberClass = sceneTheme.questionBox.numberClass || 'text-xs uppercase tracking-[0.3em] text-cyan-200/80'
+  const questionTitleClass = sceneTheme.questionBox.titleClass || 'mt-3 max-w-2xl text-2xl font-medium text-white'
+  const optionClass = sceneTheme.questionBox.optionClass || 'rounded-[1.5rem] border px-4 py-4 text-left text-sm transition'
+  const borderRadiusClass = sceneTheme.questionBox.borderRadiusClass || 'rounded-[2rem]'
+  const boxShadow = sceneTheme.questionBox.boxShadow || 'shadow-[0_35px_100px_rgba(2,6,23,0.45)]'
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative z-30 mt-6 rounded-[2rem] p-6 shadow-[0_35px_100px_rgba(2,6,23,0.45)]"
+      className={`${borderRadiusClass} p-6 ${boxShadow} max-w-2xl w-full`}
       style={{
-        width: sceneTheme.questionBox.width,
-        minHeight: sceneTheme.questionBox.minHeight,
         background: sceneTheme.questionBox.background,
         border: sceneTheme.questionBox.border,
+        minHeight: sceneTheme.questionBox.minHeight,
       }}
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/80">Question {questionNumber}</div>
-          <h2 className="mt-3 max-w-2xl text-2xl font-medium text-white">{question.text}</h2>
+        <div className="flex-1">
+          <div className={questionNumberClass}>Question {questionNumber}</div>
+          <h2 className={questionTitleClass}>{question.text}</h2>
         </div>
-        <div className="rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-sm text-amber-100">
+        <div className="flex-shrink-0 rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-sm text-amber-100">
           {question.reward} pts
         </div>
       </div>
@@ -177,7 +277,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
                 key={option.key}
                 type="button"
                 onClick={() => setAnswer(option.value)}
-                className={`rounded-[1.5rem] border px-4 py-4 text-left text-sm transition ${
+                className={`${optionClass} ${
                   answer === option.value
                     ? 'border-cyan-300/40 bg-cyan-300/10 text-white'
                     : 'border-white/10 bg-white/5 text-slate-200 hover:bg-white/10'
@@ -197,9 +297,9 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
         )}
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-3">
+      <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="text-sm text-slate-400">{totalQuestions - questionNumber} questions remain after this one.</div>
-        <Btn type="submit" loading={loading} disabled={!answer.trim()}>
+        <Btn type="submit" loading={loading} disabled={!answer.trim()} className="w-full sm:w-auto">
           Submit
         </Btn>
       </div>
@@ -208,19 +308,25 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
 }
 
 function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, onFinish, sceneTheme }) {
+  // Get custom text styles or use defaults
+  const answerLabelClass = sceneTheme.answerRevealBox.labelClass || 'text-xs uppercase tracking-[0.35em] text-cyan-100/70'
+  const answerTextClass = sceneTheme.answerRevealBox.answerClass || 'mt-6 text-xl leading-8 text-white'
+  const questionTextClass = sceneTheme.answerRevealBox.questionClass || 'mt-3 text-sm text-slate-300'
+  const borderRadiusClass = sceneTheme.answerRevealBox.borderRadiusClass || 'rounded-[2rem]'
+  const boxShadow = sceneTheme.answerRevealBox.boxShadow || 'shadow-[0_35px_100px_rgba(8,145,178,0.24)]'
+
   return (
     <div
-      className="relative z-30 mt-6 flex flex-col items-center justify-center rounded-[2rem] px-8 py-10 text-center shadow-[0_35px_100px_rgba(8,145,178,0.24)]"
+      className={`flex flex-col items-center justify-center px-8 py-10 text-center ${borderRadiusClass} ${boxShadow} max-w-2xl w-full`}
       style={{
-        width: sceneTheme.answerRevealBox.width,
-        minHeight: sceneTheme.answerRevealBox.minHeight,
         background: sceneTheme.answerRevealBox.background,
         border: sceneTheme.answerRevealBox.border,
+        minHeight: sceneTheme.answerRevealBox.minHeight,
       }}
     >
-      <div className="text-xs uppercase tracking-[0.35em] text-cyan-100/70">Submitted Answer</div>
-      <div className="mt-6 text-xl leading-8 text-white">{submittedAnswer}</div>
-      <div className="mt-3 text-sm text-slate-300">{question.text}</div>
+      <div className={answerLabelClass}>Submitted Answer</div>
+      <div className={answerTextClass}>{submittedAnswer}</div>
+      <div className={questionTextClass}>{question.text}</div>
       <div className="mt-8">
         {isLastQuestion ? <Btn onClick={onFinish}>Finish</Btn> : <Btn onClick={onContinue}>Next question</Btn>}
       </div>
@@ -243,11 +349,53 @@ export default function RoundPage({ onNav }) {
   const [finishing, setFinishing] = useState(false)
   const finishTriggeredRef = useRef(false)
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // APPLY CUSTOM BODY ELEMENT STYLING
+  // ─────────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const styleTag = document.getElementById('round-custom-body-style')
+    if (roundExperience?.sceneTheme?.bodyElement) {
+      const customBody = roundExperience.sceneTheme.bodyElement
+      const css = `
+        body.round-custom-mode {
+          background: ${customBody.background || 'transparent'} !important;
+        }
+        body.round-custom-mode::before {
+          content: '';
+          position: fixed;
+          inset: 0;
+          background-image: ${customBody.gridPattern || 'none'};
+          background-size: ${customBody.gridPatternSize || '36px 36px'};
+          opacity: ${customBody.gridPatternOpacity !== undefined ? customBody.gridPatternOpacity : 0.2};
+          pointer-events: none;
+          z-index: -999;
+        }
+      `
+      
+      if (styleTag) {
+        styleTag.textContent = css
+      } else {
+        const newStyle = document.createElement('style')
+        newStyle.id = 'round-custom-body-style'
+        newStyle.textContent = css
+        document.head.appendChild(newStyle)
+      }
+      
+      document.body.classList.add('round-custom-mode')
+      return () => {
+        document.body.classList.remove('round-custom-mode')
+      }
+    } else {
+      if (styleTag) styleTag.textContent = ''
+      document.body.classList.remove('round-custom-mode')
+    }
+  }, [roundExperience?.sceneTheme?.bodyElement])
+
   const boot = useCallback(async () => {
     try {
       setLoading(true)
       const activeRound = await api.get('/api/round/active')
-      if (!activeRound) {
+      if (!activeRound || !activeRound?.id) {
         onNav('waiting')
         return
       }
@@ -301,6 +449,12 @@ export default function RoundPage({ onNav }) {
   useEffect(() => {
     boot()
   }, [boot])
+
+  useEffect(() => {
+    if (!loading && !round && !error) {
+      onNav('waiting')
+    }
+  }, [loading, round, error, onNav])
 
   const finishRound = useCallback(
     async ({ silent = false } = {}) => {
@@ -451,52 +605,55 @@ export default function RoundPage({ onNav }) {
   }
 
   return (
-    <div className="space-y-6">
-      {error && <Alert type="error">{error}</Alert>}
+    <>
+      {/* Experience Layer - Characters and Dialogue at page level */}
+      <StageCharacter character={effectiveStageCharacters.curator} visible={highlightedCharacter === 'curator'} />
+      <StageCharacter character={effectiveStageCharacters.signal} visible={highlightedCharacter === 'signal'} />
+      {activeDialogue && <SceneDialogue item={activeDialogue} onAdvance={advanceSequence} sceneTheme={effectiveSceneTheme} />}
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="text-xs uppercase tracking-[0.35em] text-amber-200/80">Active round</div>
-          <h1 className="mt-2 text-4xl font-semibold text-white">Round #{round?.id}</h1>
-        </div>
-        {playableUntil && <Timer targetTime={playableUntil} label="Playable until" onExpire={() => finishRound({ silent: true })} />}
-      </div>
-
-      <div className="grid gap-6 xl:grid-cols-[0.28fr_1fr]">
-        <div className="space-y-4">
-          <Panel>
-            <div className="text-xs uppercase tracking-[0.3em] text-slate-400">Progress</div>
-            <div className="mt-4 text-3xl font-semibold text-white">{progress}%</div>
-            <div className="mt-2 text-sm text-slate-300">
-              {answeredCount} of {totalQuestions} answers submitted
-            </div>
-            <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-amber-300 transition-all" style={{ width: `${progress}%` }} />
-            </div>
-          </Panel>
-        </div>
-
-        <div
-          className="relative overflow-hidden rounded-[2.5rem] border border-white/10 p-6 shadow-[0_35px_120px_rgba(2,6,23,0.42)]"
-          style={{
-            minHeight: sceneTheme.frame.minHeight,
-background: effectiveSceneTheme.frame.background,
-      }}
-    >
+      {/* Background - Page level styling */}
       <div
-        className="absolute inset-5 rounded-[2rem] border border-white/10"
+        className="fixed inset-0 -z-50 pointer-events-none"
+        style={{
+          background: effectiveSceneTheme.frame.background,
+        }}
+      />
+      <div
+        className="fixed inset-0 -z-40 pointer-events-none rounded-[2rem]"
         style={{ background: effectiveSceneTheme.stage.backgroundImage }}
       />
 
-      <StageCharacter character={effectiveStageCharacters.curator} visible={highlightedCharacter === 'curator'} />
-      <StageCharacter character={effectiveStageCharacters.signal} visible={highlightedCharacter === 'signal'} />
+      {/* Main Content - Progress and Q&A Overlay */}
+      <div className="space-y-6">
+        {error && <Alert type="error">{error}</Alert>}
 
-          <div className="relative z-20 flex min-h-[calc(100vh-14rem)] flex-col items-center justify-start px-2 pt-6">
-            {activeDialogue ? (
-              <div className="mt-10 w-full max-w-2xl">
-                <SceneDialogue item={activeDialogue} onAdvance={advanceSequence} sceneTheme={effectiveSceneTheme} />
-              </div>
-            ) : currentQuestion ? (
+        {/* Header: Title on left, Timer on right */}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="text-xs uppercase tracking-[0.35em] text-amber-200/80">Active round</div>
+            <h1 className="mt-2 text-4xl font-semibold text-white">Round #{round?.id}</h1>
+          </div>
+          {playableUntil && <Timer targetTime={playableUntil} label="Playable until" onExpire={() => finishRound({ silent: true })} />}
+        </div>
+
+        {/* Progress Bar - Compact on left */}
+        <div className="flex items-center gap-4">
+          <div className="flex-shrink-0">
+            <div className="text-xs uppercase tracking-[0.3em] text-slate-400 mb-2">Progress</div>
+            <div className="text-lg font-semibold text-white">{progress}%</div>
+            <div className="text-xs text-slate-400 mt-1">
+              {answeredCount}/{totalQuestions}
+            </div>
+            <div className="mt-2 w-32 h-2 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full rounded-full bg-amber-300 transition-all" style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Q&A Overlay - Centered Modal */}
+        <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
+          <div className="pointer-events-auto">
+            {currentQuestion ? (
               showAnswerReveal ? (
                 <AnswerReveal
                   question={currentQuestion}
@@ -518,21 +675,19 @@ background: effectiveSceneTheme.frame.background,
                 />
               ) : null
             ) : (
-              <div className="relative z-30 w-full max-w-2xl">
-                <Panel className="bg-emerald-300/10 text-center">
-                  <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">No questions</div>
-                  <div className="mt-4 text-2xl font-medium text-white">This round does not have any questions yet.</div>
-                  <div className="mt-6 flex justify-center">
-                    <Btn onClick={() => finishRound({ silent: true })} loading={finishing}>
-                      Finish round
-                    </Btn>
-                  </div>
-                </Panel>
-              </div>
+              <Panel className="bg-emerald-300/10 text-center">
+                <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">No questions</div>
+                <div className="mt-4 text-2xl font-medium text-white">This round does not have any questions yet.</div>
+                <div className="mt-6 flex justify-center">
+                  <Btn onClick={() => finishRound({ silent: true })} loading={finishing}>
+                    Finish round
+                  </Btn>
+                </div>
+              </Panel>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
