@@ -1,0 +1,89 @@
+{
+  "sceneTheme": {
+    "bodyElement": {
+      "background": "url('/backgrounds/r3-space-bg.png') center/cover no-repeat fixed",
+      "gridPattern": "none",
+      "gridPatternOpacity": 0
+    },
+    "frame": {
+      "background": "rgba(0,0,0,0.5)"
+    },
+    "stage": {
+      "backgroundImage": "none"
+    },
+    "dialogueBox": {
+      "background": "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(241,243,244,0.90))",
+      "border": "1px solid rgba(255,255,255,0.5)",
+      "color": "#1a1a2e",
+      "customStyles": {
+        "voicePlayerBgClass": "mt-5 flex items-center gap-3 rounded-lg bg-[#F1F3F4] p-3",
+        "playButtonClass": "flex-shrink-0 rounded-full bg-[#2DFF9A] hover:bg-[#0CBE69] p-2 transition",
+        "voiceTextClass": "text-xs text-slate-600"
+      }
+    },
+    "questionBox": {
+      "background": "linear-gradient(180deg, rgba(11, 31, 24, 0.94), rgba(0, 0, 0, 0.90))",
+      "border": "1px solid rgba(192, 192, 192, 0.2)",
+      "numberClass": "text-xs uppercase tracking-[0.3em] text-slate-300/80",
+      "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white italic"
+    },
+    "answerRevealBox": {
+      "background": "linear-gradient(135deg, rgba(11, 31, 24, 0.96), rgba(192, 192, 192, 0.12))",
+      "border": "1px solid rgba(192, 192, 192, 0.24)"
+    }
+  },
+  "stageCharacters": {
+    "curator": {
+      "name": "Silver Surfer",
+      "accent": "#C0C0C0",
+      "image": "/images/silver-surfer.png",
+      "size": "20rem",
+      "side": "left",
+      "style": { "bottom": "1rem", "left": "2rem" },
+      "customStyles": {
+        "borderColor": "#C0C0C044"
+      }
+    },
+    "signal": {
+      "name": "Loki",
+      "accent": "#2DFF9A",
+      "image": "/images/loki.png",
+      "size": "14rem",
+      "side": "right",
+      "style": { "bottom": "1rem", "right": "2rem" },
+      "customStyles": {
+        "borderColor": "#2DFF9A44"
+      }
+    }
+  },
+  "roundNarrative": {
+    "preQuestion": [
+      {
+        "id": "r3-surfer",
+        "type": "dialogue",
+        "speaker": "Silver Surfer",
+        "characterId": "curator",
+        "text": "Doom is channeling power similar to Galactus. A cosmic cipher must be decoded."
+      }
+    ],
+    "duringQuestion": [],
+    "afterAnswer": [
+      {
+        "id": "r3-after",
+        "type": "dialogue",
+        "speaker": "Silver Surfer",
+        "characterId": "curator",
+        "text": "Reality decay slows. The cosmic balance shifts."
+      }
+    ],
+    "finished": [
+      {
+        "id": "r3-finished",
+        "type": "dialogue",
+        "speaker": "Loki",
+        "characterId": "signal",
+        "text": "The cosmic cipher is broken. One less anchor for Doom."
+      }
+    ]
+  }
+}

@@ -23,27 +23,15 @@ export default function WaitingPage({ onNav, forcedMessage }) {
   const timeoutRef = useRef(null)
   const mountedRef = useRef(true)
 
-  useEffect(() => {
-    apiRef.current = api
-  }, [api])
-
-  useEffect(() => {
-    onNavRef.current = onNav
-  }, [onNav])
-
-  useEffect(() => {
-    forcedMessageRef.current = forcedMessage
-  }, [forcedMessage])
+  useEffect(() => { apiRef.current = api }, [api])
+  useEffect(() => { onNavRef.current = onNav }, [onNav])
+  useEffect(() => { forcedMessageRef.current = forcedMessage }, [forcedMessage])
 
   const pollActiveRound = useCallback(async () => {
-    if (forcedMessageRef.current || pollingRef.current) {
-      return
-    }
-
+    if (forcedMessageRef.current || pollingRef.current) return
     pollingRef.current = true
 
     try {
-      // Get comprehensive round info (current and next round)
       const roundInfoResult = await apiRef.current.get('/api/round/info').then(
         (value) => ({ status: 'fulfilled', value }),
         (reason) => ({ status: 'rejected', reason }),
@@ -58,12 +46,10 @@ export default function WaitingPage({ onNav, forcedMessage }) {
         currentRound = info?.current || null
         nextRound = info?.next || null
       } else {
-        // Fallback to old behavior if new endpoint fails
         const activeResult = await apiRef.current.get('/api/round/active').then(
           (value) => ({ status: 'fulfilled', value }),
           (reason) => ({ status: 'rejected', reason }),
         )
-
         if (activeResult.status === 'fulfilled') {
           currentRound = activeResult.value
         } else {
@@ -73,12 +59,8 @@ export default function WaitingPage({ onNav, forcedMessage }) {
               (value) => ({ status: 'fulfilled', value }),
               (reason) => ({ status: 'rejected', reason }),
             )
-
-            if (upcomingResult.status === 'fulfilled') {
-              nextRound = upcomingResult.value
-            } else if (upcomingResult.reason?.status !== 404) {
-              errorMsg = upcomingResult.reason.message
-            }
+            if (upcomingResult.status === 'fulfilled') nextRound = upcomingResult.value
+            else if (upcomingResult.reason?.status !== 404) errorMsg = upcomingResult.reason.message
           } else {
             errorMsg = err.message
           }
@@ -89,19 +71,12 @@ export default function WaitingPage({ onNav, forcedMessage }) {
         setActiveRound(currentRound)
         setUpcomingRound(nextRound)
         setError(errorMsg)
-
-        if (isPlayable(currentRound)) {
-          onNavRef.current('round')
-        }
+        if (isPlayable(currentRound)) onNavRef.current('round')
       }
     } catch (err) {
-      if (mountedRef.current) {
-        setError(err.message)
-      }
+      if (mountedRef.current) setError(err.message)
     } finally {
-      if (mountedRef.current) {
-        setLoading(false)
-      }
+      if (mountedRef.current) setLoading(false)
       pollingRef.current = false
       if (!forcedMessageRef.current && mountedRef.current) {
         timeoutRef.current = window.setTimeout(pollActiveRound, ACTIVE_ROUND_POLL_MS)
@@ -111,18 +86,9 @@ export default function WaitingPage({ onNav, forcedMessage }) {
 
   useEffect(() => {
     mountedRef.current = true
-
-    if (forcedMessageRef.current) {
-      setLoading(false)
-      return
-    }
-
+    if (forcedMessageRef.current) { setLoading(false); return }
     pollActiveRound()
-
-    return () => {
-      mountedRef.current = false
-      window.clearTimeout(timeoutRef.current)
-    }
+    return () => { mountedRef.current = false; window.clearTimeout(timeoutRef.current) }
   }, [])
 
   const waitingReason = useMemo(() => {
@@ -135,39 +101,24 @@ export default function WaitingPage({ onNav, forcedMessage }) {
   const timerTarget = upcomingRound ? upcomingRound.startedAt : null
   const timerLabel = upcomingRound ? 'Next round starts in' : 'Waiting'
 
-  const formatDateTime = (date) => {
-    const d = new Date(date)
-    return d.toLocaleString()
-  }
-
-  const formatCountdown = (date) => {
-    const diff = new Date(date).getTime() - new Date().getTime()
-    const hours = Math.floor(diff / 3600000)
-    const mins = Math.floor((diff % 3600000) / 60000)
-    const secs = Math.floor((diff % 60000) / 1000)
-    if (hours > 0) return `${hours}h ${mins}m`
-    if (mins > 0) return `${mins}m ${secs}s`
-    return `${secs}s`
-  }
-
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-16">
-      <Panel className="max-w-3xl w-full">
-        <div className="mb-3 text-xs uppercase tracking-[0.35em] text-cyan-200/80">Waiting</div>
-        <h1 className="text-4xl font-semibold text-white">{appCopy.waiting.title}</h1>
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-8 sm:py-16">
+      <Panel className="max-w-3xl w-full fade-up">
+        <div className="mb-3 text-xs uppercase tracking-[0.35em] text-[#2DFF9A]/80">Waiting</div>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white">{appCopy.waiting.title}</h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">{waitingReason}</p>
 
-        <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[linear-gradient(135deg,rgba(34,211,238,0.18),rgba(15,23,42,0.85))] p-8">
+        <div className="mt-6 overflow-hidden rounded-[1.25rem] sm:rounded-[1.75rem] border border-[#2DFF9A]/10 bg-[linear-gradient(135deg,rgba(45,255,154,0.08),rgba(11,31,24,0.85))] p-5 sm:p-8">
           <div className="mb-4 text-sm text-slate-100">{appCopy.waiting.description}</div>
           {timerTarget ? (
-            <Timer targetTime={timerTarget} label={timerLabel} accentClass="text-cyan-200" />
+            <Timer targetTime={timerTarget} label={timerLabel} accentClass="text-[#2DFF9A]" />
           ) : loading ? (
             <div className="flex items-center gap-3 text-slate-200">
               <Spinner />
-              <span>Checking round availability…</span>
+              <span>Checking round availability...</span>
             </div>
           ) : (
-            <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/30 p-5 text-sm leading-7 text-slate-300">
+            <div className="rounded-2xl sm:rounded-3xl border border-dashed border-[#2DFF9A]/15 bg-[#0B1F18]/30 p-4 sm:p-5 text-sm leading-7 text-slate-300">
               {appCopy.waiting.note}
             </div>
           )}
@@ -175,11 +126,9 @@ export default function WaitingPage({ onNav, forcedMessage }) {
 
         {error && <Alert type="error" className="mt-6">{error}</Alert>}
 
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <div className="mt-6 flex flex-col sm:flex-row flex-wrap justify-center gap-3">
           <Btn onClick={pollActiveRound}>Refresh now</Btn>
-          <Btn variant="secondary" onClick={() => onNav('home')}>
-            Back home
-          </Btn>
+          <Btn variant="secondary" onClick={() => onNav('home')}>Back home</Btn>
         </div>
       </Panel>
     </div>

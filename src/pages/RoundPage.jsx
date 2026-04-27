@@ -99,15 +99,19 @@ function StageCharacter({ character, visible }) {
   const containerTransition = customStyles.containerTransition || 'transition duration-500'
   const imageClass = customStyles.imageClass || 'w-full h-full object-cover'
 
+  // Scale down character size on mobile
+  const sizeNum = parseInt(character.size) || 18
+  const mobileSize = `${Math.max(8, Math.round(sizeNum * 0.5))}rem`
+
   return (
     <div
-      className={`pointer-events-none fixed border ${borderRadiusClass} ${shadowClass} ${containerTransition} ${
+      className={`pointer-events-none fixed border hidden sm:block ${borderRadiusClass} ${shadowClass} ${containerTransition} ${
         visible ? 'opacity-100 translate-y-0' : 'opacity-35 translate-y-4'
       }`}
       style={{
         borderColor: borderColor,
-        width: character.size,
-        height: `calc(${character.size} * 1.1)`,
+        width: `min(${character.size}, 30vw)`,
+        height: `calc(min(${character.size}, 30vw) * 1.1)`,
         ...character.style,
       }}
     >
@@ -125,7 +129,7 @@ function StageCharacter({ character, visible }) {
           }}
         />
       )}
-      <div className={`absolute inset-x-0 bottom-6 text-center ${nameClass} ${nameBackgroundClass}`}>{character.name}</div>
+      <div className={`absolute inset-x-0 bottom-4 sm:bottom-6 text-center text-sm sm:text-lg font-medium text-white ${nameBackgroundClass}`}>{character.name}</div>
     </div>
   )
 }
@@ -157,10 +161,10 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
   const transcriptClass = dialogueCustom.transcriptClass || 'mt-5 rounded-[1.5rem] border border-white/10 bg-slate-950/10 px-4 py-3 text-sm leading-7 text-slate-700'
   const continueClass = dialogueCustom.continueClass || 'mt-5 text-right text-xs uppercase tracking-[0.25em] text-slate-500'
   const voicePlayerBgClass = dialogueCustom.voicePlayerBgClass || 'mt-5 flex items-center gap-3 rounded-lg bg-slate-900/50 p-3'
-  const playButtonClass = dialogueCustom.playButtonClass || 'flex-shrink-0 rounded-full bg-cyan-500 hover:bg-cyan-600 p-2 transition'
+  const playButtonClass = dialogueCustom.playButtonClass || 'flex-shrink-0 rounded-full bg-[#2DFF9A] hover:bg-[#0CBE69] p-2 transition'
   const voiceTextClass = dialogueCustom.voiceTextClass || 'text-xs text-slate-400'
-  const voiceMemoBoxClass = dialogueCustom.voiceMemoBoxClass || 'fixed bottom-12 left-1/2 -translate-x-1/2 z-30 max-w-2xl rounded-[2rem] border border-cyan-300/25 bg-cyan-100/95 p-6 text-left text-slate-900 shadow-[0_25px_80px_rgba(34,211,238,0.2)]'
-  const normalBoxClass = dialogueCustom.normalBoxClass || 'fixed bottom-12 left-1/2 -translate-x-1/2 z-30 max-w-2xl rounded-[2rem] p-6 text-left shadow-[0_25px_80px_rgba(255,255,255,0.18)]'
+  const voiceMemoBoxClass = dialogueCustom.voiceMemoBoxClass || 'fixed bottom-4 sm:bottom-12 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] sm:w-auto max-w-2xl rounded-[1.5rem] sm:rounded-[2rem] border border-[#2DFF9A]/25 bg-[#0B1F18]/95 p-4 sm:p-6 text-left text-slate-100 shadow-[0_25px_80px_rgba(45,255,154,0.15)] scale-in'
+  const normalBoxClass = dialogueCustom.normalBoxClass || 'fixed bottom-4 sm:bottom-12 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] sm:w-[min(36rem,60vw)] p-4 sm:p-6 text-left shadow-[0_25px_80px_rgba(255,255,255,0.18)] scale-in'
   const bubbleContainerClass = sceneTheme.dialogueBox?.bubbleContainerClass || 'rounded-[2rem]'
   const bubbleImage = sceneTheme.dialogueBox?.bubbleImage
   const bubbleImageOpacity = sceneTheme.dialogueBox?.bubbleImageOpacity ?? 1
@@ -246,7 +250,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
     onSubmit(answer)
   }
 
-  const questionNumberClass = sceneTheme.questionBox.numberClass || 'text-xs uppercase tracking-[0.3em] text-cyan-200/80'
+  const questionNumberClass = sceneTheme.questionBox.numberClass || 'text-xs uppercase tracking-[0.3em] text-[#2DFF9A]/80'
   const questionTitleClass = sceneTheme.questionBox.titleClass || 'mt-3 max-w-2xl text-2xl font-medium text-white'
   const optionClass = sceneTheme.questionBox.optionClass || 'rounded-[1.5rem] border px-4 py-4 text-left text-sm transition'
   const borderRadiusClass = sceneTheme.questionBox.borderRadiusClass || 'rounded-[2rem]'
@@ -255,7 +259,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
   return (
     <form
       onSubmit={handleSubmit}
-      className={`${borderRadiusClass} p-6 ${boxShadow} max-w-2xl w-full`}
+      className={`${borderRadiusClass} p-6 sm:p-8 ${boxShadow} max-w-2xl w-full backdrop-blur-md`}
       style={{
         background: sceneTheme.questionBox.background,
         border: sceneTheme.questionBox.border,
@@ -265,9 +269,9 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex-1">
           <div className={questionNumberClass}>Question {questionNumber}</div>
-          <h2 className={questionTitleClass}>{question.text}</h2>
+          <h2 className={questionTitleClass} style={{ whiteSpace: 'pre-line' }}>{question.text}</h2>
         </div>
-        <div className="flex-shrink-0 rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-sm text-amber-100">
+        <div className="flex-shrink-0 rounded-full border border-[#2DFF9A]/20 bg-[#2DFF9A]/10 px-4 py-2 text-sm text-[#2DFF9A]">
           {question.reward} pts
         </div>
       </div>
@@ -288,12 +292,12 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
                 onClick={() => setAnswer(option.value)}
                 className={`${optionClass} ${
                   answer === option.value
-                    ? 'border-cyan-300/40 bg-cyan-300/10 text-white'
+                    ? 'border-[#2DFF9A]/40 bg-[#2DFF9A]/10 text-white'
                     : 'border-white/10 bg-white/5 text-slate-200 hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <span className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-950/70 text-xs text-cyan-100">
+                  <span className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#0B1F18]/70 text-xs text-[#2DFF9A]">
                     {option.label}
                   </span>
                   <span className="leading-7">{option.value}</span>
@@ -302,7 +306,13 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
             ))}
           </div>
         ) : (
-          <Input value={answer} onChange={(event) => setAnswer(event.target.value)} placeholder="Type your answer here" />
+          <input
+            value={answer}
+            onChange={(event) => setAnswer(event.target.value)}
+            placeholder="Type your answer here..."
+            className="w-full rounded-[116px] border-2 border-[#2DFF9A]/30 bg-[#0B1F18] px-6 py-4 text-lg text-[#2DFF9A] outline-none transition placeholder:text-[#2DFF9A]/30 focus:border-[#2DFF9A]/60 focus:shadow-[0_0_30px_rgba(45,255,154,0.15)]"
+            style={{ textShadow: '0 0 10px rgba(45, 255, 154, 0.3)' }}
+          />
         )}
       </div>
 
@@ -317,7 +327,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
 }
 
 function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, onFinish, sceneTheme }) {
-  const answerLabelClass = sceneTheme.answerRevealBox.labelClass || 'text-xs uppercase tracking-[0.35em] text-cyan-100/70'
+  const answerLabelClass = sceneTheme.answerRevealBox.labelClass || 'text-xs uppercase tracking-[0.35em] text-[#2DFF9A]/70'
   const answerTextClass = sceneTheme.answerRevealBox.answerClass || 'mt-6 text-xl leading-8 text-white'
   const questionTextClass = sceneTheme.answerRevealBox.questionClass || 'mt-3 text-sm text-slate-300'
   const borderRadiusClass = sceneTheme.answerRevealBox.borderRadiusClass || 'rounded-[2rem]'
@@ -325,7 +335,7 @@ function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, o
 
   return (
     <div
-      className={`flex flex-col items-center justify-center px-8 py-10 text-center ${borderRadiusClass} ${boxShadow} max-w-2xl w-full`}
+      className={`flex flex-col items-center justify-center px-8 py-10 text-center ${borderRadiusClass} ${boxShadow} max-w-2xl w-full backdrop-blur-md`}
       style={{
         background: sceneTheme.answerRevealBox.background,
         border: sceneTheme.answerRevealBox.border,
@@ -658,28 +668,30 @@ export default function RoundPage({ onNav }) {
         style={{ background: effectiveSceneTheme.stage.backgroundImage }}
       />
 
-      {/* Main Content */}
-      <div className="space-y-6">
-        {error && <Alert type="error">{error}</Alert>}
-
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-[0.35em] text-amber-200/80">Active round</div>
-            <h1 className="mt-2 text-4xl font-semibold text-white">Round #{round?.id}</h1>
-          </div>
-          {playableUntil && <Timer targetTime={playableUntil} label="Playable until" onExpire={() => finishRound({ silent: true })} />}
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="flex-shrink-0">
-            <div className="text-xs uppercase tracking-[0.3em] text-slate-400 mb-2">Progress</div>
-            <div className="text-lg font-semibold text-white">{progress}%</div>
-            <div className="text-xs text-slate-400 mt-1">{answeredCount}/{totalQuestions}</div>
-            <div className="mt-2 w-32 h-2 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-amber-300 transition-all" style={{ width: `${progress}%` }} />
+      {/* Top HUD — floating overlay */}
+      <div className="fixed top-0 left-0 right-0 z-30 pointer-events-none">
+        <div className="flex items-start justify-between p-4 sm:p-6 pointer-events-auto">
+          <div className="rounded-2xl border border-[#2DFF9A]/10 bg-black/60 px-4 py-3 backdrop-blur-md">
+            <div className="text-[10px] uppercase tracking-[0.35em] text-[#2DFF9A]/70">Active round</div>
+            <div className="mt-1 text-xl font-bold text-white">Round #{round?.id}</div>
+            <div className="mt-2 flex items-center gap-3">
+              <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-[#2DFF9A] transition-all duration-500" style={{ width: `${progress}%` }} />
+              </div>
+              <span className="text-xs text-[#2DFF9A]/80">{answeredCount}/{totalQuestions}</span>
             </div>
           </div>
+          {playableUntil && (
+            <div className="pointer-events-auto">
+              <Timer targetTime={playableUntil} label="Time left" onExpire={() => finishRound({ silent: true })} />
+            </div>
+          )}
         </div>
+        {error && <div className="px-6 pointer-events-auto"><Alert type="error">{error}</Alert></div>}
+      </div>
+
+      {/* Spacer so content isn't under HUD */}
+      <div className="h-4"></div>
 
         <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
           <div className="pointer-events-auto">
@@ -717,7 +729,6 @@ export default function RoundPage({ onNav }) {
             )}
           </div>
         </div>
-      </div>
     </>
   )
 }

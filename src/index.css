@@ -1,5 +1,4 @@
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=clash-display@400,500,600,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,11 +7,11 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --orange: #f97316;
-  --orange-dim: #ea580c;
-  --bg: #0a0a0d;
-  --surface: #111115;
-  --border: #222228;
+  --primary: #2DFF9A;
+  --primary-dim: #0CBE69;
+  --bg: #000000;
+  --surface: #0B1F18;
+  --border: #2DFF9A;
   --text: #f1f1f3;
   --muted: #6b6b7a;
 }
@@ -20,7 +19,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Satoshi', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -28,14 +27,15 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Clash Display', sans-serif;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
 }
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: #2DFF9A33; border-radius: 2px; }
 
-/* Noise texture overlay — sits at z-index 1 so it's above body bg but below page content */
+/* Noise texture overlay */
 body::before {
   content: '';
   position: fixed;
@@ -43,67 +43,129 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 1;
-  opacity: 0.4;
+  opacity: 0.3;
 }
 
-/* When a round theme is active, hide the default noise overlay so the custom body bg is fully visible */
 body.round-custom-mode::before {
   display: none;
 }
 
-/* Glow effect */
+/* Glow effects */
 .glow {
-  box-shadow: 0 0 40px rgba(249, 115, 22, 0.15), 0 0 80px rgba(249, 115, 22, 0.05);
+  box-shadow: 0 0 40px rgba(45, 255, 154, 0.15), 0 0 80px rgba(45, 255, 154, 0.05);
 }
 
 .glow-text {
-  text-shadow: 0 0 30px rgba(249, 115, 22, 0.5);
+  text-shadow: 0px 4px 20px rgba(45, 255, 154, 0.8), 0px 0px 40px rgba(45, 255, 154, 0.4);
 }
 
-/* Animated gradient border */
-@keyframes borderGlow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+/* Avengers button style */
+.btn-avengers {
+  background: #0B1F18;
+  color: #2DFF9A;
+  border: 2px solid #2DFF9A;
+  border-radius: 116px;
+  box-shadow: 40px 41px 57px rgba(255, 0, 0, 0.44);
+  letter-spacing: 0.05em;
+  text-shadow: 0px 4px 20px rgba(45, 255, 154, 0.8), 0px 0px 40px rgba(45, 255, 154, 0.4);
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.75rem 2.5rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.btn-avengers:hover {
+  background: #0f2e23;
+  box-shadow: 40px 41px 57px rgba(255, 0, 0, 0.55), 0 0 20px rgba(45, 255, 154, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-avengers:active {
+  transform: translateY(0);
+}
+
+/* Card */
 .card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(45, 255, 154, 0.15);
   border-radius: 12px;
   position: relative;
   overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(45, 255, 154, 0.25);
 }
 
 .card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(249,115,22,0.03) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(45, 255, 154, 0.03) 0%, transparent 60%);
   pointer-events: none;
 }
 
+/* Smooth animations */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.fade-up { animation: fadeUp 0.4s ease forwards; }
-.fade-up-1 { animation: fadeUp 0.4s 0.1s ease both; }
-.fade-up-2 { animation: fadeUp 0.4s 0.2s ease both; }
-.fade-up-3 { animation: fadeUp 0.4s 0.3s ease both; }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(45, 255, 154, 0.1); }
+  50% { box-shadow: 0 0 40px rgba(45, 255, 154, 0.2); }
+}
+
+.fade-up { animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.fade-up-1 { animation: fadeUp 0.5s 0.1s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.fade-up-2 { animation: fadeUp 0.5s 0.2s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.fade-up-3 { animation: fadeUp 0.5s 0.3s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.fade-in { animation: fadeIn 0.4s ease both; }
+.scale-in { animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.slide-in-left { animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.slide-in-right { animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.glow-pulse { animation: glowPulse 3s ease-in-out infinite; }
+
+/* Smooth transitions for interactive elements */
+button, a, input, textarea {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Timer animation */
 @keyframes ticker {
-  0% { color: #f97316; }
-  50% { color: #fbbf24; }
-  100% { color: #f97316; }
+  0% { color: #2DFF9A; }
+  50% { color: #0CBE69; }
+  100% { color: #2DFF9A; }
 }
 
 .timer-active { animation: ticker 1s ease-in-out infinite; }
 
 @keyframes correctPulse {
-  0% { background: rgba(34,197,94,0); }
-  30% { background: rgba(34,197,94,0.15); }
-  100% { background: rgba(34,197,94,0); }
+  0% { background: rgba(45, 255, 154, 0); }
+  30% { background: rgba(45, 255, 154, 0.15); }
+  100% { background: rgba(45, 255, 154, 0); }
 }
 
 .correct-flash { animation: correctPulse 0.6s ease; }

@@ -1,0 +1,66 @@
+{
+  "sceneTheme": {
+    "bodyElement": {
+      "background": "url('/images/map-location.png') center/cover no-repeat fixed",
+      "gridPattern": "none",
+      "gridPatternOpacity": 0
+    },
+    "frame": {
+      "background": "rgba(0,0,0,0.6)"
+    },
+    "stage": {
+      "backgroundImage": "none"
+    },
+    "dialogueBox": {
+      "background": "linear-gradient(135deg, rgba(11, 31, 24, 0.96), rgba(0, 0, 0, 0.90))",
+      "border": "1px solid rgba(45, 255, 154, 0.3)",
+      "color": "#2DFF9A"
+    },
+    "questionBox": {
+      "background": "linear-gradient(180deg, rgba(11, 31, 24, 0.94), rgba(0, 0, 0, 0.90))",
+      "border": "1px solid rgba(45, 255, 154, 0.15)",
+      "numberClass": "text-xs uppercase tracking-[0.3em] text-[#2DFF9A]/80",
+      "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white"
+    }
+  },
+  "stageCharacters": {
+    "curator": {
+      "name": "Loki",
+      "accent": "#2DFF9A",
+      "image": "/images/loki.png",
+      "size": "16rem",
+      "side": "left",
+      "style": { "bottom": "1rem", "left": "2rem" },
+      "customStyles": {
+        "borderColor": "#2DFF9A44"
+      }
+    },
+    "signal": {
+      "name": "",
+      "accent": "#2DFF9A",
+      "image": "",
+      "size": "0rem",
+      "style": { "display": "none" }
+    }
+  },
+  "roundNarrative": {
+    "preQuestion": [
+      {
+        "id": "r4-intro",
+        "type": "dialogue",
+        "speaker": "Loki",
+        "characterId": "curator",
+        "text": "Doom has anchored himself in Latveria outside standard spacetime. Identify the real-world parallel from the coordinate fragment."
+      }
+    ],
+    "afterAnswer": [
+      {
+        "id": "r4-after",
+        "type": "dialogue",
+        "speaker": "Loki",
+        "characterId": "curator",
+        "text": "Portal locks on target. Prepare for the final confrontation."
+      }
+    ]
+  }
+}
