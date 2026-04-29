@@ -101,7 +101,7 @@ function QuestionImage({ src }) {
 function ImageOption({ displayLabel, src, isSelected, onClick, index, disabled }) {
   return (
     <motion.button onClick={disabled?undefined:onClick}
-      className={`relative overflow-hidden rounded-2xl focus:outline-none flex flex-col ${disabled?'cursor-default':'cursor-pointer'} ${isSelected?'bg-orange-500/10':'bg-white/3'}`}
+      className={`relative overflow-hidden rounded-2xl focus:outline-none flex flex-col ${disabled?'cursor-default':'cursor-pointer'} ${isSelected?'bg-[#2DFF9A]/10':'bg-white/3'}`}
       style={{ border: isSelected?'2px solid rgba(249,115,22,0.75)':'2px solid rgba(255,255,255,0.07)', boxShadow: isSelected?'0 0 24px rgba(249,115,22,0.35)':'none', transition:'border-color 0.2s,box-shadow 0.2s,background 0.2s' }}
       initial={{ opacity:0, scale:0.88, y:14, filter:'blur(6px)' }}
       animate={{ opacity:1, scale:1, y:0, filter:'blur(0px)' }}
@@ -109,13 +109,13 @@ function ImageOption({ displayLabel, src, isSelected, onClick, index, disabled }
       whileHover={!isSelected&&!disabled?{ scale:1.025 }:{}}
       whileTap={!disabled?{ scale:0.97 }:{}}
     >
-      <div className={`absolute top-2 left-2 z-10 w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold transition-all duration-200 ${isSelected?'bg-orange-500 text-white border border-orange-400':'bg-black/60 text-slate-400 border border-white/20'}`}
+      <div className={`absolute top-2 left-2 z-10 w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold transition-all duration-200 ${isSelected?'bg-[#2DFF9A] text-white border border-[#2DFF9A]':'bg-black/60 text-slate-400 border border-white/20'}`}
         style={{ fontFamily:'Syne,sans-serif' }}>{displayLabel}</div>
       <AnimatePresence>
         {isSelected && (
-          <motion.div className="absolute inset-0 z-10 flex items-center justify-center bg-orange-500/8"
+          <motion.div className="absolute inset-0 z-10 flex items-center justify-center bg-[#2DFF9A]/8"
             initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}>
-            <motion.div className="w-10 h-10 rounded-full bg-orange-500/90 flex items-center justify-center text-white text-lg"
+            <motion.div className="w-10 h-10 rounded-full bg-[#2DFF9A]/90 flex items-center justify-center text-white text-lg"
               style={{ boxShadow:'0 0 20px rgba(249,115,22,0.6)' }}
               initial={{ scale:0.3, opacity:0 }} animate={{ scale:1, opacity:1 }}
               transition={{ type:'spring', stiffness:420, damping:18 }}>✓</motion.div>
@@ -133,7 +133,7 @@ function ImageOption({ displayLabel, src, isSelected, onClick, index, disabled }
 function TextOption({ displayLabel, val, isSelected, onClick, index, disabled }) {
   return (
     <motion.button onClick={disabled?undefined:onClick}
-      className={`group relative w-full text-left px-4 py-3.5 rounded-xl flex items-center gap-3 overflow-hidden focus:outline-none transition-colors duration-200 ${disabled?'cursor-default':'cursor-pointer'} ${isSelected?'text-orange-200':'text-slate-400 hover:text-slate-200'}`}
+      className={`group relative w-full text-left px-4 py-3.5 rounded-xl flex items-center gap-3 overflow-hidden focus:outline-none transition-colors duration-200 ${disabled?'cursor-default':'cursor-pointer'} ${isSelected?'text-[#2DFF9A]/80':'text-slate-400 hover:text-slate-200'}`}
       style={{ border: isSelected?'1px solid rgba(249,115,22,0.55)':'1px solid rgba(255,255,255,0.08)', background: isSelected?'rgba(249,115,22,0.1)':'rgba(255,255,255,0.03)', boxShadow: isSelected?'0 4px 20px rgba(249,115,22,0.14)':'none' }}
       initial={{ opacity:0, x:-16 }}
       animate={{ opacity:1, x:0 }}
@@ -143,14 +143,14 @@ function TextOption({ displayLabel, val, isSelected, onClick, index, disabled })
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{ background:'radial-gradient(circle at 50% 50%, rgba(249,115,22,0.1), transparent 65%)' }}/>
-      <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-all duration-200 ${isSelected?'text-orange-400':'text-slate-500'}`}
+      <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-all duration-200 ${isSelected?'text-[#2DFF9A]':'text-slate-500'}`}
         style={{ background: isSelected?'rgba(249,115,22,0.3)':'rgba(255,255,255,0.06)', border: isSelected?'1px solid rgba(249,115,22,0.55)':'1px solid rgba(255,255,255,0.1)', fontFamily:'Syne,sans-serif' }}>
         {displayLabel}
       </span>
       <span className="flex-1 text-sm leading-snug" style={{ fontFamily:'DM Sans,sans-serif' }}>{val}</span>
       <AnimatePresence>
         {isSelected && (
-          <motion.span className="text-orange-400 text-base ml-auto flex-shrink-0"
+          <motion.span className="text-[#2DFF9A] text-base ml-auto flex-shrink-0"
             initial={{ scale:0.3, opacity:0 }} animate={{ scale:1, opacity:1 }} exit={{ scale:0.3, opacity:0 }}
             transition={{ type:'spring', stiffness:420, damping:18 }}>✓</motion.span>
         )}
@@ -172,19 +172,19 @@ function MixedOptions({ optionEntries, input, setInput, disabled }) {
         )
         return (
           <motion.button key={key} onClick={disabled?undefined:()=>setInput(isSel?'':key)}
-            className={`group relative text-left px-3 py-3 rounded-xl flex items-center gap-2.5 overflow-hidden focus:outline-none transition-colors duration-200 ${disabled?'cursor-default':'cursor-pointer'} ${isSel?'text-orange-200':'text-slate-400 hover:text-slate-200'}`}
+            className={`group relative text-left px-3 py-3 rounded-xl flex items-center gap-2.5 overflow-hidden focus:outline-none transition-colors duration-200 ${disabled?'cursor-default':'cursor-pointer'} ${isSel?'text-[#2DFF9A]/80':'text-slate-400 hover:text-slate-200'}`}
             style={{ border:isSel?'1px solid rgba(249,115,22,0.55)':'1px solid rgba(255,255,255,0.08)', background:isSel?'rgba(249,115,22,0.1)':'rgba(255,255,255,0.03)', boxShadow:isSel?'0 4px 20px rgba(249,115,22,0.14)':'none', minHeight:56 }}
             initial={{ opacity:0, scale:0.94 }} animate={{ opacity:1, scale:1 }}
             transition={{ duration:0.38, delay:0.07+i*0.075, ease:[0.22,1,0.36,1] }}
             whileHover={!isSel&&!disabled?{ scale:1.02 }:{}} whileTap={!disabled?{ scale:0.98 }:{}}
           >
-            <span className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${isSel?'text-orange-400':'text-slate-500'}`}
+            <span className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${isSel?'text-[#2DFF9A]':'text-slate-500'}`}
               style={{ background:isSel?'rgba(249,115,22,0.3)':'rgba(255,255,255,0.06)', border:isSel?'1px solid rgba(249,115,22,0.55)':'1px solid rgba(255,255,255,0.1)', fontFamily:'Syne,sans-serif' }}>
               {label}
             </span>
             <span className="flex-1 text-xs leading-snug" style={{ fontFamily:'DM Sans,sans-serif' }}>{val}</span>
             <AnimatePresence>
-              {isSel && <motion.span className="text-orange-400 text-sm flex-shrink-0"
+              {isSel && <motion.span className="text-[#2DFF9A] text-sm flex-shrink-0"
                 initial={{ scale:0.3, opacity:0 }} animate={{ scale:1, opacity:1 }} exit={{ scale:0.3, opacity:0 }}
                 transition={{ type:'spring', stiffness:420, damping:18 }}>✓</motion.span>}
             </AnimatePresence>
@@ -351,7 +351,7 @@ function WordBuilder({ words: initialWords, onAnswer, submitting, questionId, su
             initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }} exit={{ opacity:0, height:0 }}
           >
             <span className="text-[11px] text-slate-500 uppercase tracking-widest mr-2" style={{ fontFamily:'Syne,sans-serif' }}>Answer:</span>
-            <span className="text-sm text-orange-300 font-semibold" style={{ fontFamily:'DM Sans,sans-serif' }}>"{builtString}"</span>
+            <span className="text-sm text-[#2DFF9A] font-semibold" style={{ fontFamily:'DM Sans,sans-serif' }}>"{builtString}"</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -374,7 +374,7 @@ function WordBuilder({ words: initialWords, onAnswer, submitting, questionId, su
           {submitting===questionId ? (
             <><span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"/>Submitting…</>
           ) : submitted ? (
-            <><span className="text-orange-400">✓</span>Answer Submitted</>
+            <><span className="text-[#2DFF9A]">✓</span>Answer Submitted</>
           ) : 'Submit Answer'}
         </motion.button>
 
@@ -444,7 +444,7 @@ function TrickReveal({ optionValues, onRevealDone }) {
             initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
           >
             <motion.div
-              className="text-2xl font-black text-orange-400 tracking-widest"
+              className="text-2xl font-black text-[#2DFF9A] tracking-widest"
               style={{ fontFamily:'Syne,sans-serif', textShadow:'0 0 20px rgba(249,115,22,0.8)' }}
               animate={{ opacity:[1,0,1,0,1], x:[0,-3,3,-2,0] }}
               transition={{ duration:0.08, repeat:Infinity }}
@@ -465,7 +465,7 @@ function TrickReveal({ optionValues, onRevealDone }) {
             <motion.button
               key={i}
               onClick={phase==='fake' ? () => triggerTrick(String(i)) : undefined}
-              className={`relative w-full text-left px-4 py-3.5 rounded-xl flex items-center gap-3 overflow-hidden focus:outline-none cursor-pointer ${isSelected?'text-orange-200':'text-slate-400'}`}
+              className={`relative w-full text-left px-4 py-3.5 rounded-xl flex items-center gap-3 overflow-hidden focus:outline-none cursor-pointer ${isSelected?'text-[#2DFF9A]/80':'text-slate-400'}`}
               style={{
                 border: isSelected?'1px solid rgba(249,115,22,0.55)':'1px solid rgba(255,255,255,0.08)',
                 background: isSelected?'rgba(249,115,22,0.1)':'rgba(255,255,255,0.03)',
@@ -491,13 +491,13 @@ function TrickReveal({ optionValues, onRevealDone }) {
               }
               whileHover={phase==='fake'&&!isSelected ? { x:3 } : {}}
             >
-              <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold flex-shrink-0 ${isSelected?'text-orange-400':'text-slate-500'}`}
+              <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold flex-shrink-0 ${isSelected?'text-[#2DFF9A]':'text-slate-500'}`}
                 style={{ background:isSelected?'rgba(249,115,22,0.3)':'rgba(255,255,255,0.06)', border:isSelected?'1px solid rgba(249,115,22,0.55)':'1px solid rgba(255,255,255,0.1)', fontFamily:'Syne,sans-serif' }}>
                 {label}
               </span>
               <span className="flex-1 text-sm" style={{ fontFamily:'DM Sans,sans-serif' }}>{val}</span>
               {isSelected && (
-                <motion.span className="text-orange-400 text-base ml-auto"
+                <motion.span className="text-[#2DFF9A] text-base ml-auto"
                   initial={{ scale:0.3, opacity:0 }} animate={{ scale:1, opacity:1 }}
                   transition={{ type:'spring', stiffness:420, damping:18 }}>✓</motion.span>
               )}
@@ -585,7 +585,7 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
             {question.text}
           </motion.p>
         </div>
-        <motion.div className="flex-shrink-0 text-[11px] font-bold text-orange-400 px-3 py-1 rounded-full whitespace-nowrap"
+        <motion.div className="flex-shrink-0 text-[11px] font-bold text-[#2DFF9A] px-3 py-1 rounded-full whitespace-nowrap"
           style={{ background:'rgba(249,115,22,0.1)', border:'1px solid rgba(249,115,22,0.25)', fontFamily:'Syne,sans-serif' }}
           initial={{ opacity:0, scale:0.5 }} animate={{ opacity:1, scale:1 }} transition={{ type:'spring', stiffness:420, damping:18, delay:0.15 }}>
           +{question.reward} pts
@@ -679,7 +679,7 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
                 {submitting===question.id ? (
                   <><span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"/>Submitting…</>
                 ) : submitted ? (
-                  <><span className="text-orange-400">✓</span>Answer Submitted</>
+                  <><span className="text-[#2DFF9A]">✓</span>Answer Submitted</>
                 ) : 'Submit Answer'}
               </motion.button>
             </>
@@ -692,7 +692,7 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
           transition={{ duration:0.35, ease:[0.22,1,0.36,1] }}>
           <span className="text-xl">📝</span>
           <div>
-            <div className="text-sm font-bold text-orange-400" style={{ fontFamily:'Syne,sans-serif' }}>Answer recorded</div>
+            <div className="text-sm font-bold text-[#2DFF9A]" style={{ fontFamily:'Syne,sans-serif' }}>Answer recorded</div>
             <div className="text-xs text-slate-500 mt-0.5" style={{ fontFamily:'DM Sans,sans-serif' }}>Results will be shown when the round ends</div>
           </div>
         </motion.div>
@@ -804,7 +804,7 @@ export default function QuizPage({ onNav }) {
     <div className="max-w-xl mx-auto">
       <h1 className="text-3xl font-black text-[#e8edf5] mb-4" style={{ fontFamily:'Syne,sans-serif' }}>Quiz</h1>
       <Alert type="error">{error || 'No active round.'}</Alert>
-      <button onClick={()=>onNav('round')} className="text-orange-400 text-sm mt-3 bg-transparent border-none cursor-pointer hover:underline">← Back to Round</button>
+      <button onClick={()=>onNav('round')} className="text-[#2DFF9A] text-sm mt-3 bg-transparent border-none cursor-pointer hover:underline">← Back to Round</button>
     </div>
   )
 
@@ -828,7 +828,7 @@ export default function QuizPage({ onNav }) {
         </div>
         <AnimatePresence>
           {answered > 0 && (
-            <motion.div className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold text-orange-400"
+            <motion.div className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold text-[#2DFF9A]"
               style={{ background:'rgba(249,115,22,0.1)', border:'1px solid rgba(249,115,22,0.2)', fontFamily:'Syne,sans-serif' }}
               initial={{ opacity:0, scale:0.7 }} animate={{ opacity:1, scale:1 }} transition={{ type:'spring', stiffness:400, damping:20 }}>
               {answered} submitted ✓
@@ -842,11 +842,11 @@ export default function QuizPage({ onNav }) {
         <motion.div className="mb-7" initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.12 }}>
           <div className="flex justify-between text-[11px] mb-2 text-slate-600">
             <span className="flex items-center gap-1.5" style={{ fontFamily:'DM Sans,sans-serif' }}>
-              {!allDone && <motion.span className="w-1.5 h-1.5 rounded-full inline-block bg-orange-500"
+              {!allDone && <motion.span className="w-1.5 h-1.5 rounded-full inline-block bg-[#2DFF9A]"
                 animate={{ scale:[1,0.6,1], opacity:[1,0.4,1] }} transition={{ duration:1.5, repeat:Infinity }}/>}
               {allDone ? '🎉 All done!' : `Q ${Math.min(answered+1,questions.length)} of ${questions.length}`}
             </span>
-            <span className={`font-bold ${progress>0?'text-orange-400':''}`} style={{ fontFamily:'Syne,sans-serif' }}>{Math.round(progress)}%</span>
+            <span className={`font-bold ${progress>0?'text-[#2DFF9A]':''}`} style={{ fontFamily:'Syne,sans-serif' }}>{Math.round(progress)}%</span>
           </div>
           <div className="h-[5px] rounded-full overflow-hidden" style={{ background:'rgba(255,255,255,0.05)' }}>
             <motion.div className="h-full rounded-full"
@@ -899,7 +899,7 @@ export default function QuizPage({ onNav }) {
                   </motion.button>
                 ) : (
                   <motion.button onClick={()=>goTo(currentIndex+1)}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-orange-400 focus:outline-none tracking-wide"
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-[#2DFF9A] focus:outline-none tracking-wide"
                     style={{ border:'1px solid rgba(249,115,22,0.3)', background:'rgba(249,115,22,0.08)', fontFamily:'Syne,sans-serif' }}
                     whileHover={{ x:5 }} whileTap={{ scale:0.97 }}>
                     Next Question →

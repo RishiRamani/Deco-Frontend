@@ -1,0 +1,98 @@
+{
+  "sceneTheme": {
+    "bodyElement": {
+      "background": "url('/backgrounds/final-round-bg.png') center/cover no-repeat fixed",
+      "gridPattern": "none",
+      "gridPatternOpacity": 0
+    },
+    "frame": {
+      "background": "rgba(0,0,0,0.5)"
+    },
+    "stage": {
+      "backgroundImage": "none"
+    },
+    "dialogueBox": {
+      "background": "linear-gradient(135deg, rgba(40, 0, 0, 0.96), rgba(0, 0, 0, 0.90))",
+      "border": "1px solid rgba(255, 0, 0, 0.3)",
+      "color": "#FF4444"
+    },
+    "questionBox": {
+      "background": "linear-gradient(180deg, rgba(40, 0, 0, 0.94), rgba(0, 0, 0, 0.90))",
+      "border": "1px solid rgba(255, 0, 0, 0.2)",
+      "numberClass": "text-xs uppercase tracking-[0.3em] text-red-400/80",
+      "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white italic"
+    },
+    "answerRevealBox": {
+      "background": "linear-gradient(135deg, rgba(40, 0, 0, 0.96), rgba(255, 0, 0, 0.12))",
+      "border": "1px solid rgba(255, 0, 0, 0.24)",
+      "labelClass": "text-xs uppercase tracking-[0.35em] text-red-400/70"
+    }
+  },
+  "stageCharacters": {
+    "curator": {
+      "name": "Doctor Doom",
+      "accent": "#FF4444",
+      "image": "/characters/doctor-doom.png",
+      "size": "20rem",
+      "side": "left",
+      "style": { "bottom": "1rem", "left": "2rem" },
+      "customStyles": {
+        "borderColor": "#FF444444"
+      }
+    },
+    "signal": {
+      "name": "DECO AI",
+      "accent": "#FF0000",
+      "image": "/characters/deco-ai.png",
+      "size": "16rem",
+      "side": "right",
+      "style": { "bottom": "1rem", "right": "2rem" },
+      "customStyles": {
+        "borderColor": "#FF000044"
+      }
+    }
+  },
+  "roundNarrative": {
+    "preQuestion": [
+      {
+        "id": "r5-doom",
+        "type": "dialogue",
+        "speaker": "Doctor Doom",
+        "characterId": "curator",
+        "text": "You mistake chaos for accident. This is order perfected."
+      },
+      {
+        "id": "r5-deco",
+        "type": "dialogue",
+        "speaker": "DECO AI",
+        "characterId": "signal",
+        "text": "Commencing eradication protocol. Cognitive endurance test activated."
+      }
+    ],
+    "afterAnswer": [
+      {
+        "id": "r5-after",
+        "type": "dialogue",
+        "speaker": "DECO AI",
+        "characterId": "signal",
+        "text": "Processing core integrity decreasing. Continue the assault."
+      }
+    ],
+    "finished": [
+      {
+        "id": "r5-end-doom",
+        "type": "dialogue",
+        "speaker": "Doctor Doom",
+        "characterId": "curator",
+        "text": "This ends... temporarily."
+      },
+      {
+        "id": "r5-end-loki",
+        "type": "dialogue",
+        "speaker": "Loki",
+        "characterId": "curator",
+        "text": "Interesting. You survived Doomsday."
+      }
+    ]
+  }
+}

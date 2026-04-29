@@ -4,25 +4,29 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Clash Display', 'sans-serif'],
-        body: ['Satoshi', 'sans-serif'],
+        display: ['Inter', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
         brand: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          900: '#431407',
+          primary: '#2DFF9A',
+          dark: '#0B1F18',
+          gold: '#FEBF3C',
+          hulk: '#0CBE69',
+          black: '#000000',
         },
         dark: {
-          50: '#18181b',
-          100: '#141417',
-          200: '#0f0f12',
-          300: '#0a0a0d',
+          50: '#1A2236',
+          100: '#201916',
+          200: '#0B1F18',
+          300: '#000000',
         }
+      },
+      boxShadow: {
+        'btn-red': '40px 41px 57px rgba(255, 0, 0, 0.44)',
+        'glow-green': '0px 4px 20px rgba(45, 255, 154, 0.8), 0px 0px 40px rgba(45, 255, 154, 0.4)',
+        'logo-white': '0px 4px 82px rgba(255, 255, 255, 0.25), 31px 53px 80px rgba(178, 133, 133, 0.25)',
       },
       animation: {
         'fade-up': 'fadeUp 0.4s ease forwards',

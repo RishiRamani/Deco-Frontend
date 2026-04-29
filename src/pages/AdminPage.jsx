@@ -142,7 +142,7 @@ function RoundsTab() {
 
       {/* All rounds */}
       <div className="card overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#222228] flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-[#2DFF9A]/10 flex items-center justify-between">
           <h3 className="font-display text-white">All Rounds</h3>
           <Btn variant="ghost" size="sm" onClick={fetchRounds}>↺ Refresh</Btn>
         </div>
@@ -323,7 +323,7 @@ function QuestionsTab() {
         <div className="flex justify-center py-10"><Spinner /></div>
       ) : questions.length > 0 ? (
         <div className="card overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#222228]">
+          <div className="px-5 py-4 border-b border-[#2DFF9A]/10">
             <h3 className="font-display text-white">Questions — Round #{roundId}</h3>
           </div>
           <div className="divide-y divide-[#222228]">
@@ -352,7 +352,7 @@ function QuestionsTab() {
                         <Badge variant="yellow">+{q.reward} pts</Badge>
                         
                         {q.options && <Badge variant="blue">MCQ</Badge>}
-                        {q.link && <a href={q.link} target="_blank" rel="noreferrer" className="text-orange-400 hover:underline">🔗 link</a>}
+                        {q.link && <a href={q.link} target="_blank" rel="noreferrer" className="text-[#2DFF9A] hover:underline">🔗 link</a>}
                       </div>
                     </div>
                     <div className="flex gap-1.5 flex-shrink-0">
@@ -383,17 +383,17 @@ export default function AdminPage() {
   return (
     <div className="space-y-6 fade-up">
       <div>
-        <h1 className="text-3xl font-display text-white">Admin Panel</h1>
+        <h1 className="text-2xl sm:text-3xl font-display text-white">Admin Panel</h1>
         <p className="text-[#6b6b7a] text-sm mt-1">Organizer controls — manage rounds and questions</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-[#111115] border border-[#222228] rounded-xl w-fit">
+      <div className="flex gap-1 p-1 bg-[#0B1F18] border border-[#2DFF9A]/20 rounded-xl w-full sm:w-fit overflow-x-auto">
         {tabs.map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.id ? 'bg-orange-500 text-black font-bold' : 'text-[#6b6b7a] hover:text-white'
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.id ? 'bg-[#2DFF9A] text-[#0B1F18] font-bold' : 'text-[#6b6b7a] hover:text-white'
               }`}
           >
             {t.label}

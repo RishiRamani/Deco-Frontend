@@ -6,7 +6,8 @@ export function useApi() {
   const { getToken } = useAuth()
 
   const call = useCallback(async (method, path, body) => {
-    const token = await getToken()
+    let token = null
+    try { token = await getToken() } catch {}
     return api(path, {
       method,
       ...(body ? { body: JSON.stringify(body) } : {}),

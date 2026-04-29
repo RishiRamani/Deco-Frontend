@@ -1,64 +1,92 @@
 {
   "sceneTheme": {
     "bodyElement": {
-    "background": "url('/backgrounds/test.png') center/cover no-repeat fixed",
-    "gridPattern": "none",
-    "gridPatternOpacity": 0
-  },
+      "background": "url('/backgrounds/r1-stage1-bg.png') center/cover no-repeat fixed",
+      "gridPattern": "none",
+      "gridPatternOpacity": 0
+    },
     "frame": {
-      "background": "transparent"
+      "background": "rgba(0,0,0,0.4)"
     },
     "stage": {
       "backgroundImage": "none"
     },
     "dialogueBox": {
-      "background": "linear-gradient(135deg, #ff0000, #ff8800)",
-      "border": "5px solid yellow",
-      "color": "#000000",
-      "bubbleContainerClass": "rounded-none",
-      "boxShadow": "shadow-[0_0_40px_rgba(255,0,0,1)]"
+      "background": "rgba(255,255,255,0.95)",
+      "bubbleImage": "/images/thought-cloud.png",
+      "border": "none",
+      "color": "#1a1a2e"
     },
     "questionBox": {
-      "background": "linear-gradient(135deg, red, orange)",
-      "border": "4px solid yellow",
-      "borderRadiusClass": "rounded-none",
-      "boxShadow": "shadow-[0_0_50px_rgba(255,0,0,1)]",
-      "titleClass": "text-3xl font-black text-black"
+      "background": "linear-gradient(180deg, rgba(11, 31, 24, 0.94), rgba(0, 0, 0, 0.90))",
+      "border": "1px solid rgba(45, 255, 154, 0.15)",
+      "numberClass": "text-xs uppercase tracking-[0.3em] text-[#2DFF9A]/80",
+      "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white"
     },
     "answerRevealBox": {
-      "background": "linear-gradient(135deg, black, red)",
-      "border": "4px solid yellow",
-      "borderRadiusClass": "rounded-none",
-      "boxShadow": "shadow-[0_0_60px_rgba(255,0,0,1)]",
-      "answerClass": "text-3xl text-yellow-300 font-bold"
+      "background": "linear-gradient(135deg, rgba(11, 31, 24, 0.96), rgba(45, 255, 154, 0.12))",
+      "border": "1px solid rgba(45, 255, 154, 0.24)"
     }
   },
   "stageCharacters": {
     "curator": {
-      "name": "TEST_RED",
-      "accent": "#ff0000",
+      "name": "Captain America",
+      "accent": "#2DFF9A",
+      "image": "/characters/captain-america.png",
+      "size": "20rem",
       "side": "left",
-      "size": "24rem"
+      "style": { "bottom": "1rem", "left": "2rem" },
+      "customStyles": {
+        "borderColor": "#2DFF9A44"
+      }
     },
     "signal": {
-      "name": "TEST_ALERT",
-      "accent": "#ff8800",
+      "name": "Loki",
+      "accent": "#2DFF9A",
+      "image": "/images/loki.png",
+      "size": "16rem",
       "side": "right",
-      "size": "24rem"
+      "style": { "bottom": "1rem", "right": "2rem" },
+      "customStyles": {
+        "borderColor": "#2DFF9A44"
+      }
     }
   },
   "roundNarrative": {
     "preQuestion": [
       {
-        "id": "test1",
+        "id": "r1-intro",
         "type": "dialogue",
-        "speaker": "TEST_RED",
+        "speaker": "Loki",
+        "characterId": "signal",
+        "text": "The shield encodes the anomaly. A numerical breach is hidden in the recursion."
+      },
+      {
+        "id": "r1-cap-intro",
+        "type": "dialogue",
+        "speaker": "Captain America",
         "characterId": "curator",
-        "text": "IF YOU SEE THIS RED CHAOS, ROUND 1 THEME WORKS."
+        "text": "This fight keeps resetting. We never win. The pattern's wrong."
       }
     ],
     "duringQuestion": [],
-    "afterAnswer": [],
-    "finished": []
+    "afterAnswer": [
+      {
+        "id": "r1-after",
+        "type": "dialogue",
+        "speaker": "Captain America",
+        "characterId": "curator",
+        "text": "Good. Now let's finish this war properly."
+      }
+    ],
+    "finished": [
+      {
+        "id": "r1-finished",
+        "type": "dialogue",
+        "speaker": "Loki",
+        "characterId": "signal",
+        "text": "The loop collapses. The shield stabilizes. Onwards to the next rift."
+      }
+    ]
   }
 }
