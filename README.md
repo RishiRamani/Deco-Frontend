@@ -380,7 +380,7 @@ Leave `duringQuestion`, `afterAnswer`, and `finished` as empty arrays `[]` if yo
 
 ## 9. Using the Admin panel
 
-The Admin panel is accessible at the top-right of the app when logged in with an Organizer account. Navigate to it via the Home button → admin hash, or directly via `/#admin`.
+The Admin panel is accessible at the top-right of the app when logged in with an Organizer account. Navigate to it via the Home button, or directly via `/admin`.
 
 ### Rounds tab
 

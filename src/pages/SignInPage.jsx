@@ -1,6 +1,6 @@
 import { SignIn } from '@clerk/clerk-react'
 
-export default function SignInPage() {
+export default function SignInPage({ authError, authSynced }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4">
       {/* Background */}
@@ -21,7 +21,17 @@ export default function SignInPage() {
       </div>
 
       <div className="relative z-10 fade-up-1 w-full max-w-md">
-        <SignIn />
+        <SignIn routing="path" path="/signin" fallbackRedirectUrl="/" />
+        {authError && (
+          <div className="mt-4 rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+            {authError}
+          </div>
+        )}
+        {authSynced && (
+          <div className="mt-4 rounded-2xl border border-[#2DFF9A]/25 bg-[#2DFF9A]/10 px-4 py-3 text-sm text-[#2DFF9A]">
+            Account synced. Redirecting...
+          </div>
+        )}
       </div>
     </div>
   )

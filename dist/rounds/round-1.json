@@ -1,163 +1,92 @@
 {
   "sceneTheme": {
     "bodyElement": {
-      "background": "radial-gradient(circle at top right, rgba(236, 72, 153, 0.22), transparent 25%), radial-gradient(circle at left center, rgba(59, 130, 246, 0.18), transparent 35%), linear-gradient(180deg, #090b12 0%, #111827 45%, #020617 100%)",
-      "gridPattern": "linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)",
-      "gridPatternSize": "36px 36px",
-      "gridPatternOpacity": 0.2
+      "background": "url('/backgrounds/r1-stage1-bg.png') center/cover no-repeat fixed",
+      "gridPattern": "none",
+      "gridPatternOpacity": 0
     },
     "frame": {
-      "background": "radial-gradient(circle at top right, rgba(236, 72, 153, 0.22), transparent 25%), radial-gradient(circle at left center, rgba(59, 130, 246, 0.18), transparent 35%), linear-gradient(180deg, #090b12 0%, #111827 45%, #020617 100%)"
+      "background": "rgba(0,0,0,0.4)"
     },
     "stage": {
-      "backgroundImage": "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0)), radial-gradient(circle at 50% 100%, rgba(168, 85, 247, 0.14), transparent 32%)"
+      "backgroundImage": "none"
     },
     "dialogueBox": {
-      "background": "linear-gradient(135deg, rgba(14, 116, 144, 0.95), rgba(15, 23, 42, 0.95))",
-      "border": "1px solid rgba(59, 130, 246, 0.30)",
-      "color": "#e2e8f0",
-      "bubbleImage": null,
-      "bubbleImageOpacity": 1,
-      "bubbleContainerClass": "rounded-[2rem]",
-      "boxShadow": "shadow-[0_25px_80px_rgba(59,130,246,0.2)]",
-      "customStyles": {
-        "speakerClass": "text-xs uppercase tracking-[0.3em] text-cyan-200/80",
-        "textClass": "mt-4 text-base leading-8 text-slate-100",
-        "transcriptClass": "mt-5 rounded-[1.5rem] border border-white/10 bg-blue-950/20 px-4 py-3 text-sm leading-7 text-blue-100",
-        "continueClass": "mt-5 text-right text-xs uppercase tracking-[0.25em] text-cyan-300"
-      }
+      "background": "rgba(255,255,255,0.95)",
+      "bubbleImage": "/images/thought-cloud.png",
+      "border": "none",
+      "color": "#1a1a2e"
     },
     "questionBox": {
-      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(59, 130, 246, 0.90))",
-      "border": "1px solid rgba(59, 130, 246, 0.18)",
-      "borderRadiusClass": "rounded-[2rem]",
-      "boxShadow": "shadow-[0_35px_100px_rgba(2,6,23,0.45)]",
-      "numberClass": "text-xs uppercase tracking-[0.3em] text-cyan-200/80",
-      "titleClass": "mt-3 max-w-2xl text-2xl font-medium text-white",
-      "optionClass": "rounded-[1.5rem] border px-4 py-4 text-left text-sm transition",
-      "minHeight": "auto"
+      "background": "linear-gradient(180deg, rgba(11, 31, 24, 0.94), rgba(0, 0, 0, 0.90))",
+      "border": "1px solid rgba(45, 255, 154, 0.15)",
+      "numberClass": "text-xs uppercase tracking-[0.3em] text-[#2DFF9A]/80",
+      "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white"
     },
     "answerRevealBox": {
-      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(168, 85, 247, 0.92))",
-      "border": "1px solid rgba(168, 85, 247, 0.24)",
-      "borderRadiusClass": "rounded-[2rem]",
-      "boxShadow": "shadow-[0_35px_100px_rgba(168,85,247,0.24)]",
-      "labelClass": "text-xs uppercase tracking-[0.35em] text-cyan-100/70",
-      "answerClass": "mt-6 text-xl leading-8 text-white",
-      "questionClass": "mt-3 text-sm text-slate-300",
-      "minHeight": "auto"
+      "background": "linear-gradient(135deg, rgba(11, 31, 24, 0.96), rgba(45, 255, 154, 0.12))",
+      "border": "1px solid rgba(45, 255, 154, 0.24)"
     }
   },
   "stageCharacters": {
     "curator": {
-      "name": "Aurora",
-      "accent": "#e11d48",
+      "name": "Captain America",
+      "accent": "#2DFF9A",
+      "image": "/characters/captain-america.png",
+      "size": "20rem",
       "side": "left",
-      "size": "18rem",
-      "image": "/characters/curator.svg",
       "style": { "bottom": "1rem", "left": "2rem" },
       "customStyles": {
-        "borderRadiusClass": "rounded-[3rem]",
-        "borderColor": "#e11d4866",
-        "shadowClass": "shadow-[0_35px_100px_rgba(225,29,72,0.35)]",
-        "containerTransition": "transition duration-500",
-        "imageClass": "w-full h-full object-cover",
-        "nameClass": "text-lg font-bold text-rose-200",
-        "nameBackgroundClass": "bg-transparent",
-        "fallbackBackground": "radial-gradient(circle at 50% 20%, #e11d4855, rgba(15,23,42,0.92) 55%)"
+        "borderColor": "#2DFF9A44"
       }
     },
     "signal": {
-      "name": "Echo",
-      "accent": "#38bdf8",
-      "side": "right",
+      "name": "Loki",
+      "accent": "#2DFF9A",
+      "image": "/images/loki.png",
       "size": "16rem",
-      "image": "/characters/signal.svg",
+      "side": "right",
       "style": { "bottom": "1rem", "right": "2rem" },
       "customStyles": {
-        "borderRadiusClass": "rounded-[3rem]",
-        "borderColor": "#38bdf866",
-        "shadowClass": "shadow-[0_35px_100px_rgba(56,189,248,0.35)]",
-        "containerTransition": "transition duration-500",
-        "imageClass": "w-full h-full object-cover",
-        "nameClass": "text-lg font-bold text-cyan-200",
-        "nameBackgroundClass": "bg-transparent",
-        "fallbackBackground": "radial-gradient(circle at 50% 20%, #38bdf855, rgba(15,23,42,0.92) 55%)"
+        "borderColor": "#2DFF9A44"
       }
     }
   },
   "roundNarrative": {
     "preQuestion": [
       {
-        "id": "intro-aurora",
+        "id": "r1-intro",
         "type": "dialogue",
-        "speaker": "Aurora",
-        "characterId": "curator",
-        "text": "Welcome to Round 1. The arena is set and the questions will drop soon."
+        "speaker": "Loki",
+        "characterId": "signal",
+        "text": "The shield encodes the anomaly. A numerical breach is hidden in the recursion."
       },
       {
-        "id": "intro-echo",
-        "type": "voiceMemo",
-        "speaker": "Echo",
-        "characterId": "signal",
-        "label": "Incoming mission briefing",
-        "icon": "Waveform",
-        "text": "This round rewards speed and precision. Keep your answers sharp.",
-        "transcript": "You have one shot per question. Answer fast to stay ahead.",
-        "voiceFile": "/voices/mission-briefing.mp3"
-      }
-    ],
-    "duringQuestion": [
-      {
-        "id": "during-{{questionNumber}}",
+        "id": "r1-cap-intro",
         "type": "dialogue",
-        "speaker": "Echo",
-        "characterId": "signal",
-        "text": "Question {{questionNumber}} of {{totalQuestions}} — keep your focus."
-      },
-      {
-        "questionNumber": 3,
-        "id": "during-3-special",
-        "type": "dialogue",
-        "speaker": "Aurora",
+        "speaker": "Captain America",
         "characterId": "curator",
-        "text": "This is a turning point question. Good timing matters more now."
+        "text": "This fight keeps resetting. We never win. The pattern's wrong."
       }
     ],
+    "duringQuestion": [],
     "afterAnswer": [
       {
-        "id": "after-{{submittedAnswer}}",
+        "id": "r1-after",
         "type": "dialogue",
-        "speaker": "Echo",
-        "characterId": "signal",
-        "text": "Saved: '{{submittedAnswer}}'. {{lastQuestionPhrase}}"
-      },
-      {
-        "questionNumber": 2,
-        "id": "after-2",
-        "type": "voiceMemo",
-        "speaker": "Aurora",
+        "speaker": "Captain America",
         "characterId": "curator",
-        "label": "Second question complete",
-        "icon": "Waveform",
-        "text": "Nice work. The second question is locked in.",
-        "transcript": "Question two answer recorded. Keep the streak going.",
-        "voiceFile": "/voices/question-complete.mp3"
+        "text": "Good. Now let's finish this war properly."
       }
     ],
     "finished": [
       {
-        "id": "finished-1",
-        "type": "voiceMemo",
-        "speaker": "Aurora",
-        "characterId": "curator",
-        "label": "Round complete",
-        "icon": "Hourglass",
-        "text": "This run is finished. Check the leaderboard or wait for the next round.",
-        "transcript": "Your score was recorded. Prepare for the next round.",
-        "voiceFile": "/voices/round-complete.mp3"
+        "id": "r1-finished",
+        "type": "dialogue",
+        "speaker": "Loki",
+        "characterId": "signal",
+        "text": "The loop collapses. The shield stabilizes. Onwards to the next rift."
       }
     ]
   }
 }
-

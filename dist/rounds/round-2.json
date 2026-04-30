@@ -1,161 +1,84 @@
 {
   "sceneTheme": {
     "bodyElement": {
-      "background": "radial-gradient(circle at top right, rgba(34,197,94,0.22), transparent 25%), radial-gradient(circle at left center, rgba(124,58,237,0.18), transparent 35%), linear-gradient(180deg, #020617 0%, #091421 45%, #050a18 100%)",
-      "gridPattern": "linear-gradient(rgba(34,197,94,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(34,197,94,0.06)_1px,transparent_1px)",
-      "gridPatternSize": "40px 40px",
-      "gridPatternOpacity": 0.15
+      "background": "url('/backgrounds/r2-stage1-bg.png') center/cover no-repeat fixed",
+      "gridPattern": "none",
+      "gridPatternOpacity": 0
     },
     "frame": {
-      "background": "radial-gradient(circle at top right, rgba(34,197,94,0.22), transparent 25%), radial-gradient(circle at left center, rgba(124,58,237,0.18), transparent 35%), linear-gradient(180deg, #020617 0%, #091421 45%, #050a18 100%)"
+      "background": "rgba(0,0,0,0.3)"
     },
     "stage": {
-      "backgroundImage": "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)), radial-gradient(circle at 50% 100%, rgba(34,197,94,0.14), transparent 32%)"
+      "backgroundImage": "none"
     },
     "dialogueBox": {
-      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(16, 185, 129, 0.92))",
-      "border": "1px solid rgba(34, 197, 94, 0.24)",
-      "color": "#e9f9f1",
-      "bubbleImage": null,
-      "bubbleImageOpacity": 1,
-      "bubbleContainerClass": "rounded-[2rem]",
-      "boxShadow": "shadow-[0_25px_80px_rgba(34,197,94,0.2)]",
-      "customStyles": {
-        "speakerClass": "text-xs uppercase tracking-[0.3em] text-emerald-200/80 font-semibold",
-        "textClass": "mt-4 text-base leading-8 text-emerald-50",
-        "transcriptClass": "mt-5 rounded-[1.5rem] border border-emerald-400/20 bg-emerald-950/20 px-4 py-3 text-sm leading-7 text-emerald-100",
-        "continueClass": "mt-5 text-right text-xs uppercase tracking-[0.25em] text-emerald-300 font-bold"
-      }
+      "background": "linear-gradient(135deg, rgba(26, 34, 54, 0.96), rgba(15, 23, 42, 0.90))",
+      "border": "1px solid rgba(254, 191, 60, 0.3)",
+      "color": "#FEBF3C"
     },
     "questionBox": {
-      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(34, 197, 94, 0.20))",
-      "border": "1px solid rgba(34, 197, 94, 0.15)",
-      "borderRadiusClass": "rounded-[2rem]",
-      "boxShadow": "shadow-[0_35px_100px_rgba(34,197,94,0.15)]",
-      "numberClass": "text-xs uppercase tracking-[0.35em] text-emerald-200/90 font-bold",
-      "titleClass": "mt-3 max-w-2xl text-3xl font-bold text-emerald-100",
-      "optionClass": "rounded-2xl border px-5 py-5 text-left text-base transition font-semibold",
-      "minHeight": "auto"
+      "background": "linear-gradient(180deg, rgba(26, 34, 54, 0.94), rgba(15, 23, 42, 0.90))",
+      "border": "1px solid rgba(254, 191, 60, 0.2)",
+      "numberClass": "text-xs uppercase tracking-[0.3em] text-[#FEBF3C]/80",
+      "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white"
     },
     "answerRevealBox": {
-      "background": "linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(16, 185, 129, 0.92))",
-      "border": "1px solid rgba(16, 185, 129, 0.24)",
-      "borderRadiusClass": "rounded-[2rem]",
-      "boxShadow": "shadow-[0_35px_100px_rgba(16,185,129,0.24)]",
-      "labelClass": "text-sm uppercase tracking-[0.5em] text-emerald-200/80 font-bold",
-      "answerClass": "mt-8 text-2xl leading-10 text-emerald-100 font-bold",
-      "questionClass": "mt-4 text-base text-emerald-50/70",
-      "minHeight": "auto"
+      "background": "linear-gradient(135deg, rgba(26, 34, 54, 0.96), rgba(254, 191, 60, 0.12))",
+      "border": "1px solid rgba(254, 191, 60, 0.24)",
+      "labelClass": "text-xs uppercase tracking-[0.35em] text-[#FEBF3C]/70"
     }
   },
   "stageCharacters": {
     "curator": {
-      "name": "Nova",
-      "accent": "#22c55e",
+      "name": "Iron Man",
+      "accent": "#FEBF3C",
+      "image": "/characters/hulk.png",
+      "size": "20rem",
       "side": "left",
-      "size": "17rem",
-      "image": "/characters/curator.svg",
-      "style": { "bottom": "1rem", "left": "1.5rem" },
+      "style": { "bottom": "1rem", "left": "2rem" },
       "customStyles": {
-        "borderRadiusClass": "rounded-[2.5rem]",
-        "borderColor": "#22c55e66",
-        "shadowClass": "shadow-[0_35px_100px_rgba(34,197,94,0.35)]",
-        "containerTransition": "transition duration-500",
-        "imageClass": "w-full h-full object-cover",
-        "nameClass": "text-lg font-bold text-emerald-200",
-        "nameBackgroundClass": "bg-emerald-950/20 rounded-full px-3 py-1",
-        "fallbackBackground": "radial-gradient(circle at 50% 20%, #22c55e55, rgba(15,23,42,0.92) 55%)"
+        "borderColor": "#FEBF3C44"
       }
     },
     "signal": {
-      "name": "Pulse",
-      "accent": "#7c3aed",
+      "name": "Hulk",
+      "accent": "#0CBE69",
+      "image": "/characters/hulk.png",
+      "size": "18rem",
       "side": "right",
-      "size": "17rem",
-      "image": "/characters/signal.svg",
-      "style": { "bottom": "1rem", "right": "1.5rem" },
+      "style": { "bottom": "1rem", "right": "2rem" },
       "customStyles": {
-        "borderRadiusClass": "rounded-[2.5rem]",
-        "borderColor": "#7c3aed66",
-        "shadowClass": "shadow-[0_35px_100px_rgba(124,58,237,0.35)]",
-        "containerTransition": "transition duration-500",
-        "imageClass": "w-full h-full object-cover",
-        "nameClass": "text-lg font-bold text-violet-200",
-        "nameBackgroundClass": "bg-violet-950/20 rounded-full px-3 py-1",
-        "fallbackBackground": "radial-gradient(circle at 50% 20%, #7c3aed55, rgba(15,23,42,0.92) 55%)"
+        "borderColor": "#0CBE6944"
       }
     }
   },
   "roundNarrative": {
     "preQuestion": [
       {
-        "id": "intro-nova",
+        "id": "r2-intro",
         "type": "dialogue",
-        "speaker": "Nova",
+        "speaker": "Iron Man",
         "characterId": "curator",
-        "text": "Round 2 is live. Your answers must be sharp and strategic."
-      },
-      {
-        "id": "intro-pulse",
-        "type": "voiceMemo",
-        "speaker": "Pulse",
-        "characterId": "signal",
-        "label": "System check",
-        "icon": "Waveform",
-        "text": "Remember: every correct answer counts more in the final score.",
-        "transcript": "Pay attention to the questions and watch the timer.",
-        "voiceFile": "/voices/mission-briefing.mp3"
+        "text": "DECO inserted a recursive logic trap inside the arc reactor interface. We need to break the loop."
       }
     ],
-    "duringQuestion": [
-      {
-        "id": "during-{{questionNumber}}",
-        "type": "dialogue",
-        "speaker": "Pulse",
-        "characterId": "signal",
-        "text": "Question {{questionNumber}} of {{totalQuestions}} — keep your focus."
-      },
-      {
-        "questionNumber": 1,
-        "id": "during-1-special",
-        "type": "dialogue",
-        "speaker": "Nova",
-        "characterId": "curator",
-        "text": "First one sets the pace. Choose wisely."
-      }
-    ],
+    "duringQuestion": [],
     "afterAnswer": [
       {
-        "id": "after-{{submittedAnswer}}",
+        "id": "r2-after",
         "type": "dialogue",
-        "speaker": "Nova",
+        "speaker": "Iron Man",
         "characterId": "curator",
-        "text": "Recorded: '{{submittedAnswer}}'. {{lastQuestionPhrase}}"
-      },
-      {
-        "questionNumber": 3,
-        "id": "after-3",
-        "type": "voiceMemo",
-        "speaker": "Pulse",
-        "characterId": "signal",
-        "label": "Third checkpoint",
-        "icon": "Waveform",
-        "text": "Question three complete. You're past the halfway point.",
-        "transcript": "Good job. Keep pushing through the second half.",
-        "voiceFile": "/voices/question-complete.mp3"
+        "text": "Next time Doom touches my code, I'm charging him rent."
       }
     ],
     "finished": [
       {
-        "id": "finished-2",
-        "type": "voiceMemo",
-        "speaker": "Nova",
-        "characterId": "curator",
-        "label": "Round complete",
-        "icon": "Hourglass",
-        "text": "That was Round 2. Great work — you're one step closer to the top.",
-        "transcript": "Wait for the leaderboard or prepare the next round.",
-        "voiceFile": "/voices/round-complete.mp3"
+        "id": "r2-finished",
+        "type": "dialogue",
+        "speaker": "Hulk",
+        "characterId": "signal",
+        "text": "CALM... ENOUGH. The gamma equation is solved."
       }
     ]
   }

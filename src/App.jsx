@@ -13,45 +13,88 @@ import LeaderboardPage from './pages/LeaderboardPage'
 import AdminPage from './pages/AdminPage'
 
 const DEFAULT_PAGE = 'home'
+const ROUTES = new Set(['home', 'about', 'registration', 'signin', 'round', 'waiting', 'leaderboard', 'admin'])
 
-function getHashPage() {
-  const hash = window.location.hash.replace('#', '').trim()
-  return hash || DEFAULT_PAGE
+function pageFromPathname(pathname) {
+  const page = pathname.replace(/^\/+|\/+$/g, '').split('/')[0] || DEFAULT_PAGE
+  return ROUTES.has(page) ? page : DEFAULT_PAGE
+}
+
+function pathForPage(page) {
+  return page === DEFAULT_PAGE ? '/' : `/${page}`
+}
+
+function getCurrentPage() {
+  const hashPage = window.location.hash.replace('#', '').trim()
+  if (hashPage) {
+    return ROUTES.has(hashPage) ? hashPage : DEFAULT_PAGE
+  }
+
+  return pageFromPathname(window.location.pathname)
 }
 
 function AuthenticatedApp() {
-  const { getToken, isSignedIn } = useAuth()
-  const [page, setPage] = useState(getHashPage)
+  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const [page, setPage] = useState(getCurrentPage)
   const [userRole, setUserRole] = useState(null)
+  const [authError, setAuthError] = useState(null)
+  const [authSynced, setAuthSynced] = useState(false)
 
   useEffect(() => {
-    const sync = () => setPage(getHashPage())
-    window.addEventListener('hashchange', sync)
-    return () => window.removeEventListener('hashchange', sync)
+    const hashPage = window.location.hash.replace('#', '').trim()
+    if (hashPage) {
+      const normalizedPage = ROUTES.has(hashPage) ? hashPage : DEFAULT_PAGE
+      window.history.replaceState({}, '', pathForPage(normalizedPage))
+      setPage(normalizedPage)
+    }
+
+    const sync = () => setPage(pageFromPathname(window.location.pathname))
+    window.addEventListener('popstate', sync)
+    return () => window.removeEventListener('popstate', sync)
   }, [])
 
   useEffect(() => {
     const fetchMe = async () => {
-      if (!isSignedIn) {
-        setUserRole(null)
+      if (!isLoaded) {
         return
       }
+
+      if (!isSignedIn) {
+        setUserRole(null)
+        setAuthError(null)
+        setAuthSynced(false)
+        return
+      }
+
+      setAuthSynced(false)
+      setAuthError(null)
+
       try {
         const token = await getToken()
         const data = await api('/api/auth/me', {}, token)
         setUserRole(data?.user?.role || null)
-      } catch {
+        setAuthSynced(true)
+
+        if (page === 'signin') {
+          window.history.replaceState({}, '', pathForPage(DEFAULT_PAGE))
+          setPage(DEFAULT_PAGE)
+        }
+      } catch (err) {
+        setAuthError(err?.data?.message || err?.message || 'Could not register your account with the backend.')
         setUserRole('PARTICIPANT')
+        setAuthSynced(false)
       }
     }
 
     fetchMe()
-  }, [getToken, isSignedIn])
+  }, [getToken, isLoaded, isSignedIn, page])
 
   const navigate = useCallback((nextPage) => {
     const requiresSignIn = ['round', 'waiting', 'admin']
     if (requiresSignIn.includes(nextPage) && !isSignedIn) {
-      window.location.hash = 'signin'
+      window.history.pushState({}, '', pathForPage('signin'))
+      setPage('signin')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
 
@@ -60,7 +103,8 @@ function AuthenticatedApp() {
     }
 
     const target = nextPage || DEFAULT_PAGE
-    window.location.hash = target
+    window.history.pushState({}, '', pathForPage(target))
+    setPage(target)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [userRole, isSignedIn])
 
@@ -69,7 +113,7 @@ function AuthenticatedApp() {
       home: <HomePage onNav={navigate} userRole={userRole} />,
       about: <AboutPage onNav={navigate} />,
       registration: <RegistrationPage onNav={navigate} />,
-      signin: <SignInPage />,
+      signin: <SignInPage authError={authError} authSynced={authSynced} />,
       round: <RoundPage onNav={navigate} userRole={userRole} />,
       waiting: <WaitingPage onNav={navigate} userRole={userRole} />,
       leaderboard: <LeaderboardPage />,
@@ -80,7 +124,7 @@ function AuthenticatedApp() {
           <WaitingPage onNav={navigate} userRole={userRole} forcedMessage="Organizer access is required for the admin panel." />
         ),
     }),
-    [navigate, userRole],
+    [navigate, userRole, authError, authSynced],
   )
 
   return (
