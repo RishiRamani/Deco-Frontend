@@ -1,4 +1,15 @@
-const BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+const rawBase = import.meta.env.VITE_API_BASE_URL || ''
+const normalizedBase = rawBase.trim().replace(/\/+$/, '')
+
+if (!normalizedBase) {
+  throw new Error('VITE_API_BASE_URL environment variable must be set to a single backend URL')
+}
+
+if (normalizedBase.includes(',')) {
+  throw new Error('VITE_API_BASE_URL must contain exactly one backend URL; comma-separated lists are not allowed')
+}
+
+const BASE = normalizedBase
 
 export async function api(path, options = {}, token = null) {
   const headers = { 'Content-Type': 'application/json' }

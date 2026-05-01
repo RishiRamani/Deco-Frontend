@@ -12,13 +12,13 @@
       "backgroundImage": "none"
     },
     "dialogueBox": {
-      "background": "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(241,243,244,0.90))",
-      "border": "1px solid rgba(255,255,255,0.5)",
-      "color": "#1a1a2e",
+      "background": "#ffffff",
+      "border": "1px solid rgba(192, 192, 192, 0.36)",
+      "color": "#111827",
       "customStyles": {
-        "voicePlayerBgClass": "mt-5 flex items-center gap-3 rounded-lg bg-[#F1F3F4] p-3",
-        "playButtonClass": "flex-shrink-0 rounded-full bg-[#2DFF9A] hover:bg-[#0CBE69] p-2 transition",
-        "voiceTextClass": "text-xs text-slate-600"
+        "voicePlayerBgClass": "mt-4 flex items-center gap-3 rounded-xl border border-[#2DFF9A]/20 bg-[#2DFF9A]/8 p-3",
+        "playButtonClass": "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#0B1F18] text-[#2DFF9A] shadow-[0_0_18px_rgba(45,255,154,0.24)] hover:bg-[#123628] transition",
+        "voiceTextClass": "text-xs font-medium uppercase tracking-[0.18em] text-slate-600"
       }
     },
     "questionBox": {

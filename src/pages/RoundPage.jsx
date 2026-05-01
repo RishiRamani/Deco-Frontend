@@ -99,9 +99,7 @@ function StageCharacter({ character, visible }) {
   const containerTransition = customStyles.containerTransition || 'transition duration-500'
   const imageClass = customStyles.imageClass || 'w-full h-full object-cover'
 
-  // Scale down character size on mobile
-  const sizeNum = parseInt(character.size) || 18
-  const mobileSize = `${Math.max(8, Math.round(sizeNum * 0.5))}rem`
+  const characterWidth = `min(calc(${character.size} * 0.9), 26vw)`
 
   return (
     <div
@@ -110,8 +108,8 @@ function StageCharacter({ character, visible }) {
       }`}
       style={{
         borderColor: borderColor,
-        width: `min(${character.size}, 30vw)`,
-        height: `calc(min(${character.size}, 30vw) * 1.1)`,
+        width: characterWidth,
+        aspectRatio: '1 / 1.1',
         ...character.style,
       }}
     >
@@ -156,18 +154,18 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
   const handleAudioEnded = () => setIsPlaying(false)
 
   const dialogueCustom = sceneTheme.dialogueBox?.customStyles || {}
-  const speakerClass = dialogueCustom.speakerClass || 'text-xs uppercase tracking-[0.3em] text-slate-500'
-  const textClass = dialogueCustom.textClass || 'mt-4 text-base leading-8'
-  const transcriptClass = dialogueCustom.transcriptClass || 'mt-5 rounded-[1.5rem] border border-white/10 bg-slate-950/10 px-4 py-3 text-sm leading-7 text-slate-700'
-  const continueClass = dialogueCustom.continueClass || 'mt-5 text-right text-xs uppercase tracking-[0.25em] text-slate-500'
-  const voicePlayerBgClass = dialogueCustom.voicePlayerBgClass || 'mt-5 flex items-center gap-3 rounded-lg bg-slate-900/50 p-3'
-  const playButtonClass = dialogueCustom.playButtonClass || 'flex-shrink-0 rounded-full bg-[#2DFF9A] hover:bg-[#0CBE69] p-2 transition'
-  const voiceTextClass = dialogueCustom.voiceTextClass || 'text-xs text-slate-400'
-  const voiceMemoBoxClass = dialogueCustom.voiceMemoBoxClass || 'fixed bottom-4 sm:bottom-12 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] sm:w-auto max-w-2xl rounded-[1.5rem] sm:rounded-[2rem] border border-[#2DFF9A]/25 bg-[#0B1F18]/95 p-4 sm:p-6 text-left text-slate-100 shadow-[0_25px_80px_rgba(45,255,154,0.15)] scale-in'
-  const normalBoxClass = dialogueCustom.normalBoxClass || 'fixed bottom-4 sm:bottom-12 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] sm:w-[min(36rem,60vw)] p-4 sm:p-6 text-left shadow-[0_25px_80px_rgba(255,255,255,0.18)] scale-in'
-  const bubbleContainerClass = sceneTheme.dialogueBox?.bubbleContainerClass || 'rounded-[2rem]'
-  const bubbleImage = sceneTheme.dialogueBox?.bubbleImage
-  const bubbleImageOpacity = sceneTheme.dialogueBox?.bubbleImageOpacity ?? 1
+  const speakerClass = dialogueCustom.speakerClass || 'text-xs uppercase tracking-[0.22em] text-slate-500'
+  const textClass = dialogueCustom.textClass || 'mt-3 text-base leading-7 text-slate-900'
+  const transcriptClass = dialogueCustom.transcriptClass || 'mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-7 text-slate-700 shadow-inner'
+  const continueClass = dialogueCustom.continueClass || 'mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-slate-400'
+  const voicePlayerBgClass = dialogueCustom.voicePlayerBgClass || 'mt-4 flex items-center gap-3 rounded-xl border border-[#2DFF9A]/20 bg-[#2DFF9A]/8 p-3'
+  const playButtonClass = dialogueCustom.playButtonClass || 'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#0B1F18] text-[#2DFF9A] shadow-[0_0_18px_rgba(45,255,154,0.24)] hover:bg-[#123628] transition'
+  const voiceTextClass = dialogueCustom.voiceTextClass || 'text-xs font-medium uppercase tracking-[0.18em] text-slate-600'
+  const voiceMemoBoxClass = dialogueCustom.voiceMemoBoxClass || 'relative w-full max-w-xl rounded-2xl p-4 sm:p-5 text-left scale-in'
+  const normalBoxClass = dialogueCustom.normalBoxClass || 'relative w-full max-w-xl p-4 sm:p-5 text-left scale-in'
+  const bubbleContainerClass = sceneTheme.dialogueBox?.bubbleContainerClass || 'rounded-2xl'
+  const boxShadowClass = sceneTheme.dialogueBox?.boxShadow || 'shadow-[0_22px_70px_rgba(0,0,0,0.28)]'
+  const dialogueBackground = sceneTheme.dialogueBox?.background || '#ffffff'
 
   const body = (
     <>
@@ -180,7 +178,18 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
               <button type="button" onClick={handlePlayAudio} className={playButtonClass}>
                 <span className="text-white font-bold">{isPlaying ? '⏸' : '▶'}</span>
               </button>
-              <span className={voiceTextClass}>{isPlaying ? 'Playing...' : 'Play voice memo'}</span>
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <span className={voiceTextClass}>{isPlaying ? 'Playing voice memo' : 'Voice memo'}</span>
+                <div className="flex h-5 flex-1 items-center gap-1 overflow-hidden">
+                  {Array.from({ length: 18 }, (_, index) => (
+                    <span
+                      key={index}
+                      className="w-1 rounded-full bg-[#2DFF9A]/60"
+                      style={{ height: `${6 + (index % 5) * 3}px` }}
+                    />
+                  ))}
+                </div>
+              </div>
               <audio
                 ref={audioRef}
                 src={item.voiceFile}
@@ -202,13 +211,12 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
       <button
         type="button"
         onClick={onAdvance}
-        className={voiceMemoBoxClass}
+        className={`${voiceMemoBoxClass} ${boxShadowClass}`}
         style={{
+          background: dialogueBackground,
+          border: sceneTheme.dialogueBox.border,
+          color: sceneTheme.dialogueBox.color,
           ...(dialogueCustom.voiceMemoBoxStyle || {}),
-          backgroundImage: bubbleImage ? `url(${bubbleImage})` : undefined,
-          backgroundSize: bubbleImage ? 'cover' : undefined,
-          backgroundPosition: bubbleImage ? 'center' : undefined,
-          opacity: bubbleImage ? bubbleImageOpacity : undefined,
         }}
       >
         {body}
@@ -220,14 +228,11 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
     <button
       type="button"
       onClick={onAdvance}
-      className={`${normalBoxClass} ${bubbleContainerClass}`}
+      className={`${normalBoxClass} ${bubbleContainerClass} ${boxShadowClass}`}
       style={{
-        background: bubbleImage ? `url(${bubbleImage})` : sceneTheme.dialogueBox.background,
-        backgroundSize: bubbleImage ? 'cover' : undefined,
-        backgroundPosition: bubbleImage ? 'center' : undefined,
+        background: dialogueBackground,
         border: sceneTheme.dialogueBox.border,
         color: sceneTheme.dialogueBox.color,
-        opacity: bubbleImage ? bubbleImageOpacity : 1,
         ...(dialogueCustom.normalBoxStyle || {}),
       }}
     >
@@ -259,7 +264,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
   return (
     <form
       onSubmit={handleSubmit}
-      className={`${borderRadiusClass} p-6 sm:p-8 ${boxShadow} max-w-2xl w-full backdrop-blur-md`}
+      className={`${borderRadiusClass} p-5 sm:p-6 ${boxShadow} max-w-xl w-full backdrop-blur-md`}
       style={{
         background: sceneTheme.questionBox.background,
         border: sceneTheme.questionBox.border,
@@ -335,7 +340,7 @@ function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, o
 
   return (
     <div
-      className={`flex flex-col items-center justify-center px-8 py-10 text-center ${borderRadiusClass} ${boxShadow} max-w-2xl w-full backdrop-blur-md`}
+      className={`flex flex-col items-center justify-center px-6 py-8 text-center ${borderRadiusClass} ${boxShadow} max-w-xl w-full backdrop-blur-md`}
       style={{
         background: sceneTheme.answerRevealBox.background,
         border: sceneTheme.answerRevealBox.border,
@@ -577,8 +582,8 @@ export default function RoundPage({ onNav }) {
   const activeDialogue = sequenceIndex < activeSequence.length ? activeSequence[sequenceIndex] : null
   const highlightedCharacter = activeDialogue?.characterId
   const isLastQuestion = currentIndex === questions.length - 1
-  const showQuestionCard = phase === 'question' && !activeDialogue && currentQuestion
-  const showAnswerReveal = phase === 'answer' && !activeDialogue && currentQuestion && currentResponse
+  const showQuestionCard = phase === 'question' && currentQuestion
+  const showAnswerReveal = phase === 'answer' && currentQuestion && currentResponse
 
   // ─── SUBMIT ────────────────────────────────────────────────────────────────
   // Saves to localStorage immediately so refresh restores the answer without
@@ -656,7 +661,6 @@ export default function RoundPage({ onNav }) {
       {/* Experience Layer */}
       <StageCharacter character={effectiveStageCharacters.curator} visible={highlightedCharacter === 'curator'} />
       <StageCharacter character={effectiveStageCharacters.signal} visible={highlightedCharacter === 'signal'} />
-      {activeDialogue && <SceneDialogue item={activeDialogue} onAdvance={advanceSequence} sceneTheme={effectiveSceneTheme} />}
 
       {/* Background */}
       <div
@@ -693,29 +697,31 @@ export default function RoundPage({ onNav }) {
       {/* Spacer so content isn't under HUD */}
       <div className="h-4"></div>
 
-        <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
-          <div className="pointer-events-auto">
+        <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none px-4 py-24 sm:py-28">
+          <div className="pointer-events-auto max-h-[calc(100vh-9rem)] w-full max-w-xl overflow-y-auto px-1 py-1">
             {currentQuestion ? (
-              showAnswerReveal ? (
-                <AnswerReveal
-                  question={currentQuestion}
-                  submittedAnswer={currentResponse.submittedAnswer}
-                  isLastQuestion={isLastQuestion}
-                  onContinue={goNext}
-                  onFinish={() => finishRound()}
-                  sceneTheme={effectiveSceneTheme}
-                />
-              ) : showQuestionCard ? (
-                <QuestionCard
-                  question={currentQuestion}
-                  questionNumber={currentIndex + 1}
-                  totalQuestions={totalQuestions}
-                  onSubmit={submitAnswer}
-                  loading={submitting}
-                  previousAnswer={currentResponse?.submittedAnswer}
-                  sceneTheme={effectiveSceneTheme}
-                />
-              ) : null
+              <>
+                {showAnswerReveal ? (
+                  <AnswerReveal
+                    question={currentQuestion}
+                    submittedAnswer={currentResponse.submittedAnswer}
+                    isLastQuestion={isLastQuestion}
+                    onContinue={goNext}
+                    onFinish={() => finishRound()}
+                    sceneTheme={effectiveSceneTheme}
+                  />
+                ) : showQuestionCard ? (
+                  <QuestionCard
+                    question={currentQuestion}
+                    questionNumber={currentIndex + 1}
+                    totalQuestions={totalQuestions}
+                    onSubmit={submitAnswer}
+                    loading={submitting}
+                    previousAnswer={currentResponse?.submittedAnswer}
+                    sceneTheme={effectiveSceneTheme}
+                  />
+                ) : null}
+              </>
             ) : (
               <Panel className="bg-emerald-300/10 text-center">
                 <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">No questions</div>
@@ -729,6 +735,14 @@ export default function RoundPage({ onNav }) {
             )}
           </div>
         </div>
+
+        {activeDialogue && (
+          <div className="fixed inset-x-0 bottom-4 z-50 flex justify-center px-4 pointer-events-none">
+            <div className="pointer-events-auto w-full max-w-xl">
+              <SceneDialogue item={activeDialogue} onAdvance={advanceSequence} sceneTheme={effectiveSceneTheme} />
+            </div>
+          </div>
+        )}
     </>
   )
 }

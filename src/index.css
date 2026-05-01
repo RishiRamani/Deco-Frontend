@@ -160,6 +160,19 @@ button, a, input, textarea {
   100% { color: #2DFF9A; }
 }
 
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 40px rgba(45,255,154,0.08);
+  }
+  50% {
+    box-shadow: 0 0 70px rgba(45,255,154,0.15);
+  }
+}
+
+.glow-pulse {
+  animation: glowPulse 6s ease-in-out infinite;
+}
+
 .timer-active { animation: ticker 1s ease-in-out infinite; }
 
 @keyframes correctPulse {

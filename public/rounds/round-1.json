@@ -12,10 +12,10 @@
       "backgroundImage": "none"
     },
     "dialogueBox": {
-      "background": "rgba(255,255,255,0.95)",
-      "bubbleImage": "/images/thought-cloud.png",
-      "border": "none",
-      "color": "#1a1a2e"
+      "background": "#ffffff",
+      "bubbleImage": null,
+      "border": "1px solid rgba(45, 255, 154, 0.24)",
+      "color": "#111827"
     },
     "questionBox": {
       "background": "linear-gradient(180deg, rgba(11, 31, 24, 0.94), rgba(0, 0, 0, 0.90))",

@@ -40,6 +40,8 @@ function AuthenticatedApp() {
   const [authError, setAuthError] = useState(null)
   const [authSynced, setAuthSynced] = useState(false)
   const [userAllowed, setUserAllowed] = useState(false)
+  const [allowedLoading, setAllowedLoading] = useState(false)
+  const [roundIntroActive, setRoundIntroActive] = useState(false)
 
   useEffect(() => {
     const hashPage = window.location.hash.replace('#', '').trim()
@@ -55,13 +57,17 @@ function AuthenticatedApp() {
   }, [])
 
   useEffect(() => {
-    const fetchIsAllowed = async () => {
+    let cancelled = false
+
+    const syncUser = async () => {
       if (!isLoaded) {
         return
       }
 
       if (!isSignedIn) {
         setUserRole(null)
+        setUserAllowed(false)
+        setAllowedLoading(false)
         setAuthError(null)
         setAuthSynced(false)
         return
@@ -69,59 +75,41 @@ function AuthenticatedApp() {
 
       setAuthSynced(false)
       setAuthError(null)
+      setAllowedLoading(true)
 
       try {
         const token = await getToken()
-        const data = await api('/api/allowed', {}, token)
-        setUserAllowed(data.allowed);
+        const [me, allowed] = await Promise.all([
+          api('/api/auth/me', {}, token),
+          api('/api/allowed', {}, token),
+        ])
 
-        if (page === 'signin') {
-          window.history.replaceState({}, '', pathForPage(DEFAULT_PAGE))
-          setPage(DEFAULT_PAGE)
-        }
-      } catch (err) {
-        setAuthError(err?.data?.message || err?.message || 'Could not fetch if user is allowed or not.')
-        setAuthSynced(false)
-      }
-    }
+        if (cancelled) return
 
-    fetchIsAllowed()
-  }, [getToken, isLoaded, isSignedIn, page])
-
-  useEffect(() => {
-    const fetchMe = async () => {
-      if (!isLoaded) {
-        return
-      }
-
-      if (!isSignedIn) {
-        setUserRole(null)
-        setAuthError(null)
-        setAuthSynced(false)
-        return
-      }
-
-      setAuthSynced(false)
-      setAuthError(null)
-
-      try {
-        const token = await getToken()
-        const data = await api('/api/auth/me', {}, token)
-        setUserRole(data?.user?.role || null)
+        setUserRole(me?.user?.role || null)
+        setUserAllowed(Boolean(allowed?.allowed))
         setAuthSynced(true)
+        setAllowedLoading(false)
 
         if (page === 'signin') {
           window.history.replaceState({}, '', pathForPage(DEFAULT_PAGE))
           setPage(DEFAULT_PAGE)
         }
       } catch (err) {
+        if (cancelled) return
+
         setAuthError(err?.data?.message || err?.message || 'Could not register your account with the backend.')
         setUserRole('PARTICIPANT')
+        setUserAllowed(false)
+        setAllowedLoading(false)
         setAuthSynced(false)
       }
     }
 
-    fetchMe()
+    syncUser()
+    return () => {
+      cancelled = true
+    }
   }, [getToken, isLoaded, isSignedIn, page])
 
   const navigate = useCallback((nextPage) => {
@@ -138,14 +126,28 @@ function AuthenticatedApp() {
     }
 
     const target = nextPage || DEFAULT_PAGE
+
+    if (target === 'round' && page !== 'round') {
+      if (roundIntroActive) return
+
+      setRoundIntroActive(true)
+      window.setTimeout(() => {
+        window.history.pushState({}, '', pathForPage(target))
+        setPage(target)
+        setRoundIntroActive(false)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 1400)
+      return
+    }
+
     window.history.pushState({}, '', pathForPage(target))
     setPage(target)
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [userRole, isSignedIn])
+  }, [page, roundIntroActive, userRole, isSignedIn])
 
   const pages = useMemo(
     () => ({
-      home: <HomePage onNav={navigate} userRole={userRole} />,
+      home: <HomePage onNav={navigate} userRole={userRole} userAllowed={userAllowed} allowedLoading={allowedLoading} />,
       about: <AboutPage onNav={navigate} />,
       registration: <RegistrationPage onNav={navigate} />,
       signin: <SignInPage authError={authError} authSynced={authSynced} />,
@@ -159,11 +161,11 @@ function AuthenticatedApp() {
           <WaitingPage onNav={navigate} userRole={userRole} forcedMessage="Organizer access is required for the admin panel." />
         ),
     }),
-    [navigate, userRole, authError, authSynced],
+    [navigate, userRole, userAllowed, allowedLoading, authError, authSynced],
   )
 
   return (
-    <Layout page={page} onNav={navigate} userRole={userRole}>
+    <Layout page={page} onNav={navigate} userRole={userRole} roundIntroActive={roundIntroActive}>
       {pages[page] || pages.home}
     </Layout>
   )

@@ -12,9 +12,9 @@
       "backgroundImage": "none"
     },
     "dialogueBox": {
-      "background": "linear-gradient(135deg, rgba(11, 31, 24, 0.96), rgba(0, 0, 0, 0.90))",
-      "border": "1px solid rgba(45, 255, 154, 0.3)",
-      "color": "#2DFF9A"
+      "background": "#ffffff",
+      "border": "1px solid rgba(45, 255, 154, 0.24)",
+      "color": "#111827"
     },
     "questionBox": {
       "background": "linear-gradient(180deg, rgba(11, 31, 24, 0.94), rgba(0, 0, 0, 0.90))",
