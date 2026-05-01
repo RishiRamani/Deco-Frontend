@@ -68,7 +68,7 @@ export default function Layout({ children, page, onNav, userRole, roundIntroActi
               exit={{ opacity: 0, scale: 1.35, filter: 'blur(10px)' }}
               transition={{ duration: 1.15, ease: [0.16, 1, 0.3, 1] }}
             >
-              BECAUSE IF YOU FAIL... REALITY WON’T
+              STEP FORWARD....IF YOU DARE
             </motion.div>
           </motion.div>
         )}
