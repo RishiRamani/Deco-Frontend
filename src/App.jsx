@@ -80,8 +80,7 @@ function AuthenticatedApp() {
           setPage(DEFAULT_PAGE)
         }
       } catch (err) {
-        setAuthError(err?.data?.message || err?.message || 'Could not register your account with the backend.')
-        setUserRole('PARTICIPANT')
+        setAuthError(err?.data?.message || err?.message || 'Could not fetch if user is allowed or not.')
         setAuthSynced(false)
       }
     }
