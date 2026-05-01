@@ -39,6 +39,7 @@ function AuthenticatedApp() {
   const [userRole, setUserRole] = useState(null)
   const [authError, setAuthError] = useState(null)
   const [authSynced, setAuthSynced] = useState(false)
+  const [userAllowed, setUserAllowed] = useState(false)
 
   useEffect(() => {
     const hashPage = window.location.hash.replace('#', '').trim()
@@ -52,6 +53,41 @@ function AuthenticatedApp() {
     window.addEventListener('popstate', sync)
     return () => window.removeEventListener('popstate', sync)
   }, [])
+
+  useEffect(() => {
+    const fetchIsAllowed = async () => {
+      if (!isLoaded) {
+        return
+      }
+
+      if (!isSignedIn) {
+        setUserRole(null)
+        setAuthError(null)
+        setAuthSynced(false)
+        return
+      }
+
+      setAuthSynced(false)
+      setAuthError(null)
+
+      try {
+        const token = await getToken()
+        const data = await api('/api/allowed', {}, token)
+        setUserAllowed(data.allowed);
+
+        if (page === 'signin') {
+          window.history.replaceState({}, '', pathForPage(DEFAULT_PAGE))
+          setPage(DEFAULT_PAGE)
+        }
+      } catch (err) {
+        setAuthError(err?.data?.message || err?.message || 'Could not register your account with the backend.')
+        setUserRole('PARTICIPANT')
+        setAuthSynced(false)
+      }
+    }
+
+    fetchIsAllowed()
+  }, [getToken, isLoaded, isSignedIn, page])
 
   useEffect(() => {
     const fetchMe = async () => {
