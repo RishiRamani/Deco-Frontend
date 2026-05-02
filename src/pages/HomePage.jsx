@@ -53,7 +53,7 @@ export default function HomePage({ onNav, userRole, userAllowed, allowedLoading 
       {/* Logo */}
       <div className="absolute inset-0 z-10 flex items-center justify-center pb-32 sm:pb-40">
         <img
-          src="/images/deco-logo.png"
+          src="/images/DecoIcon.png"
           alt="Deco Disaster"
           className="w-[260px] sm:w-[380px] md:w-[480px] lg:w-[580px] object-contain animate-pulse-slow"
           style={{
@@ -76,7 +76,7 @@ export default function HomePage({ onNav, userRole, userAllowed, allowedLoading 
             >
               CHECKING
             </button>
-          ) : userAllowed ? (
+          ) : userAllowed && (
             <button
               onClick={() => onNav('round')}
               className={`w-full sm:w-auto ${homeButtonClass}`}
@@ -84,15 +84,7 @@ export default function HomePage({ onNav, userRole, userAllowed, allowedLoading 
             >
               START
             </button>
-          ) : (
-            <button
-              onClick={() => window.open("https://examplegoogleform.com", "_blank")}
-              className={`w-full sm:w-auto ${homeButtonClass}`}
-              style={homeButtonStyle}
-            >
-              REGISTER NOW
-            </button>
-          )}
+          ) }
 
           {/* ABOUT */}
           <button
