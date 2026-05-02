@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useUser } from '../context/AuthContext'   
+import { useUser } from '../context/AuthContext'
 import { useApi } from '../hooks/useApi'
 import { Alert, Spinner } from '../components/UI'
+import Timer from '../components/Timer'
 
 function formatTime(totalSeconds) {
   const safe = Number(totalSeconds || 0)
@@ -19,6 +20,8 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(null)
+  const [infoMessage, setInfoMessage] = useState(null)
+  const [availableAt, setAvailableAt] = useState(null)
 
   const load = async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true)
@@ -27,10 +30,14 @@ export default function LeaderboardPage() {
     try {
       const result = await api.get('/api/leaderboard')
       setEntries(result?.data || [])
+      setInfoMessage(result?.message || null)
+      setAvailableAt(result?.availableAt ? new Date(result.availableAt) : null)
       setError(null)
     } catch (err) {
       setError(err.message)
       setEntries([])
+      setInfoMessage(null)
+      setAvailableAt(null)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -42,6 +49,13 @@ export default function LeaderboardPage() {
   }, [])
 
   const myEmail = user?.primaryEmailAddress?.emailAddress
+
+  // ✅ UPDATED: credits with optional URLs
+  const credits = [
+    { name: "Placeholder Name", url: "" },
+    { name: "Placeholder Name", url: "https://example.com" },
+    { name: "Placeholder Name" }
+  ]
 
   if (loading) {
     return (
@@ -100,7 +114,60 @@ export default function LeaderboardPage() {
 
         {entries.length === 0 ? (
           <div className="py-20 text-center text-slate-400 text-lg">
-            No cumulative results available.
+            {availableAt ? (
+              <div className="py-10 flex justify-center">
+
+                <div className="relative w-full max-w-lg rounded-xl border border-[#2DFF9A]/20 bg-black/60 backdrop-blur-md px-6 py-6 shadow-[0_0_40px_rgba(45,255,154,0.08)]">
+
+                  {/* subtle glow */}
+                  <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle,rgba(45,255,154,0.12),transparent_70%)] opacity-40" />
+
+                  {/* HEADER */}
+                  <div
+                    className="text-xs tracking-[0.5em] text-[#2DFF9A]/70 mb-4 text-center"
+                    style={{ fontFamily: "Orbitron, sans-serif" }}
+                  >
+                    ACCESS RESTRICTED
+                  </div>
+
+                  {/* LORE TEXT (bigger + readable) */}
+                  <div className="text-sm sm:text-base text-slate-300 leading-relaxed text-center max-w-md mx-auto">
+                    Temporal records remain sealed. Synchronization with the central timeline is incomplete —
+                    premature access may destabilize recorded outcomes.
+                  </div>
+
+                  {/* 🔥 TIMER ROW (FIXED ALIGNMENT) */}
+                  <div className="mt-6 flex items-center justify-center gap-6">
+
+                    {/* label */}
+                    <div className="text-xs tracking-[0.3em] text-slate-400">
+                      UNLOCK IN
+                    </div>
+
+                    {/* timer box */}
+                    <div className="px-5 py-2 rounded-lg bg-[#2DFF9A]/10 border border-[#2DFF9A]/30 shadow-[0_0_20px_rgba(45,255,154,0.25)]">
+                      <div
+                        className="text-xl sm:text-2xl font-semibold text-[#2DFF9A]"
+                        style={{ fontFamily: "monospace" }}   // 👈 different font
+                      >
+                        <Timer targetTime={availableAt} label="" />
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* FOOTER */}
+                  <div className="mt-5 text-[10px] text-slate-500 tracking-[0.25em] text-center">
+                    [ TIMELINE STABILIZATION IN PROGRESS ]
+                  </div>
+
+                </div>
+              </div>
+            ) : (
+              <div>
+                {infoMessage || 'No cumulative results available.'}
+              </div>
+            )}
           </div>
         ) : (
           entries.map((entry) => {
@@ -115,7 +182,6 @@ export default function LeaderboardPage() {
                   entry.email === myEmail ? 'bg-[#2DFF9A]/10' : ''
                 }`}
               >
-                {/* 🔥 RANK (special styling for top 3) */}
                 <div
                   className={`text-xl font-bold ${
                     isTop1
@@ -130,17 +196,14 @@ export default function LeaderboardPage() {
                   #{entry.rank}
                 </div>
 
-                {/* ✅ NAME ONLY (email removed) */}
                 <div className="text-white font-medium text-lg">
                   {entry.name}
                 </div>
 
-                {/* TIME */}
                 <div className="text-right text-slate-300">
                   {formatTime(entry.totalTime)}
                 </div>
 
-                {/* POINTS */}
                 <div
                   className={`text-right text-2xl font-bold ${
                     isTop1
@@ -156,10 +219,9 @@ export default function LeaderboardPage() {
         )}
       </div>
 
-
+      {/* ✅ CREDITS */}
       <div className="mt-40 text-center">
 
-        {/* Label — now dominant */}
         <div
           className="text-sm sm:text-base uppercase tracking-[0.6em] text-[#2DFF9A] mb-4 drop-shadow-[0_0_10px_rgba(45,255,154,0.6)]"
           style={{ fontFamily: "Orbitron, sans-serif" }}
@@ -167,37 +229,39 @@ export default function LeaderboardPage() {
           CREDITS
         </div>
 
-        {/* Title — toned down */}
         <h2 className="text-xl sm:text-2xl font-medium text-slate-300 mb-12 tracking-wide">
           Built by ACM Web Team
         </h2>
 
-        {/* Names */}
         <div className="max-w-md mx-auto space-y-5">
 
-          {[
-            "Placeholder Name",
-            "Placeholder Name",
-            "Placeholder Name",
-          ].map((name) => (
-            <div
-              key={name}
-              className="group relative text-slate-400 transition-all duration-300 hover:text-[#2DFF9A]"
-              style={{ fontFamily: "Orbitron, sans-serif" }}
-            >
-              {/* Glow line on hover */}
-              <span className="absolute left-1/2 -translate-x-1/2 bottom-0 h-px w-0 bg-[#2DFF9A] transition-all duration-300 group-hover:w-24" />
+          {credits.map((person, index) => {
+            const hasLink = person.url && person.url.trim() !== ""
 
-              {/* Name */}
-              <span className="tracking-wide group-hover:tracking-[0.12em] transition-all">
-                {name}
-              </span>
-            </div>
-          ))}
+            return (
+              <div
+                key={`${person.name}-${index}`}
+                onClick={() => {
+                  if (hasLink) {
+                    window.open(person.url, "_blank")
+                  }
+                }}
+                className={`group relative text-slate-400 transition-all duration-300 hover:text-[#2DFF9A] ${
+                  hasLink ? "cursor-pointer" : "cursor-default"
+                }`}
+                style={{ fontFamily: "Orbitron, sans-serif" }}
+              >
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-0 h-px w-0 bg-[#2DFF9A] transition-all duration-300 group-hover:w-24" />
+
+                <span className="tracking-wide group-hover:tracking-[0.12em] transition-all">
+                  {person.name}
+                </span>
+              </div>
+            )
+          })}
 
         </div>
 
-        {/* Footer */}
         <div className="mt-14 text-xs text-slate-500 tracking-wide">
           Deco Disaster 6.0 — Doomsday Protocol
         </div>

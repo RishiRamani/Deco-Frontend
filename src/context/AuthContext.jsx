@@ -12,20 +12,13 @@ export function AuthProvider({ children }) {
   const fetchMe = useCallback(async () => {
     try {
       const url = backendUrl + '/api/auth/me'
-      console.log("Fetching user from:", url);
       const res = await fetch(url, { 
         credentials: 'include',
       })
-      console.log("Response status:", res.status);
-      console.log("Response headers:", [...res.headers.entries()]);
-      
       if (res.ok) {
         const json = await res.json()
-        console.log("User data received:", json);
         setUser(json.user || null)
       } else {
-        const errText = await res.text();
-        console.log("Auth failed:", res.status, errText);
         setUser(null)
       }
     } catch (err) {

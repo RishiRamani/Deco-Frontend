@@ -48,35 +48,7 @@ export default function HomePage({ onNav, userRole, userAllowed, allowedLoading 
         />
       </a>
 
-      {/* Auth controls */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 flex gap-3">
-        {userRole === 'ORGANIZER' && (
-          <button
-            onClick={() => onNav('admin')}
-            className="rounded-full border border-[#2DFF9A]/40 bg-black/60 px-4 py-2 text-xs text-[#2DFF9A] backdrop-blur-sm transition hover:bg-[#2DFF9A]/10"
-            style={{ fontFamily: "Orbitron, sans-serif", letterSpacing: "0.15em" }}
-          >
-            ADMIN
-          </button>
-        )}
-        {isSignedIn ? (
-          <button
-            onClick={() => signOut()}
-            className="rounded-full border border-white/20 bg-black/60 px-4 py-2 text-xs text-white/80 backdrop-blur-sm transition hover:bg-white/10"
-            style={{ fontFamily: "Orbitron, sans-serif", letterSpacing: "0.15em" }}
-          >
-            SIGN OUT
-          </button>
-        ) : (
-          <button
-            onClick={() => onNav('signin')}
-            className="rounded-full border border-[#2DFF9A]/40 bg-black/60 px-4 py-2 text-xs text-[#2DFF9A] backdrop-blur-sm transition hover:bg-[#2DFF9A]/10"
-            style={{ fontFamily: "Orbitron, sans-serif", letterSpacing: "0.15em" }}
-          >
-            LOGIN
-          </button>
-        )}
-      </div>
+
 
       {/* Logo */}
       <div className="absolute inset-0 z-10 flex items-center justify-center pb-32 sm:pb-40">
@@ -114,7 +86,7 @@ export default function HomePage({ onNav, userRole, userAllowed, allowedLoading 
             </button>
           ) : (
             <button
-              onClick={() => onNav('signin')}
+              onClick={() => window.open("https://examplegoogleform.com", "_blank")}
               className={`w-full sm:w-auto ${homeButtonClass}`}
               style={homeButtonStyle}
             >
@@ -139,6 +111,36 @@ export default function HomePage({ onNav, userRole, userAllowed, allowedLoading 
           >
             LEADERBOARD
           </button>
+
+          {/* 🔐 LOGIN / SIGNOUT */}
+          {isSignedIn ? (
+            <button
+              onClick={() => signOut()}
+              className={`w-full sm:w-auto ${homeButtonClass}`}
+              style={homeButtonStyle}
+            >
+              SIGN OUT
+            </button>
+          ) : (
+            <button
+              onClick={() => onNav('signin')}
+              className={`w-full sm:w-auto ${homeButtonClass}`}
+              style={homeButtonStyle}
+            >
+              LOGIN
+            </button>
+          )}
+
+          {/* 🛠 ADMIN */}
+          {userRole === 'ORGANIZER' && (
+            <button
+              onClick={() => onNav('admin')}
+              className={`w-full sm:w-auto ${homeButtonClass}`}
+              style={homeButtonStyle}
+            >
+              ADMIN
+            </button>
+          )}
 
         </div>
       </div>

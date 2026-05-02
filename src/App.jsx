@@ -10,10 +10,11 @@ import RegistrationPage from './pages/RegistrationPage'
 import RoundPage from './pages/RoundPage'
 import WaitingPage from './pages/WaitingPage'
 import LeaderboardPage from './pages/LeaderboardPage'
+import EndPage from './pages/EndPage'
 import AdminPage from './pages/AdminPage'
 
 const DEFAULT_PAGE = 'home'
-const ROUTES = new Set(['home', 'about', 'registration', 'signin', 'round', 'waiting', 'leaderboard', 'admin'])
+const ROUTES = new Set(['home', 'about', 'registration', 'signin', 'round', 'waiting', 'leaderboard', 'end', 'admin'])
 
 function pageFromPathname(pathname) {
   const page = pathname.replace(/^\/+|\/+$/g, '').split('/')[0] || DEFAULT_PAGE
@@ -35,7 +36,6 @@ function getCurrentPage() {
 
 function AuthenticatedApp() {
   const { user, loaded, isSignedIn, signOut, refetch } = useAuth()
-  console.log(isSignedIn);
   const [page, setPage] = useState(getCurrentPage)
   const [userRole, setUserRole] = useState(null)
   const [authError, setAuthError] = useState(null)
@@ -173,6 +173,7 @@ function AuthenticatedApp() {
       round: <RoundPage onNav={navigate} userRole={userRole} />,
       waiting: <WaitingPage onNav={navigate} userRole={userRole} />,
       leaderboard: <LeaderboardPage />,
+      end: <EndPage onNav={navigate} />,
       admin:
         userRole === 'ORGANIZER' ? (
           <AdminPage />

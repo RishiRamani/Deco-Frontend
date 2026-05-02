@@ -5,10 +5,44 @@ import { Alert, Btn, Input, Panel, Spinner } from '../components/UI'
 import {
   ROUND_JOIN_BUFFER_MS,
   loadRoundExperience,
+  resolveRoundStage,
   roundNarrative,
   sceneTheme,
   stageCharacters,
 } from '../config/experience'
+import FlashbackTransition from '../components/FlashbackTransition'
+
+// Flashback transition config
+const FLASHBACK_IMAGES = [
+  '/backgrounds/final-round-bg.png',
+  '/backgrounds/home-hero.png',
+  '/backgrounds/r1-stage1-bg.png',
+  '/backgrounds/r1-stage2-bg.png',
+  '/backgrounds/r2-stage1-bg.png',
+  '/backgrounds/r2-stage2-bg.png',
+  '/backgrounds/r3-bg.png',
+  '/backgrounds/r3-space-bg.png',
+  '/backgrounds/test.png',
+  '/images/acm-logo.png',
+  '/images/ancient-bg.png',
+  '/images/college-logo.png',
+  '/images/deco-logo.png',
+  '/images/intro-1.png',
+  '/images/intro-2.png',
+  '/images/intro-3.png',
+  '/images/intro-4.png',
+  '/images/intro-5.png',
+  '/images/intro-6.png',
+  '/images/loki.png',
+  '/images/map-location.png',
+  '/images/powered-by.png',
+  '/images/scroll-bg.png',
+  '/images/silver-surfer.png',
+  '/images/sound-wave.png',
+  '/images/thought-cloud.png',
+].reverse() // Reverse for time restoring back effect
+const FLASHBACK_DURATION = 8 // seconds
+const FLASHBACK_SOUND = '/voices/welldone.mp3' // assuming a sound file
 
 // ─── localStorage helpers ─────────────────────────────────────────────────────
 function cacheKey(roundId) {
@@ -98,6 +132,7 @@ function StageCharacter({ character, visible }) {
   const nameBackgroundClass = customStyles.nameBackgroundClass || 'bg-transparent'
   const containerTransition = customStyles.containerTransition || 'transition duration-500'
   const imageClass = customStyles.imageClass || 'w-full h-full object-cover'
+  const imageStyle = customStyles.imageStyle || {}
 
   const characterWidth = `min(calc(${character.size} * 0.9), 26vw)`
 
@@ -118,6 +153,7 @@ function StageCharacter({ character, visible }) {
           src={character.image}
           alt={character.name}
           className={`${imageClass} ${borderRadiusClass}`}
+          style={imageStyle}
         />
       ) : (
         <div
@@ -374,6 +410,7 @@ export default function RoundPage({ onNav }) {
   const [submitting, setSubmitting] = useState(false)
   const [finishing, setFinishing] = useState(false)
   const finishTriggeredRef = useRef(false)
+  const [showFlashback, setShowFlashback] = useState(false)
 
   // ─── BODY STYLING ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -418,9 +455,7 @@ export default function RoundPage({ onNav }) {
     try {
       setLoading(true)
       const activeRound = await api.get('/api/round/active')
-      console.log(activeRound);
       if (!activeRound || !activeRound?._id) {
-        
         return
       }
 
@@ -431,33 +466,34 @@ export default function RoundPage({ onNav }) {
       }
 
       setRound(activeRound)
+      const roundIdentifier = activeRound.id || activeRound.roundNumber || activeRound._id
 
-      const status = await api.get(`/api/round/status/${activeRound._id}`)
+      const status = await api.get(`/api/round/status/${roundIdentifier}`)
       if (!status.started) {
-        await api.post(`/api/round/${activeRound._id}/start`)
+        await api.post(`/api/round/${roundIdentifier}/start`)
       } else if (status.finished) {
         onNav('waiting')
         return
       }
 
-      const roundExperienceConfig = await loadRoundExperience(activeRound._id)
+      const roundExperienceConfig = await loadRoundExperience(roundIdentifier)
       if (roundExperienceConfig) {
         setRoundExperience(roundExperienceConfig)
       }
 
-      const questionResult = await api.get(`/api/question/round/${activeRound._id}`)
-      const responseResult = await api.get(`/api/response/${activeRound._id}/me`)
+      const questionResult = await api.get(`/api/question/round/${roundIdentifier}`)
+      const responseResult = await api.get(`/api/response/${roundIdentifier}/me`)
       const loadedQuestions = questionResult?.data || []
       const loadedResponses = Array.isArray(responseResult) ? responseResult : []
 
       // Load cached drafts from localStorage, but remove any that are already in DB
       const dbAnsweredIds = new Set(loadedResponses.map((r) => r.questionId))
-      const cached = loadCache(activeRound._id)
+      const cached = loadCache(roundIdentifier)
       const cleanedCache = Object.fromEntries(
         Object.entries(cached).filter(([qId]) => !dbAnsweredIds.has(qId))
       )
       // Persist cleaned cache back
-      saveCache(activeRound._id, cleanedCache)
+      saveCache(roundIdentifier, cleanedCache)
       setDraftResponses(cleanedCache)
 
       // Combine DB responses + draft responses to find first unanswered question
@@ -519,10 +555,10 @@ export default function RoundPage({ onNav }) {
         if (upcomingRound) {
           onNav('waiting')
         } else {
-          onNav('leaderboard')
+          setShowFlashback(true)
         }
       } catch {
-        onNav('leaderboard')
+        setShowFlashback(true)
       }
     },
     [api, onNav, round],
@@ -539,7 +575,9 @@ export default function RoundPage({ onNav }) {
         : null)
     : null
 
-  const experience = roundExperience || { sceneTheme, stageCharacters, roundNarrative }
+  const baseExperience = roundExperience || { sceneTheme, stageCharacters, roundNarrative, stages: [] }
+  const currentQuestionNumber = currentQuestion ? currentIndex + 1 : 1
+  const experience = resolveRoundStage(baseExperience, currentQuestionNumber)
   const effectiveSceneTheme = experience.sceneTheme
   const effectiveStageCharacters = experience.stageCharacters
   const effectiveRoundNarrative = experience.roundNarrative
@@ -695,12 +733,10 @@ export default function RoundPage({ onNav }) {
         {error && <div className="px-6 pointer-events-auto"><Alert type="error">{error}</Alert></div>}
       </div>
 
-      {/* Spacer so content isn't under HUD */}
-      <div className="h-4"></div>
-
-        <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none px-4 py-24 sm:py-28">
-          <div className="pointer-events-auto max-h-[calc(100vh-9rem)] w-full max-w-xl overflow-y-auto px-1 py-1">
-            {currentQuestion ? (
+      {/* Main round content area */}
+      <div className="relative z-40 flex min-h-screen items-center justify-center pointer-events-none px-0 py-0">
+        <div className="pointer-events-auto flex min-h-screen w-full max-w-full items-center justify-center overflow-y-auto px-0 py-0">
+          {currentQuestion ? (
               <>
                 {showAnswerReveal ? (
                   <AnswerReveal
@@ -744,6 +780,16 @@ export default function RoundPage({ onNav }) {
             </div>
           </div>
         )}
+
+        {showFlashback && (
+          <FlashbackTransition
+            images={FLASHBACK_IMAGES}
+            duration={FLASHBACK_DURATION}
+            soundEffect={FLASHBACK_SOUND}
+            onComplete={() => onNav('end')}
+          />
+        )}
+
     </>
   )
 }

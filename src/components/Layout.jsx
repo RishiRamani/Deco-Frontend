@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 export default function Layout({ children, page, onNav, userRole, roundIntroActive }) {
   const isRound = page === 'round'
   const isHome = page === 'home'
+  const isEnd = page === 'end'
 
   return (
     <motion.div
@@ -10,14 +11,14 @@ export default function Layout({ children, page, onNav, userRole, roundIntroActi
       animate={roundIntroActive ? { x: [0, -12, 10, -8, 7, -4, 0] } : { x: 0 }}
       transition={roundIntroActive ? { duration: 0.65, ease: 'easeInOut' } : { duration: 0.2 }}
     >
-      {!isRound && !isHome && (
+      {!isRound && !isHome && !isEnd && (
         <>
           <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(45,255,154,0.08),transparent_24%),radial-gradient(circle_at_left,rgba(45,255,154,0.05),transparent_28%),linear-gradient(180deg,#000000_0%,#0B1F18_40%,#000000_100%)]" />
           <div className="fixed inset-0 -z-10 bg-[linear-gradient(rgba(45,255,154,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(45,255,154,0.02)_1px,transparent_1px)] bg-[size:24px_24px] sm:bg-[size:36px_36px] opacity-20" />
         </>
       )}
 
-      {!isRound && !isHome && (
+      {!isRound && !isHome && !isEnd && (
         <div className="fixed left-4 top-4 z-50 sm:left-6 sm:top-6">
           <button
             onClick={() => onNav('home')}
@@ -36,7 +37,7 @@ export default function Layout({ children, page, onNav, userRole, roundIntroActi
       <AnimatePresence mode="wait">
         <motion.main
           key={page}
-          className={isHome ? '' : 'mx-auto w-full max-w-7xl px-4 pb-8 pt-24 sm:px-6'}
+          className={isRound || isEnd ? 'w-full px-0 pb-0 pt-0' : isHome ? '' : 'mx-auto w-full max-w-7xl px-4 pb-8 pt-24 sm:px-6'}
           initial={{ opacity: 0, y: 10, filter: 'blur(6px)' }}
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           exit={{ opacity: 0, y: -8, filter: 'blur(6px)' }}

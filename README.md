@@ -1,24 +1,57 @@
 # Deco — UI Team Guide
-### Everything you need to theme rounds, place assets, and manage content
+### Everything you need to run the frontend, theme rounds, place assets, and manage content
+
+---
+
+## About this frontend
+This is the Deco rounds frontend application. It is built with Vite, React, and Tailwind CSS.
+
+The frontend is configured so that most visual and content changes are made through JSON theme files and static assets located in `public/`. That means you can customize round styling, characters, dialogue, and question visuals without changing React code.
+
+The app loads one round configuration file from `public/rounds/round-{id}.json` and merges it with the default UI theme.
+
+## Quick start
+From `Deco-Frontend/`:
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+3. Build for production:
+   ```bash
+   npm run build
+   ```
+4. Preview the built app:
+   ```bash
+   npm run preview
+   ```
+
+> Use the development server when making theme or asset changes locally. Asset updates in `public/` reload automatically.
 
 ---
 
 ## Table of Contents
-1. [How the round theming system works](#1-how-the-round-theming-system-works)
-2. [File structure — where to put your assets](#2-file-structure--where-to-put-your-assets)
-3. [The round JSON file — full reference](#3-the-round-json-file--full-reference)
-4. [Body background](#4-body-background)
-5. [Character images](#5-character-images)
-6. [Dialogue boxes](#6-dialogue-boxes)
-7. [Question & answer cards](#7-question--answer-cards)
-8. [Round narrative — dialogue script](#8-round-narrative--dialogue-script)
-9. [Using the Admin panel](#9-using-the-admin-panel)
-10. [End-to-end checklist for a new round](#10-end-to-end-checklist-for-a-new-round)
-11. [Common mistakes](#11-common-mistakes)
+1. [About this frontend](#about-this-frontend)
+2. [Quick start](#quick-start)
+3. [How the round theming system works](#3-how-the-round-theming-system-works)
+4. [File structure — where to put your assets](#4-file-structure--where-to-put-your-assets)
+5. [The round JSON file — full reference](#5-the-round-json-file--full-reference)
+6. [Body background](#6-body-background)
+7. [Character images](#7-character-images)
+8. [Dialogue boxes](#8-dialogue-boxes)
+9. [Question & answer cards](#9-question--answer-cards)
+10. [Round narrative — dialogue script](#10-round-narrative--dialogue-script)
+11. [Using the Admin panel](#11-using-the-admin-panel)
+12. [End-to-end checklist for a new round](#12-end-to-end-checklist-for-a-new-round)
+13. [Common mistakes](#13-common-mistakes)
 
 ---
 
-## 1. How the round theming system works
+## How the round theming system works
 
 Every round can have its own visual theme and dialogue script. This is controlled entirely through a single JSON file you drop into the `public/rounds/` folder. No code changes needed.
 
@@ -28,7 +61,7 @@ The JSON uses a **merge** system, meaning you only need to specify the things yo
 
 ---
 
-## 2. File structure — where to put your assets
+## File structure — where to put your assets
 
 All assets live inside the `Deco-Frontend/public/` folder. This folder is served as the root of the site, so a file at `public/backgrounds/round1.jpg` is accessible at the URL `/backgrounds/round1.jpg`.
 
@@ -80,7 +113,16 @@ Here is the complete structure with every possible option. All fields are option
     "duringQuestion": [],
     "afterAnswer": [],
     "finished": []
-  }
+  },
+  "stages": [
+    {
+      "id": "stage-1",
+      "questionRange": { "from": 1, "to": 3 },
+      "sceneTheme": { ... },
+      "stageCharacters": { ... },
+      "roundNarrative": { ... }
+    }
+  ]
 }
 ```
 
@@ -389,7 +431,7 @@ The Admin panel is accessible at the top-right of the app when logged in with an
 2. Set a Start Time and End Time using the date/time pickers
 3. Click **+ Create Round**
 4. The new round appears in the list with a blue "Upcoming" badge
-5. Note the Round ID — you'll need it for questions and your JSON file
+5. Note the Round number (e.g., 1, 2, 3) — you'll need it for questions and your JSON file
 
 **Round statuses:**
 - **Upcoming** — scheduled but not started yet
@@ -402,7 +444,7 @@ The Admin panel is accessible at the top-right of the app when logged in with an
 
 **Adding a question:**
 1. Click the **Questions** tab
-2. Enter the Round ID in the "Round ID" field and click **Load Questions**
+2. Enter the Round number in the "Round ID" field and click **Load Questions**
 3. Fill in the form:
    - **Question text** — the question shown to participants (required)
    - **Answer** — the exact correct answer string, case-sensitive (required)
@@ -438,7 +480,7 @@ Use this checklist before each round goes live:
 - [ ] `public/rounds/round-{id}.json` created and filled
 
 **JSON file:**
-- [ ] File is named exactly `round-{id}.json` where `{id}` matches the admin panel Round ID
+- [ ] File is named exactly `round-{id}.json` where `{id}` matches the admin panel Round number
 - [ ] All image paths start with `/` e.g. `/backgrounds/round1.jpg`
 - [ ] JSON is valid — paste it into [jsonlint.com](https://jsonlint.com) to check
 - [ ] `"frame": { "background": "transparent" }` is set if using a body image
@@ -446,8 +488,8 @@ Use this checklist before each round goes live:
 
 **Admin (content team):**
 - [ ] Round created with correct start and end times
-- [ ] Note the Round ID
-- [ ] All questions added to the correct Round ID
+- [ ] Note the Round number
+- [ ] All questions added to the correct Round number
 - [ ] Each MCQ option list has at least 2 entries
 - [ ] Answers are spelled exactly as participants should type them (for free text)
 - [ ] Question reward points are set
@@ -472,7 +514,7 @@ Make sure `"frame": { "background": "transparent" }` is in your JSON. The frame 
 - The file must be in the `public/` folder, not `src/`
 
 **JSON file not loading:**
-- File must be named exactly `round-1.json`, `round-2.json` etc. — matching the round ID from the admin panel
+- File must be named exactly `round-1.json`, `round-2.json` etc. — matching the round number from the admin panel
 - File must be in `public/rounds/` — not `src/`
 - Validate the JSON at jsonlint.com — a single missing comma breaks everything
 

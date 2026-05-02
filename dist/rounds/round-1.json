@@ -1,92 +1,205 @@
 {
-  "sceneTheme": {
-    "bodyElement": {
-      "background": "url('/backgrounds/r1-stage1-bg.png') center/cover no-repeat fixed",
-      "gridPattern": "none",
-      "gridPatternOpacity": 0
-    },
-    "frame": {
-      "background": "rgba(0,0,0,0.4)"
-    },
-    "stage": {
-      "backgroundImage": "none"
-    },
-    "dialogueBox": {
-      "background": "#ffffff",
-      "bubbleImage": null,
-      "border": "1px solid rgba(45, 255, 154, 0.24)",
-      "color": "#111827"
-    },
-    "questionBox": {
-      "background": "linear-gradient(180deg, rgba(11, 31, 24, 0.94), rgba(0, 0, 0, 0.90))",
-      "border": "1px solid rgba(45, 255, 154, 0.15)",
-      "numberClass": "text-xs uppercase tracking-[0.3em] text-[#2DFF9A]/80",
-      "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white"
-    },
-    "answerRevealBox": {
-      "background": "linear-gradient(135deg, rgba(11, 31, 24, 0.96), rgba(45, 255, 154, 0.12))",
-      "border": "1px solid rgba(45, 255, 154, 0.24)"
-    }
-  },
-  "stageCharacters": {
-    "curator": {
-      "name": "Captain America",
-      "accent": "#2DFF9A",
-      "image": "/characters/captain-america.png",
-      "size": "20rem",
-      "side": "left",
-      "style": { "bottom": "1rem", "left": "2rem" },
-      "customStyles": {
-        "borderColor": "#2DFF9A44"
-      }
-    },
-    "signal": {
-      "name": "Loki",
-      "accent": "#2DFF9A",
-      "image": "/images/loki.png",
-      "size": "16rem",
-      "side": "right",
-      "style": { "bottom": "1rem", "right": "2rem" },
-      "customStyles": {
-        "borderColor": "#2DFF9A44"
-      }
-    }
-  },
-  "roundNarrative": {
-    "preQuestion": [
-      {
-        "id": "r1-intro",
-        "type": "dialogue",
-        "speaker": "Loki",
-        "characterId": "signal",
-        "text": "The shield encodes the anomaly. A numerical breach is hidden in the recursion."
+  "stages": [
+    {
+      "id": "stage-1",
+      "questionRange": { "from": 1, "to": 2 },
+      "sceneTheme": {
+        "bodyElement": {
+          "background": "url('/backgrounds/r1-stage1-bg.png') center/cover no-repeat fixed",
+          "gridPattern": "none",
+          "gridPatternOpacity": 0
+        },
+        "frame": {
+          "background": "rgba(0,0,0,0.4)"
+        },
+        "stage": {
+          "backgroundImage": "linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.9)), url('/backgrounds/r1-stage1-bg.png') center/cover no-repeat"
+        },
+        "dialogueBox": {
+          "background": "#ffffff",
+          "bubbleImage": null,
+          "border": "1px solid rgba(45, 255, 154, 0.24)",
+          "color": "#111827"
+        },
+        "questionBox": {
+          "background": "linear-gradient(180deg, rgba(11, 31, 24, 0.94), rgba(0, 0, 0, 0.90))",
+          "border": "1px solid rgba(45, 255, 154, 0.15)",
+          "numberClass": "text-xs uppercase tracking-[0.3em] text-[#2DFF9A]/80",
+          "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white"
+        },
+        "answerRevealBox": {
+          "background": "linear-gradient(135deg, rgba(11, 31, 24, 0.96), rgba(45, 255, 154, 0.12))",
+          "border": "1px solid rgba(45, 255, 154, 0.24)"
+        }
       },
-      {
-        "id": "r1-cap-intro",
-        "type": "dialogue",
-        "speaker": "Captain America",
-        "characterId": "curator",
-        "text": "This fight keeps resetting. We never win. The pattern's wrong."
+      "stageCharacters": {
+        "curator": {
+          "name": "Captain America",
+          "accent": "#2DFF9A",
+          "image": "/characters/captain-america.png",
+          "size": "20rem",
+          "side": "left",
+          "style": { "bottom": "1rem", "left": "2rem" },
+          "customStyles": {
+            "borderColor": "#2DFF9A44"
+          }
+        },
+        "signal": {
+          "name": "Loki",
+          "accent": "#2DFF9A",
+          "image": "/images/loki.png",
+          "size": "16rem",
+          "side": "right",
+          "style": { "bottom": "1rem", "right": "2rem" },
+          "customStyles": {
+            "borderColor": "#2DFF9A44"
+          }
+        }
+      },
+      "roundNarrative": {
+        "preQuestion": [
+          {
+            "id": "stage1-intro",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "signal",
+            "questionNumber": [1, 2],
+            "text": "The shield encodes the anomaly. A numerical breach is hidden in the recursion."
+          },
+          {
+            "id": "stage1-cap-intro",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "curator",
+            "questionNumber": [1, 2],
+            "text": "This fight keeps resetting. We never win. The pattern's wrong."
+          }
+        ],
+        "duringQuestion": [
+          {
+            "id": "stage1-during-1",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "signal",
+            "questionNumber": [2],
+            "text": "Stage 1 active. Decode the first two branches before the shield destabilizes."
+          }
+        ],
+        "afterAnswer": [
+          {
+            "id": "stage1-after",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "curator",
+            "questionNumber": [1],
+            "text": "Nice work. The first barrier holds. Prepare for a deeper breach."
+          }
+        ],
+        "finished": []
       }
-    ],
-    "duringQuestion": [],
-    "afterAnswer": [
-      {
-        "id": "r1-after",
-        "type": "dialogue",
-        "speaker": "Captain America",
-        "characterId": "curator",
-        "text": "Good. Now let's finish this war properly."
+    },
+    {
+      "id": "stage-2",
+      "questionRange": { "from": 3, "to": 4 },
+      "sceneTheme": {
+        "bodyElement": {
+          "background": "url('/backgrounds/r1-stage2-bg.png') center/cover no-repeat fixed",
+          "gridPattern": "none",
+          "gridPatternOpacity": 0
+        },
+        "frame": {
+          "background": "rgba(0,0,0,0.4)"
+        },
+        "stage": {
+          "backgroundImage": "linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.95)), url('/backgrounds/r1-stage2-bg.png') center/cover no-repeat"
+        },
+        "dialogueBox": {
+          "background": "#ffffff",
+          "bubbleImage": null,
+          "border": "1px solid rgba(255, 102, 102, 0.24)",
+          "color": "#111827"
+        },
+        "questionBox": {
+          "background": "linear-gradient(180deg, rgba(20, 12, 33, 0.94), rgba(0, 0, 0, 0.95))",
+          "border": "1px solid rgba(255, 102, 102, 0.18)",
+          "numberClass": "text-xs uppercase tracking-[0.3em] text-[#FF6B6B]/80",
+          "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white"
+        },
+        "answerRevealBox": {
+          "background": "linear-gradient(135deg, rgba(15, 8, 32, 0.96), rgba(255, 102, 102, 0.12))",
+          "border": "1px solid rgba(255, 102, 102, 0.24)"
+        }
+      },
+      "stageCharacters": {
+        "curator": {
+          "name": "Doctor Doom",
+          "accent": "#FF4444",
+          "image": "/characters/doctor-doom.png",
+          "size": "20rem",
+          "side": "left",
+          "style": { "bottom": "1rem", "left": "2rem" },
+          "customStyles": {
+            "borderColor": "#FF444466",
+            "imageClass": "w-full h-full object-cover",
+            "imageStyle": { "objectPosition": "top" }
+          }
+        },
+        "signal": {
+          "name": "DECO AI",
+          "accent": "#68D3FF",
+          "image": "/characters/deco-ai.png",
+          "size": "16rem",
+          "side": "right",
+          "style": { "bottom": "1rem", "right": "2rem" },
+          "customStyles": {
+            "borderColor": "#68D3FF44",
+            "imageClass": "w-full h-full object-cover",
+            "imageStyle": { "objectPosition": "top" }
+          }
+        }
+      },
+      "roundNarrative": {
+        "preQuestion": [
+          {
+            "id": "stage2-intro",
+            "type": "dialogue",
+            "speaker": "Doctor Doom",
+            "characterId": "curator",
+            "questionNumber": [3, 4],
+            "text": "The anomaly has shifted. Stage 2 begins — the code is more corrupt now."
+          }
+        ],
+        "duringQuestion": [
+          {
+            "id": "stage2-during-1",
+            "type": "dialogue",
+            "speaker": "DECO AI",
+            "characterId": "signal",
+            "questionNumber": [3, 4],
+            "text": "Keep moving. Use the previous answers to anticipate the next encoded branch."
+          }
+        ],
+        "afterAnswer": [
+          {
+            "id": "stage2-after",
+            "type": "dialogue",
+            "speaker": "Doctor Doom",
+            "characterId": "curator",
+            "questionNumber": [3, 4],
+            "text": "Two more loops to break. Your next choice determines whether the shield stabilizes or shatters."
+          }
+        ],
+        "finished": [
+          {
+            "id": "stage2-finished",
+            "type": "dialogue",
+            "speaker": "DECO AI",
+            "characterId": "signal",
+            "questionNumber": 4,
+            "text": "The final sequence is complete. The shields hold... for now."
+          }
+        ]
       }
-    ],
-    "finished": [
-      {
-        "id": "r1-finished",
-        "type": "dialogue",
-        "speaker": "Loki",
-        "characterId": "signal",
-        "text": "The loop collapses. The shield stabilizes. Onwards to the next rift."
-      }
-    ]
-  }
+    }
+  ]
 }

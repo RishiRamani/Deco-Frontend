@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useApi } from '../hooks/useApi'
 import { Btn, Input, Textarea, Alert, Spinner, StatusBadge, Badge } from '../components/UI'
+import FlashbackTransition from '../components/FlashbackTransition'
+import { motion, AnimatePresence } from 'framer-motion'
+import { createPortal } from 'react-dom'
 
 // ── Maintenance Tab ──────────────────────────────────────────────────────────────
 function MaintenanceTab() {
@@ -45,6 +48,116 @@ function MaintenanceTab() {
   )
 }
 
+// ── Transitions Tab ──────────────────────────────────────────────────────────────
+function TransitionsTab() {
+  const [showFlashback, setShowFlashback] = useState(false)
+  const [showCrack, setShowCrack] = useState(false)
+  const [portalRoot, setPortalRoot] = useState(null)
+
+  useEffect(() => {
+    setPortalRoot(document.body)
+  }, [])
+
+  const testFlashback = () => {
+    setShowFlashback(true)
+  }
+
+  const testTimelineCrack = () => {
+    setShowCrack(true)
+    setTimeout(() => setShowCrack(false), 3000) // Auto-hide after 3 seconds
+  }
+
+  const flashbackImages = [
+    '/characters/deco-ai.png',
+    '/images/loki.png',
+    '/characters/doctor-doom.png',
+    '/characters/captain-america.png',
+    '/backgrounds/r1-stage1-bg.png'
+  ]
+
+  return (
+    <div className="space-y-5">
+      <div className="card p-5">
+        <h3 className="font-display text-white text-lg mb-4">Transition Testing</h3>
+        <p className="text-slate-300 mb-4">
+          Test visual transitions for development purposes.
+        </p>
+        <div className="flex gap-4">
+          <Btn onClick={testFlashback}>Test Flashback Transition</Btn>
+          <Btn onClick={testTimelineCrack}>Test Timeline Crack</Btn>
+        </div>
+      </div>
+
+      {showFlashback && (
+        <FlashbackTransition
+          images={flashbackImages}
+          duration={5}
+          soundEffect="/voices/welldone.mp3"
+          onComplete={() => setShowFlashback(false)}
+        />
+      )}
+
+      {portalRoot && createPortal(
+        <AnimatePresence>
+          {showCrack && (
+            <motion.div
+              className="fixed inset-0 z-[9998] pointer-events-none overflow-hidden bg-black"
+              style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 1, 1, 0] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 2.6, times: [0, 0.18, 0.66, 0.84, 1], ease: [0.22, 1, 0.36, 1] }}
+            >
+              <motion.div
+                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(45,255,154,0.18),transparent_32%),radial-gradient(circle_at_center,rgba(255,0,0,0.16),transparent_62%)]"
+                style={{ willChange: 'opacity', transform: 'translateZ(0)' }}
+                animate={{ opacity: [0.35, 0.95, 0.75, 0.12] }}
+                transition={{ duration: 2.35, ease: 'easeOut' }}
+              />
+              {/* Simplified crack paths for testing */}
+              <motion.svg
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                className="absolute inset-0 h-full w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 2.35, delay: 0.13, times: [0, 0.28, 0.78, 1] }}
+              >
+                <defs>
+                  <filter id="glow-test">
+                    <feGaussianBlur stdDeviation="1.2" result="blur" />
+                    <feFlood floodColor="#2DFF9A" floodOpacity="0.7" result="color" />
+                    <feComposite in="color" in2="blur" operator="in" result="glow" />
+                    <feMerge>
+                      <feMergeNode in="glow" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                <g filter="url(#glow-test)">
+                  <motion.path
+                    d="M50 0 L48 15 L52 28 L49 42 L54 55 L50 70 L53 86 L50 100"
+                    fill="none"
+                    stroke="#2DFF9A"
+                    strokeWidth="0.55"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    pathLength="1"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: [0, 1, 0.85] }}
+                    transition={{ duration: 1.08, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                </g>
+              </motion.svg>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        portalRoot
+      )}
+    </div>
+  )
+}
+
 function RoundsTab() {
   const api = useApi()
   const [rounds, setRounds] = useState([])
@@ -65,7 +178,6 @@ function RoundsTab() {
       setRounds(Array.isArray(data) ? data : [])
     } catch (e) {
       flash('error', e.message)
-      console.log(e)
     } finally {
       setLoading(false)
     }
@@ -156,17 +268,17 @@ function RoundsTab() {
         ) : (
           <div className="divide-y divide-[#222228]">
             {rounds.map(r => (
-              // FIX: use r._id (MongoDB) instead of r.id
               <div key={r._id} className="px-5 py-4 flex items-center gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="font-mono text-sm text-white font-semibold">
-                      Round <span className="text-[#2DFF9A] text-xs">{r._id}</span>
+                      Round <span className="text-[#2DFF9A] text-xs">{r.id}</span>
                     </span>
                     {isRoundActive(r) && <Badge variant="green">Active</Badge>}
                     {isRoundCompleted(r) && <Badge variant="gray">Completed</Badge>}
                     {!isRoundActive(r) && !isRoundCompleted(r) && <Badge variant="blue">Upcoming</Badge>}
                   </div>
+
                   <div className="flex flex-col gap-1 text-xs text-[#6b6b7a]">
                     <span>📅 Starts: {formatDateTime(r.startedAt)}</span>
                     <span>📅 Ends: {formatDateTime(r.endsAt)}</span>
@@ -234,7 +346,7 @@ function QuestionsTab() {
         return
       }
 
-      // FIX: roundId must be the raw ObjectId string — no Number() cast
+      // Allow numeric round IDs or ObjectIds from the backend
       const payload = {
         roundId: roundId.trim(),
         text: form.text,
@@ -316,12 +428,12 @@ function QuestionsTab() {
       <div className="card p-5 space-y-4">
         <h3 className="font-display text-white text-lg">Add Question</h3>
         <div className="flex gap-3 items-end">
-          {/* FIX: plain text input — paste the ObjectId string from the Rounds tab */}
+          {/* Accept numeric round IDs or raw ObjectIds for backward compatibility */}
           <Input
-            label="Round ID (ObjectId)"
+            label="Round Number"
             value={roundId}
             onChange={e => setRoundId(e.target.value)}
-            placeholder="e.g. 6650f3a2c1b2d3e4f5a6b7c8"
+            placeholder="e.g. 1"
             className="flex-1"
           />
           <Btn variant="secondary" size="sm" onClick={fetchQuestions} disabled={!roundId.trim()}>Load Questions</Btn>
@@ -402,6 +514,7 @@ export default function AdminPage() {
     { id: 'rounds', label: '🔄 Rounds' },
     { id: 'questions', label: '❓ Questions' },
     { id: 'maintenance', label: '🛠️ Maintenance' },
+    { id: 'transitions', label: '🎬 Transitions' },
   ]
 
   return (
@@ -429,6 +542,7 @@ export default function AdminPage() {
       {tab === 'rounds' && <RoundsTab />}
       {tab === 'questions' && <QuestionsTab />}
       {tab === 'maintenance' && <MaintenanceTab />}
+      {tab === 'transitions' && <TransitionsTab />}
     </div>
   )
 }

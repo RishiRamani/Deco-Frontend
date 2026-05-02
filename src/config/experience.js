@@ -222,6 +222,41 @@ function mergeDeep(target, source) {
   return output
 }
 
+const matchesStageForQuestion = (stage, questionNumber) => {
+  if (!stage || questionNumber == null) return false
+
+  if (Array.isArray(stage.questionNumbers)) {
+    return stage.questionNumbers.includes(questionNumber)
+  }
+
+  if (stage.questionRange) {
+    const from = Number(stage.questionRange.from ?? 1)
+    const to = Number(stage.questionRange.to ?? Infinity)
+    return questionNumber >= from && questionNumber <= to
+  }
+
+  return false
+}
+
+export function resolveRoundStage(roundExperience, questionNumber) {
+  if (!roundExperience || !Array.isArray(roundExperience.stages)) {
+    return roundExperience
+  }
+
+  const stage = roundExperience.stages.find((item) => matchesStageForQuestion(item, questionNumber))
+  if (!stage) {
+    return roundExperience
+  }
+
+  return {
+    ...roundExperience,
+    sceneTheme: mergeDeep(roundExperience.sceneTheme, stage.sceneTheme || {}),
+    stageCharacters: mergeDeep(roundExperience.stageCharacters, stage.stageCharacters || {}),
+    roundNarrative: mergeDeep(roundExperience.roundNarrative, stage.roundNarrative || {}),
+    currentStage: stage,
+  }
+}
+
 export function buildRoundExperience(roundConfig) {
   if (!roundConfig) {
     return {
@@ -229,6 +264,7 @@ export function buildRoundExperience(roundConfig) {
       sceneTheme,
       stageCharacters,
       roundNarrative,
+      stages: [],
     }
   }
 
@@ -237,12 +273,13 @@ export function buildRoundExperience(roundConfig) {
     sceneTheme: mergeDeep(sceneTheme, roundConfig.sceneTheme || {}),
     stageCharacters: mergeDeep(stageCharacters, roundConfig.stageCharacters || {}),
     roundNarrative: mergeDeep(roundNarrative, roundConfig.roundNarrative || {}),
+    stages: Array.isArray(roundConfig.stages) ? roundConfig.stages : [],
   }
 }
 
 export async function loadRoundExperience(roundId) {
   try {
-    const res = await fetch(import.meta.env.VITE_API_BASE_URL+`/rounds/round-${roundId}.json`)
+    const res = await fetch(`/rounds/round-${roundId}.json`)
     if (!res.ok) return null
     const config = await res.json()
     return buildRoundExperience(config)

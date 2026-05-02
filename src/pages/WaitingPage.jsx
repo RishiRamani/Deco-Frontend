@@ -6,13 +6,16 @@ import Timer from '../components/Timer'
 import { ACTIVE_ROUND_POLL_MS, ROUND_JOIN_BUFFER_MS } from '../config/experience'
 import { Alert, Spinner } from '../components/UI'
 
+const TIMELINE_CRACK_SOUND = '/voices/wait.mp3' // assuming a sound file
+
 function isPlayable(round) {
   if (!round) return false
   return Date.now() < new Date(round.endsAt).getTime() - ROUND_JOIN_BUFFER_MS
 }
 
-function TimelineCrackTransition({ show }) {
+function TimelineCrackTransition({ show, soundEffect }) {
   const [portalRoot, setPortalRoot] = useState(null)
+  const [audio] = useState(() => soundEffect ? new Audio(soundEffect) : null)
   const crackPaths = [
     'M50 0 L48 15 L52 28 L49 42 L54 55 L50 70 L53 86 L50 100',
     'M49 42 L35 32 L25 22 L15 20',
@@ -48,6 +51,16 @@ function TimelineCrackTransition({ show }) {
   useEffect(() => {
     setPortalRoot(document.body)
   }, [])
+
+  useEffect(() => {
+    if (show && audio) {
+      audio.currentTime = 0
+      audio.play().catch(() => {})
+    } else if (!show && audio) {
+      audio.pause()
+      audio.currentTime = 0
+    }
+  }, [show, audio])
 
   if (!portalRoot) return null
 
@@ -196,7 +209,6 @@ export default function WaitingPage({ onNav, forcedMessage }) {
       const result = await apiRef.current.get('/api/round/info').catch(() => null)
       
       let currentRound = result?.current || null
-      console.log(currentRound);
       let nextRound = result?.next || null
 
       if (!result) {
@@ -213,8 +225,8 @@ export default function WaitingPage({ onNav, forcedMessage }) {
         setActiveRound(currentRound)
         setUpcomingRound(nextRound)
         if (currentRound?._id) {
-  onNavRef.current('round')
-}
+          onNavRef.current('round')
+        }
       }
     } catch (err) {
       if (mountedRef.current) setError(err.message)
@@ -256,7 +268,7 @@ export default function WaitingPage({ onNav, forcedMessage }) {
 
   return (
     <>
-      <TimelineCrackTransition show={showCrackTransition} />
+      <TimelineCrackTransition show={showCrackTransition} soundEffect={TIMELINE_CRACK_SOUND} />
 
       {!introComplete ? (
         <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
