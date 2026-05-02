@@ -138,6 +138,13 @@ body.round-custom-mode::before {
   50% { box-shadow: 0 0 40px rgba(45, 255, 154, 0.2); }
 }
 
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
 .fade-up { animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
 .fade-up-1 { animation: fadeUp 0.5s 0.1s cubic-bezier(0.4, 0, 0.2, 1) both; }
 .fade-up-2 { animation: fadeUp 0.5s 0.2s cubic-bezier(0.4, 0, 0.2, 1) both; }
@@ -147,6 +154,7 @@ body.round-custom-mode::before {
 .slide-in-left { animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
 .slide-in-right { animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
 .glow-pulse { animation: glowPulse 3s ease-in-out infinite; }
+.animate-fade-in-out { animation: fadeInOut 4s ease-in-out forwards; }
 
 /* Smooth transitions for interactive elements */
 button, a, input, textarea {

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useUser } from '@clerk/clerk-react'
+import { useEffect, useState } from 'react'
+import { useUser } from '../context/AuthContext'   
 import { useApi } from '../hooks/useApi'
 import { Alert, Spinner } from '../components/UI'
 
@@ -72,7 +72,6 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        {/* ✅ FIXED BUTTON (matches your theme now) */}
         <button
           onClick={() => load(true)}
           className="rounded-full border border-[#2DFF9A]/40 bg-black/60 px-5 py-2 text-sm text-[#2DFF9A] backdrop-blur-sm transition hover:bg-[#2DFF9A]/10"

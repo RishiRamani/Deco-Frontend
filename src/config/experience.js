@@ -242,7 +242,7 @@ export function buildRoundExperience(roundConfig) {
 
 export async function loadRoundExperience(roundId) {
   try {
-    const res = await fetch(`/rounds/round-${roundId}.json`)
+    const res = await fetch(import.meta.env.VITE_API_BASE_URL+`/rounds/round-${roundId}.json`)
     if (!res.ok) return null
     const config = await res.json()
     return buildRoundExperience(config)

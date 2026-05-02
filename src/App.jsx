@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useAuth } from '@clerk/clerk-react'
+import { useAuth } from './context/AuthContext'
 import { api } from '../api'
 
 import Layout from './components/Layout'
@@ -34,7 +34,8 @@ function getCurrentPage() {
 }
 
 function AuthenticatedApp() {
-  const { getToken, isLoaded, isSignedIn } = useAuth()
+  const { user, loaded, isSignedIn, signOut, refetch } = useAuth()
+  console.log(isSignedIn);
   const [page, setPage] = useState(getCurrentPage)
   const [userRole, setUserRole] = useState(null)
   const [authError, setAuthError] = useState(null)
@@ -42,6 +43,7 @@ function AuthenticatedApp() {
   const [userAllowed, setUserAllowed] = useState(false)
   const [allowedLoading, setAllowedLoading] = useState(false)
   const [roundIntroActive, setRoundIntroActive] = useState(false)
+  const [toast, setToast] = useState(null)
 
   useEffect(() => {
     const hashPage = window.location.hash.replace('#', '').trim()
@@ -56,11 +58,19 @@ function AuthenticatedApp() {
     return () => window.removeEventListener('popstate', sync)
   }, [])
 
+  // Auto-dismiss toast after 4 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [toast])
+
   useEffect(() => {
     let cancelled = false
 
     const syncUser = async () => {
-      if (!isLoaded) {
+      if (!loaded) {
         return
       }
 
@@ -78,15 +88,24 @@ function AuthenticatedApp() {
       setAllowedLoading(true)
 
       try {
-        const token = await getToken()
-        const [me, allowed] = await Promise.all([
-          api('/api/auth/me', {}, token),
-          api('/api/allowed', {}, token),
+        const [allowed] = await Promise.all([
+          api('/api/auth/allowed', {}),
         ])
 
         if (cancelled) return
 
-        setUserRole(me?.user?.role || null)
+        // If user is not allowed, logout and show toast
+        if (!allowed?.allowed) {
+          setToast({ message: 'User not authorized', type: 'error' })
+          await signOut()
+          setUserRole(null)
+          setUserAllowed(false)
+          setAuthSynced(true)
+          setAllowedLoading(false)
+          return
+        }
+
+        setUserRole(user?.role || null)
         setUserAllowed(Boolean(allowed?.allowed))
         setAuthSynced(true)
         setAllowedLoading(false)
@@ -98,7 +117,7 @@ function AuthenticatedApp() {
       } catch (err) {
         if (cancelled) return
 
-        setAuthError(err?.data?.message || err?.message || 'Could not register your account with the backend.')
+        setAuthError(err?.data?.message || err?.message || 'Could not access backend.')
         setUserRole('PARTICIPANT')
         setUserAllowed(false)
         setAllowedLoading(false)
@@ -110,7 +129,7 @@ function AuthenticatedApp() {
     return () => {
       cancelled = true
     }
-  }, [getToken, isLoaded, isSignedIn, page])
+  }, [loaded, isSignedIn, page, user, refetch])
 
   const navigate = useCallback((nextPage) => {
     const requiresSignIn = ['round', 'waiting', 'admin']
@@ -165,9 +184,22 @@ function AuthenticatedApp() {
   )
 
   return (
-    <Layout page={page} onNav={navigate} userRole={userRole} roundIntroActive={roundIntroActive}>
-      {pages[page] || pages.home}
-    </Layout>
+    <>
+      <Layout page={page} onNav={navigate} userRole={userRole} roundIntroActive={roundIntroActive}>
+        {pages[page] || pages.home}
+      </Layout>
+      
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-6 right-6 px-6 py-3 rounded-lg text-white text-sm font-medium z-[9999] animate-fade-in-out ${
+          toast.type === 'error' 
+            ? 'bg-red-500/90 backdrop-blur-sm border border-red-400' 
+            : 'bg-green-500/90 backdrop-blur-sm border border-green-400'
+        }`}>
+          {toast.message}
+        </div>
+      )}
+    </>
   )
 }
 

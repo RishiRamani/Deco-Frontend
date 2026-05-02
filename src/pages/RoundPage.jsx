@@ -418,8 +418,9 @@ export default function RoundPage({ onNav }) {
     try {
       setLoading(true)
       const activeRound = await api.get('/api/round/active')
-      if (!activeRound || !activeRound?.id) {
-        onNav('waiting')
+      console.log(activeRound);
+      if (!activeRound || !activeRound?._id) {
+        
         return
       }
 
@@ -431,32 +432,32 @@ export default function RoundPage({ onNav }) {
 
       setRound(activeRound)
 
-      const status = await api.get(`/api/round/status/${activeRound.id}`)
+      const status = await api.get(`/api/round/status/${activeRound._id}`)
       if (!status.started) {
-        await api.post(`/api/round/${activeRound.id}/start`)
+        await api.post(`/api/round/${activeRound._id}/start`)
       } else if (status.finished) {
         onNav('waiting')
         return
       }
 
-      const roundExperienceConfig = await loadRoundExperience(activeRound.id)
+      const roundExperienceConfig = await loadRoundExperience(activeRound._id)
       if (roundExperienceConfig) {
         setRoundExperience(roundExperienceConfig)
       }
 
-      const questionResult = await api.get(`/api/question/round/${activeRound.id}`)
-      const responseResult = await api.get(`/api/response/${activeRound.id}/me`)
+      const questionResult = await api.get(`/api/question/round/${activeRound._id}`)
+      const responseResult = await api.get(`/api/response/${activeRound._id}/me`)
       const loadedQuestions = questionResult?.data || []
       const loadedResponses = Array.isArray(responseResult) ? responseResult : []
 
       // Load cached drafts from localStorage, but remove any that are already in DB
       const dbAnsweredIds = new Set(loadedResponses.map((r) => r.questionId))
-      const cached = loadCache(activeRound.id)
+      const cached = loadCache(activeRound._id)
       const cleanedCache = Object.fromEntries(
         Object.entries(cached).filter(([qId]) => !dbAnsweredIds.has(qId))
       )
       // Persist cleaned cache back
-      saveCache(activeRound.id, cleanedCache)
+      saveCache(activeRound._id, cleanedCache)
       setDraftResponses(cleanedCache)
 
       // Combine DB responses + draft responses to find first unanswered question
@@ -501,7 +502,7 @@ export default function RoundPage({ onNav }) {
       setFinishing(true)
 
       try {
-        await api.post(`/api/round/${round.id}/finish`)
+        await api.post(`/api/round/${round._id}/finish`)
       } catch (err) {
         if (!silent && err?.message !== 'Round already ended') {
           setError(err.message)
@@ -605,7 +606,7 @@ export default function RoundPage({ onNav }) {
     // 3. Submit to DB in background
     try {
       await api.post('/api/response', {
-        questionId: currentQuestion.id,
+        questionId: currentQuestion._id,
         submittedAnswer,
       })
       // On success: add to DB responses and remove from drafts

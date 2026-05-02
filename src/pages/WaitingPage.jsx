@@ -194,8 +194,9 @@ export default function WaitingPage({ onNav, forcedMessage }) {
 
     try {
       const result = await apiRef.current.get('/api/round/info').catch(() => null)
-
+      
       let currentRound = result?.current || null
+      console.log(currentRound);
       let nextRound = result?.next || null
 
       if (!result) {
@@ -211,7 +212,9 @@ export default function WaitingPage({ onNav, forcedMessage }) {
       if (mountedRef.current) {
         setActiveRound(currentRound)
         setUpcomingRound(nextRound)
-        if (isPlayable(currentRound)) onNavRef.current('round')
+        if (currentRound?._id) {
+  onNavRef.current('round')
+}
       }
     } catch (err) {
       if (mountedRef.current) setError(err.message)

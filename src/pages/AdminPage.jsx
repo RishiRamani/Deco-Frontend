@@ -44,6 +44,7 @@ function MaintenanceTab() {
     </div>
   )
 }
+
 function RoundsTab() {
   const api = useApi()
   const [rounds, setRounds] = useState([])
@@ -62,8 +63,12 @@ function RoundsTab() {
     try {
       const data = await api.get('/api/round/admin/all')
       setRounds(Array.isArray(data) ? data : [])
-    } catch (e) { flash('error', e.message) }
-    finally { setLoading(false) }
+    } catch (e) {
+      flash('error', e.message)
+      console.log(e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { fetchRounds() }, [])
@@ -73,10 +78,10 @@ function RoundsTab() {
       flash('error', 'Both start and end times are required')
       return
     }
-    
+
     const startDate = new Date(startedAt)
     const endDate = new Date(endsAt)
-    
+
     if (endDate <= startDate) {
       flash('error', 'End time must be after start time')
       return
@@ -84,36 +89,34 @@ function RoundsTab() {
 
     setCreating(true)
     try {
-      await api.post('/api/round', { 
+      await api.post('/api/round', {
         startedAt: startDate.toISOString(),
         endsAt: endDate.toISOString()
       })
-      
+
       flash('success', 'Round created!')
       setStartedAt('')
       setEndsAt('')
       fetchRounds()
-    } catch (e) { flash('error', e.message) }
-    finally { setCreating(false) }
+    } catch (e) {
+      flash('error', e.message)
+    } finally {
+      setCreating(false)
+    }
   }
 
   const formatDateTime = (dateStr) => {
     if (!dateStr) return 'N/A'
-    const date = new Date(dateStr)
-    return date.toLocaleString()
+    return new Date(dateStr).toLocaleString()
   }
 
   const isRoundActive = (round) => {
     const now = new Date()
-    const start = new Date(round.startedAt)
-    const end = new Date(round.endsAt)
-    return now >= start && now <= end
+    return now >= new Date(round.startedAt) && now <= new Date(round.endsAt)
   }
 
   const isRoundCompleted = (round) => {
-    const now = new Date()
-    const end = new Date(round.endsAt)
-    return now > end
+    return new Date() > new Date(round.endsAt)
   }
 
   return (
@@ -153,10 +156,13 @@ function RoundsTab() {
         ) : (
           <div className="divide-y divide-[#222228]">
             {rounds.map(r => (
-              <div key={r.id} className="px-5 py-4 flex items-center gap-4">
+              // FIX: use r._id (MongoDB) instead of r.id
+              <div key={r._id} className="px-5 py-4 flex items-center gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="font-mono text-sm text-white font-semibold">Round #{r.id}</span>
+                    <span className="font-mono text-sm text-white font-semibold">
+                      Round <span className="text-[#2DFF9A] text-xs">{r._id}</span>
+                    </span>
                     {isRoundActive(r) && <Badge variant="green">Active</Badge>}
                     {isRoundCompleted(r) && <Badge variant="gray">Completed</Badge>}
                     {!isRoundActive(r) && !isRoundCompleted(r) && <Badge variant="blue">Upcoming</Badge>}
@@ -166,7 +172,6 @@ function RoundsTab() {
                     <span>📅 Ends: {formatDateTime(r.endsAt)}</span>
                     <span>❓ Questions: {r.totalQuestions || 0}</span>
                     <span>📋 Participants: {r.totalParticipants || 0}</span>
-                    
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -200,54 +205,54 @@ function QuestionsTab() {
   }
 
   const fetchQuestions = async () => {
-    if (!roundId) return
+    if (!roundId.trim()) return
     setLoadingQs(true)
     try {
-      const res = await api.get(`/api/question/round/${roundId}`);
-      flash('success', `${res?.data.length} Questions found in this round!`);
-      setQuestions(res?.data || res || [])
-      console.log(res.data);
+      const res = await api.get(`/api/question/round/${roundId.trim()}`)
+      const qs = res?.data || res || []
+      flash('success', `${qs.length} question(s) found in this round!`)
+      setQuestions(qs)
     } catch (e) {
-      flash('error', e.message);
-
+      flash('error', e.message)
+    } finally {
+      setLoadingQs(false)
     }
-    finally { setLoadingQs(false) }
   }
 
   const createQuestion = async () => {
-    if (!roundId || !form.text || !form.answer || !form.reward) return
+    if (!roundId.trim() || !form.text || !form.answer || !form.reward) return
     setSubmitting(true)
     try {
       const opts = form.options
-        .split(",")
+        .split(',')
         .map(opt => opt.trim())
         .filter(opt => opt.length > 0)
 
-      // Allow both MCQ (with options) and textual questions (without options)
-      const payload = {
-        roundId: Number(roundId),
-        text: form.text,
-        answer: form.answer,
-        ...(form.link && { link: form.link }),
-        reward: Number(form.reward),
+      if (opts.length === 1) {
+        flash('error', 'MCQ must have at least 2 options. Leave blank for a textual question.')
+        setSubmitting(false)
+        return
       }
 
-      // Only add options if provided
-      if (opts.length > 0) {
-        if (opts.length < 2) {
-          flash("error", "MCQ must have at least 2 options. Leave blank for textual question.");
-          setSubmitting(false);
-          return;
-        }
-        payload.options = opts
+      // FIX: roundId must be the raw ObjectId string — no Number() cast
+      const payload = {
+        roundId: roundId.trim(),
+        text: form.text,
+        answer: form.answer,
+        reward: Number(form.reward),
+        ...(form.link && { link: form.link }),
+        ...(opts.length >= 2 && { options: opts }),
       }
 
       await api.post('/api/question', payload)
       setForm({ text: '', options: '', answer: '', link: '', reward: '' })
       flash('success', 'Question created!')
       fetchQuestions()
-    } catch (e) { flash('error', e.message) }
-    finally { setSubmitting(false) }
+    } catch (e) {
+      flash('error', e.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const deleteQuestion = async (id) => {
@@ -256,17 +261,22 @@ function QuestionsTab() {
     try {
       await api.del(`/api/question/${id}`)
       flash('success', 'Question deleted')
-      setQuestions(qs => qs.filter(q => q.id !== id))
-    } catch (e) { flash('error', e.message) }
-    finally { setDeletingId(null) }
+      // FIX: filter by _id string
+      setQuestions(qs => qs.filter(q => q._id !== id))
+    } catch (e) {
+      flash('error', e.message)
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   const startEdit = (q) => {
-    setEditingId(q.id)
+    // FIX: use q._id
+    setEditingId(q._id)
     setEditForm({
       text: q.text,
-      options: q.options ? JSON.stringify(q.options) : '',
-      answer: q.answer,
+      options: q.options ? (Array.isArray(q.options) ? q.options.join(', ') : JSON.stringify(q.options)) : '',
+      answer: q.answer || '',
       link: q.link || '',
       reward: String(q.reward),
     })
@@ -276,19 +286,26 @@ function QuestionsTab() {
     try {
       let opts = undefined
       if (editForm.options.trim()) {
-        try { opts = JSON.parse(editForm.options) } catch { flash('error', 'Invalid JSON in options'); return }
+        // Accept both comma-separated and JSON array
+        try {
+          opts = JSON.parse(editForm.options)
+        } catch {
+          opts = editForm.options.split(',').map(o => o.trim()).filter(Boolean)
+        }
       }
       const body = {}
       if (editForm.text) body.text = editForm.text
       if (editForm.answer) body.answer = editForm.answer
       if (editForm.reward) body.reward = Number(editForm.reward)
-      if (editForm.link !== undefined && editForm.link.length > 1) body.link = editForm.link
+      if (editForm.link && editForm.link.length > 1) body.link = editForm.link
       if (opts !== undefined) body.options = opts
       await api.patch(`/api/question/${id}`, body)
       flash('success', 'Question updated!')
       setEditingId(null)
       fetchQuestions()
-    } catch (e) { flash('error', e.message) }
+    } catch (e) {
+      flash('error', e.message)
+    }
   }
 
   return (
@@ -299,8 +316,15 @@ function QuestionsTab() {
       <div className="card p-5 space-y-4">
         <h3 className="font-display text-white text-lg">Add Question</h3>
         <div className="flex gap-3 items-end">
-          <Input label="Round ID" value={roundId} onChange={e => setRoundId(e.target.value)} placeholder="1" className="w-32" />
-          <Btn variant="secondary" size="sm" onClick={fetchQuestions} disabled={!roundId}>Load Questions</Btn>
+          {/* FIX: plain text input — paste the ObjectId string from the Rounds tab */}
+          <Input
+            label="Round ID (ObjectId)"
+            value={roundId}
+            onChange={e => setRoundId(e.target.value)}
+            placeholder="e.g. 6650f3a2c1b2d3e4f5a6b7c8"
+            className="flex-1"
+          />
+          <Btn variant="secondary" size="sm" onClick={fetchQuestions} disabled={!roundId.trim()}>Load Questions</Btn>
         </div>
         <Textarea label="Question text *" value={form.text} onChange={e => setForm(f => ({ ...f, text: e.target.value }))} placeholder="What is the capital of France?" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -308,14 +332,14 @@ function QuestionsTab() {
           <Input label="Reward (points) *" value={form.reward} onChange={e => setForm(f => ({ ...f, reward: e.target.value }))} placeholder="10" />
         </div>
         <Textarea
-          label='Options (optional — for MCQ, comma-separated. Leave blank for textual question)'
+          label="Options (optional — for MCQ, comma-separated. Leave blank for textual question)"
           value={form.options}
           onChange={e => setForm(f => ({ ...f, options: e.target.value }))}
-          placeholder='E.g., Paris, London, Berlin, India'
+          placeholder="E.g., Paris, London, Berlin, India"
           rows={2}
         />
         <Input label="Reference link (optional)" value={form.link} onChange={e => setForm(f => ({ ...f, link: e.target.value }))} placeholder="https://..." />
-        <Btn onClick={createQuestion} loading={submitting} disabled={!roundId}>+ Add Question</Btn>
+        <Btn onClick={createQuestion} loading={submitting} disabled={!roundId.trim()}>+ Add Question</Btn>
       </div>
 
       {/* Questions list */}
@@ -324,22 +348,23 @@ function QuestionsTab() {
       ) : questions.length > 0 ? (
         <div className="card overflow-hidden">
           <div className="px-5 py-4 border-b border-[#2DFF9A]/10">
-            <h3 className="font-display text-white">Questions — Round #{roundId}</h3>
+            <h3 className="font-display text-white">Questions — Round {roundId}</h3>
           </div>
           <div className="divide-y divide-[#222228]">
             {questions.map((q, i) => (
-              <div key={q.id} className="px-5 py-4">
-                {editingId === q.id ? (
+              // FIX: key and all operations use q._id
+              <div key={q._id} className="px-5 py-4">
+                {editingId === q._id ? (
                   <div className="space-y-3">
                     <Textarea value={editForm.text} onChange={e => setEditForm(f => ({ ...f, text: e.target.value }))} rows={2} />
                     <div className="grid grid-cols-2 gap-3">
                       <Input label="Answer" value={editForm.answer} onChange={e => setEditForm(f => ({ ...f, answer: e.target.value }))} />
                       <Input label="Reward" value={editForm.reward} onChange={e => setEditForm(f => ({ ...f, reward: e.target.value }))} />
                     </div>
-                    <Textarea label="Options JSON" value={editForm.options} onChange={e => setEditForm(f => ({ ...f, options: e.target.value }))} rows={2} />
+                    <Textarea label="Options (comma-separated or JSON array)" value={editForm.options} onChange={e => setEditForm(f => ({ ...f, options: e.target.value }))} rows={2} />
                     <Input label="Link" value={editForm.link} onChange={e => setEditForm(f => ({ ...f, link: e.target.value }))} />
                     <div className="flex gap-2">
-                      <Btn size="sm" onClick={() => saveEdit(q.id)}>Save</Btn>
+                      <Btn size="sm" onClick={() => saveEdit(q._id)}>Save</Btn>
                       <Btn size="sm" variant="ghost" onClick={() => setEditingId(null)}>Cancel</Btn>
                     </div>
                   </div>
@@ -350,14 +375,13 @@ function QuestionsTab() {
                       <p className="text-white text-sm mb-1">{q.text}</p>
                       <div className="flex flex-wrap gap-2 text-xs">
                         <Badge variant="yellow">+{q.reward} pts</Badge>
-                        
                         {q.options && <Badge variant="blue">MCQ</Badge>}
                         {q.link && <a href={q.link} target="_blank" rel="noreferrer" className="text-[#2DFF9A] hover:underline">🔗 link</a>}
                       </div>
                     </div>
                     <div className="flex gap-1.5 flex-shrink-0">
                       <Btn size="sm" variant="ghost" onClick={() => startEdit(q)}>✏️</Btn>
-                      <Btn size="sm" variant="danger" onClick={() => deleteQuestion(q.id)} loading={deletingId === q.id}>🗑</Btn>
+                      <Btn size="sm" variant="danger" onClick={() => deleteQuestion(q._id)} loading={deletingId === q._id}>🗑</Btn>
                     </div>
                   </div>
                 )}
@@ -393,8 +417,9 @@ export default function AdminPage() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.id ? 'bg-[#2DFF9A] text-[#0B1F18] font-bold' : 'text-[#6b6b7a] hover:text-white'
-              }`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              tab === t.id ? 'bg-[#2DFF9A] text-[#0B1F18] font-bold' : 'text-[#6b6b7a] hover:text-white'
+            }`}
           >
             {t.label}
           </button>

@@ -1,6 +1,8 @@
-import { useAuth } from '@clerk/clerk-react'
+// pages/HomePage.jsx
+// Replaced: import { useAuth } from '@clerk/clerk-react'
+// With:     import { useAuth } from '../context/AuthContext'
 
-const REGISTRATION_URL = 'https://forms.gle/replace-with-google-form'
+import { useAuth } from '../context/AuthContext'
 
 const homeButtonClass =
   'rounded-full border border-[#2DFF9A]/40 bg-black/60 px-5 py-2.5 text-center text-sm uppercase text-[#2DFF9A] backdrop-blur-sm transition hover:bg-[#2DFF9A]/10 disabled:cursor-wait disabled:opacity-60 sm:px-7 sm:py-3'
@@ -12,6 +14,7 @@ const homeButtonStyle = {
 }
 
 export default function HomePage({ onNav, userRole, userAllowed, allowedLoading }) {
+  // ✅ Replaced Clerk's useAuth() — now reads from our custom AuthContext
   const { isSignedIn, signOut } = useAuth()
 
   return (
@@ -110,15 +113,13 @@ export default function HomePage({ onNav, userRole, userAllowed, allowedLoading 
               START
             </button>
           ) : (
-            <a
-              href={REGISTRATION_URL}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              onClick={() => onNav('signin')}
               className={`w-full sm:w-auto ${homeButtonClass}`}
               style={homeButtonStyle}
             >
               REGISTER NOW
-            </a>
+            </button>
           )}
 
           {/* ABOUT */}

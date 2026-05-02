@@ -28,7 +28,7 @@ export default function Layout({ children, page, onNav, userRole, roundIntroActi
               textShadow: '0 0 8px rgba(45,255,154,0.7)',
             }}
           >
-            HOME
+            RETURN
           </button>
         </div>
       )}

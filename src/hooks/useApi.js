@@ -1,18 +1,16 @@
-import { useAuth } from '@clerk/clerk-react'
+import { useAuth } from '../context/AuthContext'
 import { useCallback, useMemo } from 'react'
 import { api } from '../../api'
 
 export function useApi() {
-  const { getToken } = useAuth()
+  const { user } = useAuth()
 
   const call = useCallback(async (method, path, body) => {
-    let token = null
-    try { token = await getToken() } catch {}
     return api(path, {
       method,
       ...(body ? { body: JSON.stringify(body) } : {}),
-    }, token)
-  }, [getToken])
+    })
+  }, [])
 
   return useMemo(() => ({
     get: (path) => call('GET', path),

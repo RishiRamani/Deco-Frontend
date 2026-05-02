@@ -789,7 +789,7 @@ export default function QuizPage({ onNav }) {
   const finishRound = async () => {
     if (!activeRound) return
     setFinishing(true)
-    try { await api.post(`/api/round/${activeRound.id}/finish`); onNav('leaderboard') }
+    try { await api.post(`/api/round/${activeRound._id}/finish`); onNav('leaderboard') }
     catch (e) { setError(e.message); setFinishing(false) }
   }
 
@@ -821,7 +821,7 @@ export default function QuizPage({ onNav }) {
         <div>
           <h1 className="text-[28px] font-black text-[#e8edf5] leading-none mb-2" style={{ fontFamily:'Syne,sans-serif' }}>Quiz</h1>
           <div className="flex items-center gap-2 flex-wrap text-xs" style={{ fontFamily:'DM Sans,sans-serif' }}>
-            <span className="text-slate-500">Round #{activeRound.id}</span>
+            <span className="text-slate-500">Round #{activeRound._id}</span>
             <span className="text-slate-700">·</span>
             <span className="text-slate-500">{answered}/{questions.length} answered</span>
           </div>
