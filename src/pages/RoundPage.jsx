@@ -14,32 +14,15 @@ import FlashbackTransition from '../components/FlashbackTransition'
 
 // Flashback transition config
 const FLASHBACK_IMAGES = [
-  '/backgrounds/final-round-bg.png',
   '/backgrounds/home-hero.png',
   '/backgrounds/r1-stage1-bg.png',
   '/backgrounds/r1-stage2-bg.png',
   '/backgrounds/r2-stage1-bg.png',
   '/backgrounds/r2-stage2-bg.png',
+  '/backgrounds/easteregg.png',
   '/backgrounds/r3-bg.png',
   '/backgrounds/r3-space-bg.png',
   '/backgrounds/test.png',
-  '/images/acm-logo.png',
-  '/images/ancient-bg.png',
-  '/images/college-logo.png',
-  '/images/deco-logo.png',
-  '/images/intro-1.png',
-  '/images/intro-2.png',
-  '/images/intro-3.png',
-  '/images/intro-4.png',
-  '/images/intro-5.png',
-  '/images/intro-6.png',
-  '/images/loki.png',
-  '/images/map-location.png',
-  '/images/powered-by.png',
-  '/images/scroll-bg.png',
-  '/images/silver-surfer.png',
-  '/images/sound-wave.png',
-  '/images/thought-cloud.png',
 ].reverse() // Reverse for time restoring back effect
 const FLASHBACK_DURATION = 8 // seconds
 const FLASHBACK_SOUND = '/voices/welldone.mp3' // assuming a sound file

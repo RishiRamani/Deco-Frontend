@@ -68,11 +68,16 @@ function TransitionsTab() {
   }
 
   const flashbackImages = [
-    '/characters/deco-ai.png',
-    '/images/loki.png',
-    '/characters/doctor-doom.png',
-    '/characters/captain-america.png',
-    '/backgrounds/r1-stage1-bg.png'
+     '/backgrounds/final-round-bg.png',
+    '/backgrounds/home-hero.png',
+    '/backgrounds/r1-stage1-bg.png',
+    '/backgrounds/r1-stage2-bg.png',
+    '/backgrounds/r2-stage1-bg.png',
+    '/backgrounds/r2-stage2-bg.png',
+    '/backgrounds/easteregg.png',
+    '/backgrounds/r3-bg.png',
+    '/backgrounds/r3-space-bg.png',
+    '/backgrounds/test.png',
   ]
 
   return (
