@@ -23,6 +23,16 @@ const FLASHBACK_IMAGES = [
   '/backgrounds/r3-bg.png',
   '/backgrounds/r3-space-bg.png',
   '/backgrounds/test.png',
+  '/backgrounds/final-round-bg.png',
+  '/backgrounds/home-hero.png',
+  '/backgrounds/r1-stage1-bg.png',
+  '/backgrounds/r1-stage2-bg.png',
+  '/backgrounds/r2-stage1-bg.png',
+  '/backgrounds/r2-stage2-bg.png',
+  '/backgrounds/easteregg.png',
+  '/backgrounds/r3-bg.png',
+  '/backgrounds/r3-space-bg.png',
+  '/backgrounds/test.png',
 ].reverse() // Reverse for time restoring back effect
 const FLASHBACK_DURATION = 8 // seconds
 const FLASHBACK_SOUND = '/voices/welldone.mp3' // assuming a sound file
