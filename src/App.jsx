@@ -13,6 +13,7 @@ import LeaderboardPage from './pages/LeaderboardPage'
 import EndPage from './pages/EndPage'
 import AdminPage from './pages/AdminPage'
 import RotateOverlay from './components/RotateOverlay'
+import CrackTransitionOverlay from './components/CrackTransitionOverlay'
 
 const DEFAULT_PAGE = 'home'
 const ROUTES = new Set(['home', 'about', 'registration', 'signin', 'round', 'waiting', 'leaderboard', 'end', 'admin'])
@@ -45,6 +46,7 @@ function AuthenticatedApp() {
   const [allowedLoading, setAllowedLoading] = useState(false)
   const [roundIntroActive, setRoundIntroActive] = useState(false)
   const [toast, setToast] = useState(null)
+  const [transitionToWaiting, setTransitionToWaiting] = useState(false)
 
   useEffect(() => {
     const hashPage = window.location.hash.replace('#', '').trim()
@@ -141,11 +143,23 @@ function AuthenticatedApp() {
       return
     }
 
+    if (transitionToWaiting) return
+
     if (nextPage === 'admin' && userRole !== 'ORGANIZER') {
       return
     }
 
     const target = nextPage || DEFAULT_PAGE
+
+    if (target === 'waiting' && page !== 'waiting') {
+      setTransitionToWaiting(true)
+      window.setTimeout(() => {
+        window.history.pushState({}, '', pathForPage(target))
+        setPage(target)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 320)
+      return
+    }
 
     if (target === 'round' && page !== 'round') {
       if (roundIntroActive) return
@@ -163,7 +177,7 @@ function AuthenticatedApp() {
     window.history.pushState({}, '', pathForPage(target))
     setPage(target)
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [page, roundIntroActive, userRole, isSignedIn])
+  }, [page, roundIntroActive, userRole, isSignedIn, transitionToWaiting])
 
   const pages = useMemo(
     () => ({
@@ -191,6 +205,11 @@ function AuthenticatedApp() {
       <Layout page={page} onNav={navigate} userRole={userRole} roundIntroActive={roundIntroActive}>
         {pages[page] || pages.home}
       </Layout>
+      <CrackTransitionOverlay
+        isActive={transitionToWaiting}
+        onComplete={() => setTransitionToWaiting(false)}
+        soundEffect="/voices/wait.mp3"
+      />
       
       {/* Toast Notification */}
       {toast && (

@@ -602,10 +602,11 @@ export default function RoundPage({ onNav }) {
 
   const activeSequence = phase === 'answer' ? postAnswerSequence : preQuestionSequence
   const activeDialogue = sequenceIndex < activeSequence.length ? activeSequence[sequenceIndex] : null
+  const hasActiveDialogue = Boolean(activeDialogue)
   const highlightedCharacter = activeDialogue?.characterId
   const isLastQuestion = currentIndex === questions.length - 1
-  const showQuestionCard = phase === 'question' && currentQuestion
-  const showAnswerReveal = phase === 'answer' && currentQuestion && currentResponse
+  const showQuestionCard = phase === 'question' && currentQuestion && !hasActiveDialogue
+  const showAnswerReveal = phase === 'answer' && currentQuestion && currentResponse && !hasActiveDialogue
 
   // ─── SUBMIT ────────────────────────────────────────────────────────────────
   // Saves to localStorage immediately so refresh restores the answer without

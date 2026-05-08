@@ -109,29 +109,24 @@ function TransitionsTab() {
               className="fixed inset-0 z-[9998] pointer-events-none overflow-hidden bg-black"
               style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 1, 1, 0] }}
+              animate={{ opacity: [0, 1, 1, 0] }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 2.6, times: [0, 0.18, 0.66, 0.84, 1], ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 2.4, times: [0, 0.18, 0.8, 1], ease: [0.22, 1, 0.36, 1] }}
             >
-              <motion.div
-                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(45,255,154,0.18),transparent_32%),radial-gradient(circle_at_center,rgba(255,0,0,0.16),transparent_62%)]"
-                style={{ willChange: 'opacity', transform: 'translateZ(0)' }}
-                animate={{ opacity: [0.35, 0.95, 0.75, 0.12] }}
-                transition={{ duration: 2.35, ease: 'easeOut' }}
-              />
-              {/* Simplified crack paths for testing */}
+              {/* Full-screen shatter crack effect */}
               <motion.svg
                 viewBox="0 0 100 100"
                 preserveAspectRatio="none"
                 className="absolute inset-0 h-full w-full"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 1, 1, 0] }}
-                transition={{ duration: 2.35, delay: 0.13, times: [0, 0.28, 0.78, 1] }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 2.4, times: [0, 0.15, 0.85, 1], ease: 'easeOut' }}
               >
                 <defs>
-                  <filter id="glow-test">
-                    <feGaussianBlur stdDeviation="1.2" result="blur" />
-                    <feFlood floodColor="#2DFF9A" floodOpacity="0.7" result="color" />
+                  <filter id="crack-glow">
+                    <feGaussianBlur stdDeviation="0.8" result="blur" />
+                    <feFlood floodColor="#ffffff" floodOpacity="0.4" result="color" />
                     <feComposite in="color" in2="blur" operator="in" result="glow" />
                     <feMerge>
                       <feMergeNode in="glow" />
@@ -139,18 +134,72 @@ function TransitionsTab() {
                     </feMerge>
                   </filter>
                 </defs>
-                <g filter="url(#glow-test)">
+                <g filter="url(#crack-glow)">
                   <motion.path
-                    d="M50 0 L48 15 L52 28 L49 42 L54 55 L50 70 L53 86 L50 100"
+                    d="M50 0 L48 18 L52 30 L49 45 L54 58 L50 72 L53 88 L50 100"
                     fill="none"
-                    stroke="#2DFF9A"
-                    strokeWidth="0.55"
+                    stroke="#ffffff"
+                    strokeWidth="0.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    pathLength="1"
                     initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: [0, 1, 0.85] }}
-                    transition={{ duration: 1.08, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
+                    animate={{ pathLength: 1, opacity: [0, 1, 1] }}
+                    transition={{ duration: 1.1, ease: 'easeOut' }}
+                  />
+                  <motion.path
+                    d="M0 50 L18 48 L30 52 L45 49 L58 53 L72 47 L100 50"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="0.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: [0, 1, 1] }}
+                    transition={{ duration: 1.05, delay: 0.08, ease: 'easeOut' }}
+                  />
+                  <motion.path
+                    d="M0 0 L16 14 L30 28 L44 42 L50 50"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="0.65"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: [0, 1, 1] }}
+                    transition={{ duration: 1.05, delay: 0.16, ease: 'easeOut' }}
+                  />
+                  <motion.path
+                    d="M100 0 L84 16 L70 30 L56 44 L50 50"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="0.65"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: [0, 1, 1] }}
+                    transition={{ duration: 1.05, delay: 0.2, ease: 'easeOut' }}
+                  />
+                  <motion.path
+                    d="M0 100 L16 84 L30 70 L44 56 L50 50"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="0.65"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: [0, 1, 1] }}
+                    transition={{ duration: 1.05, delay: 0.24, ease: 'easeOut' }}
+                  />
+                  <motion.path
+                    d="M100 100 L84 84 L70 70 L56 56 L50 50"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="0.65"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: [0, 1, 1] }}
+                    transition={{ duration: 1.05, delay: 0.28, ease: 'easeOut' }}
                   />
                 </g>
               </motion.svg>

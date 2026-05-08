@@ -1,169 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useApi } from '../hooks/useApi'
 import Timer from '../components/Timer'
 import { ACTIVE_ROUND_POLL_MS, ROUND_JOIN_BUFFER_MS } from '../config/experience'
 import { Alert, Spinner } from '../components/UI'
 
-const TIMELINE_CRACK_SOUND = '/voices/wait.mp3' // assuming a sound file
-
 function isPlayable(round) {
   if (!round) return false
   return Date.now() < new Date(round.endsAt).getTime() - ROUND_JOIN_BUFFER_MS
-}
-
-function TimelineCrackTransition({ show, soundEffect }) {
-  const [portalRoot, setPortalRoot] = useState(null)
-  const [audio] = useState(() => soundEffect ? new Audio(soundEffect) : null)
-  const crackPaths = [
-    'M50 0 L48 15 L52 28 L49 42 L54 55 L50 70 L53 86 L50 100',
-    'M49 42 L35 32 L25 22 L15 20',
-    'M51 31 L63 22 L73 12 L86 8',
-    'M52 55 L67 61 L80 72 L96 78',
-    'M49 65 L36 75 L25 88 L9 94',
-    'M50 18 L42 10 L37 2',
-    'M53 84 L61 93 L69 99',
-  ]
-
-  // Reduced from 3 clusters to 2
-  const clusters = [
-    {
-      className: 'absolute inset-0 h-full w-full',
-      transform: 'none',
-      strokeScale: 1,
-      delay: 0,
-    },
-    {
-      className: 'absolute -left-[18vw] top-[4vh] h-[92vh] w-[62vw]',
-      transform: 'rotate(-18deg) scaleX(0.92)',
-      strokeScale: 1.12,
-      delay: 0.13,
-    },
-    {
-      className: 'absolute -right-[18vw] top-[8vh] h-[88vh] w-[62vw]',
-      transform: 'rotate(22deg) scaleX(0.9)',
-      strokeScale: 1.06,
-      delay: 0.2,
-    },
-  ]
-
-  useEffect(() => {
-    setPortalRoot(document.body)
-  }, [])
-
-  useEffect(() => {
-    if (show && audio) {
-      audio.currentTime = 0
-      audio.play().catch(() => {})
-    } else if (!show && audio) {
-      audio.pause()
-      audio.currentTime = 0
-    }
-  }, [show, audio])
-
-  if (!portalRoot) return null
-
-  return createPortal(
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          className="fixed inset-0 z-[9998] pointer-events-none overflow-hidden bg-black"
-          style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 1, 1, 1, 0] }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 2.6, times: [0, 0.18, 0.66, 0.84, 1], ease: [0.22, 1, 0.36, 1] }}
-        >
-          {/* Radial gradient bg — opacity-only animation, no filter */}
-          <motion.div
-            className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(45,255,154,0.18),transparent_32%),radial-gradient(circle_at_center,rgba(255,0,0,0.16),transparent_62%)]"
-            style={{ willChange: 'opacity', transform: 'translateZ(0)' }}
-            animate={{ opacity: [0.35, 0.95, 0.75, 0.12] }}
-            transition={{ duration: 2.35, ease: 'easeOut' }}
-          />
-
-          {clusters.map((cluster, clusterIndex) => (
-            <motion.svg
-              key={clusterIndex}
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              className={cluster.className}
-              style={{
-                transform: cluster.transform,
-                transformOrigin: 'center',
-                willChange: 'opacity',
-              }}
-              // Static SVG filter replaces animated CSS filter — much cheaper
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 1, 0] }}
-              transition={{ duration: 2.35, delay: cluster.delay, times: [0, 0.28, 0.78, 1] }}
-            >
-              {/* Declare glow as SVG filter — applied statically, no animation */}
-              <defs>
-                <filter id={`glow-${clusterIndex}`} x="-30%" y="-30%" width="160%" height="160%">
-                  <feGaussianBlur stdDeviation="1.2" result="blur" />
-                  <feFlood floodColor="#2DFF9A" floodOpacity="0.7" result="color" />
-                  <feComposite in="color" in2="blur" operator="in" result="glow" />
-                  <feMerge>
-                    <feMergeNode in="glow" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-
-              <g filter={`url(#glow-${clusterIndex})`}>
-                {crackPaths.map((path, index) => (
-                  <motion.path
-                    key={`${clusterIndex}-${path}`}
-                    d={path}
-                    fill="none"
-                    stroke={index % 2 === 0 ? '#2DFF9A' : '#ff3b3b'}
-                    strokeWidth={(index === 0 ? 0.55 : 0.32) * cluster.strokeScale}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    pathLength="1"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: [0, 1, 0.85] }}
-                    transition={{
-                      duration: 1.08,
-                      delay: cluster.delay + 0.14 + index * 0.075,
-                      ease: [0.16, 1, 0.3, 1],
-                    }}
-                  />
-                ))}
-
-                {['47,18 42,35 49,42', '53,28 60,45 52,56', '48,63 37,80 51,72', '55,58 76,72 61,64'].map(
-                  (points, index) => (
-                    <motion.polygon
-                      key={`${clusterIndex}-${points}`}
-                      points={points}
-                      fill={index % 2 === 0 ? 'rgba(45,255,154,0.12)' : 'rgba(255,0,0,0.1)'}
-                      stroke="rgba(255,255,255,0.22)"
-                      strokeWidth="0.12"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 1, 0] }}
-                      // Removed scale animation — compositor can't handle SVG scale cheaply
-                      transition={{ duration: 1.65, delay: cluster.delay + 0.68 + index * 0.1 }}
-                    />
-                  ),
-                )}
-              </g>
-            </motion.svg>
-          ))}
-
-          {/* Flash line — cheap single div */}
-          <motion.div
-            className="absolute left-1/2 top-1/2 h-[1px] w-0 -translate-x-1/2 -translate-y-1/2 bg-white/80 shadow-[0_0_40px_rgba(45,255,154,1)]"
-            style={{ willChange: 'width, opacity' }}
-            animate={{ width: ['0%', '92%', '92%', '0%'], opacity: [0, 1, 0.8, 0] }}
-            transition={{ duration: 1.05, delay: 0.7, ease: 'easeOut' }}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>,
-    portalRoot,
-  )
 }
 
 export default function WaitingPage({ onNav, forcedMessage }) {
@@ -172,10 +16,6 @@ export default function WaitingPage({ onNav, forcedMessage }) {
   const [upcomingRound, setUpcomingRound] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [showCrackTransition, setShowCrackTransition] = useState(false)
-  const hasPlayedRef = useRef(false)
-  const [introComplete, setIntroComplete] = useState(false)
-
   const apiRef = useRef(api)
   const onNavRef = useRef(onNav)
   const forcedMessageRef = useRef(forcedMessage)
@@ -186,20 +26,6 @@ export default function WaitingPage({ onNav, forcedMessage }) {
   useEffect(() => { apiRef.current = api }, [api])
   useEffect(() => { onNavRef.current = onNav }, [onNav])
   useEffect(() => { forcedMessageRef.current = forcedMessage }, [forcedMessage])
-
-  useEffect(() => {
-  if (hasPlayedRef.current) return
-
-  hasPlayedRef.current = true
-  setShowCrackTransition(true)
-
-  const timer = window.setTimeout(() => {
-    setShowCrackTransition(false)
-    setIntroComplete(true)
-  }, 2600)
-
-  return () => window.clearTimeout(timer)
-}, [])
 
   const pollActiveRound = useCallback(async () => {
     if (forcedMessageRef.current || pollingRef.current) return
@@ -268,14 +94,8 @@ export default function WaitingPage({ onNav, forcedMessage }) {
 
   return (
     <>
-      <TimelineCrackTransition show={showCrackTransition} soundEffect={TIMELINE_CRACK_SOUND} />
-
-      {!introComplete ? (
+      {loading ? (
         <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-          <Spinner size="lg" />
-        </div>
-      ) : loading ? (
-        <div className="flex justify-center py-24">
           <Spinner size="lg" />
         </div>
       ) : (
