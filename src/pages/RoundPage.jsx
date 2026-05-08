@@ -300,7 +300,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
   return (
     <form
       onSubmit={handleSubmit}
-      className={`${borderRadiusClass} p-5 sm:p-6 ${boxShadow} max-w-xl w-full backdrop-blur-md`}
+      className={`${borderRadiusClass} p-4 sm:p-6 landscape:p-4 ${boxShadow} max-w-xl w-full backdrop-blur-md`}
       style={{
         background: sceneTheme.questionBox.background,
         border: sceneTheme.questionBox.border,
@@ -713,73 +713,93 @@ export default function RoundPage({ onNav }) {
 
       {/* Top HUD — floating overlay */}
       <div className="fixed top-0 left-0 right-0 z-30 pointer-events-none">
-        <div className="flex items-start justify-between p-4 sm:p-6 pointer-events-auto">
-          <div className="rounded-2xl border border-[#2DFF9A]/10 bg-black/60 px-4 py-3 backdrop-blur-md">
-            <div className="text-[10px] uppercase tracking-[0.35em] text-[#2DFF9A]/70">Active round</div>
-            <div className="mt-1 text-xl font-bold text-white">Round #{round?.id}</div>
-            <div className="mt-2 flex items-center gap-3">
-              <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-[#2DFF9A] transition-all duration-500" style={{ width: `${progress}%` }} />
-              </div>
-              <span className="text-xs text-[#2DFF9A]/80">{answeredCount}/{totalQuestions}</span>
-            </div>
-          </div>
-          {playableUntil && (
-            <div className="pointer-events-auto">
-              <Timer targetTime={playableUntil} label="Time left" onExpire={() => finishRound({ silent: true })} />
-            </div>
-          )}
-        </div>
-        {error && <div className="px-6 pointer-events-auto"><Alert type="error">{error}</Alert></div>}
+  <div className="flex items-start justify-between p-3 sm:p-6 landscape:p-2 landscape:px-4 pointer-events-auto">
+    <div className="rounded-2xl border border-[#2DFF9A]/10 bg-black/60 px-3 py-2 landscape:py-1.5 backdrop-blur-md">
+      <div className="text-[10px] uppercase tracking-[0.35em] text-[#2DFF9A]/70">Active round</div>
+      <div className="mt-0.5 text-base sm:text-xl landscape:text-sm font-bold text-white">
+        Round #{round?.id}
       </div>
-
-      {/* Main round content area */}
-      <div className="relative z-40 flex min-h-screen items-center justify-center pointer-events-none px-0 py-0">
-        <div className="pointer-events-auto flex min-h-screen w-full max-w-full items-center justify-center overflow-y-auto px-0 py-0">
-          {currentQuestion ? (
-              <>
-                {showAnswerReveal ? (
-                  <AnswerReveal
-                    question={currentQuestion}
-                    submittedAnswer={currentResponse.submittedAnswer}
-                    isLastQuestion={isLastQuestion}
-                    onContinue={goNext}
-                    onFinish={() => finishRound()}
-                    sceneTheme={effectiveSceneTheme}
-                  />
-                ) : showQuestionCard ? (
-                  <QuestionCard
-                    question={currentQuestion}
-                    questionNumber={currentIndex + 1}
-                    totalQuestions={totalQuestions}
-                    onSubmit={submitAnswer}
-                    loading={submitting}
-                    previousAnswer={currentResponse?.submittedAnswer}
-                    sceneTheme={effectiveSceneTheme}
-                  />
-                ) : null}
-              </>
-            ) : (
-              <Panel className="bg-emerald-300/10 text-center">
-                <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">No questions</div>
-                <div className="mt-4 text-2xl font-medium text-white">This round does not have any questions yet.</div>
-                <div className="mt-6 flex justify-center">
-                  <Btn onClick={() => finishRound({ silent: true })} loading={finishing}>
-                    Finish round
-                  </Btn>
-                </div>
-              </Panel>
-            )}
-          </div>
+      <div className="mt-1.5 flex items-center gap-3">
+        <div className="h-1.5 w-20 sm:w-24 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full rounded-full bg-[#2DFF9A] transition-all duration-500"
+            style={{ width: `${progress}%` }} />
         </div>
+        <span className="text-xs text-[#2DFF9A]/80">{answeredCount}/{totalQuestions}</span>
+      </div>
+    </div>
+    {playableUntil && (
+      <div className="pointer-events-auto scale-90 sm:scale-100 origin-top-right">
+        <Timer targetTime={playableUntil} label="Time left"
+          onExpire={() => finishRound({ silent: true })} />
+      </div>
+    )}
+  </div>
+  {error && (
+    <div className="px-4 sm:px-6 pointer-events-auto">
+      <Alert type="error">{error}</Alert>
+    </div>
+  )}
+</div>
 
-        {activeDialogue && (
-          <div className="fixed inset-x-0 bottom-4 z-50 flex justify-center px-4 pointer-events-none">
-            <div className="pointer-events-auto w-full max-w-xl">
-              <SceneDialogue item={activeDialogue} onAdvance={advanceSequence} sceneTheme={effectiveSceneTheme} />
-            </div>
-          </div>
-        )}
+{/* Main round content area — clears HUD via pt, scrollable on landscape */}
+<div className="relative z-40 flex min-h-screen items-center justify-center pointer-events-none
+                landscape:items-start landscape:pt-[60px]">
+  <div className="pointer-events-auto flex w-full max-w-full items-center justify-center
+                  overflow-y-auto px-3 sm:px-6 py-6 landscape:py-3
+                  min-h-screen landscape:min-h-0 landscape:max-h-[calc(100vh-60px)]">
+    {currentQuestion ? (
+      <>
+        {showAnswerReveal ? (
+          <AnswerReveal
+            question={currentQuestion}
+            submittedAnswer={currentResponse.submittedAnswer}
+            isLastQuestion={isLastQuestion}
+            onContinue={goNext}
+            onFinish={() => finishRound()}
+            sceneTheme={effectiveSceneTheme}
+          />
+        ) : showQuestionCard ? (
+          <QuestionCard
+            question={currentQuestion}
+            questionNumber={currentIndex + 1}
+            totalQuestions={totalQuestions}
+            onSubmit={submitAnswer}
+            loading={submitting}
+            previousAnswer={currentResponse?.submittedAnswer}
+            sceneTheme={effectiveSceneTheme}
+          />
+        ) : null}
+      </>
+    ) : (
+      <Panel className="bg-emerald-300/10 text-center">
+        <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">No questions</div>
+        <div className="mt-4 text-2xl font-medium text-white">
+          This round does not have any questions yet.
+        </div>
+        <div className="mt-6 flex justify-center">
+          <Btn onClick={() => finishRound({ silent: true })} loading={finishing}>
+            Finish round
+          </Btn>
+        </div>
+      </Panel>
+    )}
+  </div>
+</div>
+
+{activeDialogue && (
+  <div
+    className="fixed inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
+    style={{ bottom: 'max(env(safe-area-inset-bottom), 12px)' }}
+  >
+    <div className="pointer-events-auto w-full max-w-xl">
+      <SceneDialogue
+        item={activeDialogue}
+        onAdvance={advanceSequence}
+        sceneTheme={effectiveSceneTheme}
+      />
+    </div>
+  </div>
+)}
 
         {showFlashback && (
           <FlashbackTransition

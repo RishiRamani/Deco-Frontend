@@ -203,3 +203,10 @@ button, a, input, textarea {
 .rank-1 { background: linear-gradient(135deg, #ffd700, #f59e0b); color: #000; }
 .rank-2 { background: linear-gradient(135deg, #c0c0c0, #94a3b8); color: #000; }
 .rank-3 { background: linear-gradient(135deg, #cd7f32, #a16207); color: #fff; }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  40% { transform: rotate(90deg); }
+  60% { transform: rotate(90deg); }
+  100% { transform: rotate(0deg); }
+}

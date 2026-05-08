@@ -564,7 +564,7 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
 
   return (
     <motion.div ref={cardRef}
-      className="relative rounded-[18px] p-7 overflow-visible"
+      className="relative rounded-[18px] p-5 landscape:p-4 sm:p-7 overflow-visible"
       style={{ border:`1px solid ${borderColor}`, background:'#0e1420', transition:'border-color 0.5s ease' }}
       initial={{ opacity:0, y:28, scale:0.97, filter:'blur(5px)' }}
       animate={{ opacity:1, y:0, scale:1, filter:'blur(0px)' }}
@@ -812,143 +812,166 @@ export default function QuizPage({ onNav }) {
   const isLast          = currentIndex === questions.length - 1
   const currentResponse = currentQuestion && getResponse(currentQuestion.id)
 
-  return (
-    <div className="max-w-[700px] mx-auto">
+  eturn (
+  <div className="w-full max-w-[700px] mx-auto px-3 xs:px-4 sm:px-6
+                  landscape:px-4 landscape:pb-4">
 
-      {/* HEADER */}
-      <motion.div className="flex items-start justify-between gap-4 mb-7"
-        initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.4 }}>
-        <div>
-          <h1 className="text-[28px] font-black text-[#e8edf5] leading-none mb-2" style={{ fontFamily:'Syne,sans-serif' }}>Quiz</h1>
-          <div className="flex items-center gap-2 flex-wrap text-xs" style={{ fontFamily:'DM Sans,sans-serif' }}>
-            <span className="text-slate-500">Round #{activeRound._id}</span>
-            <span className="text-slate-700">·</span>
-            <span className="text-slate-500">{answered}/{questions.length} answered</span>
-          </div>
+    {/* HEADER */}
+    <motion.div className="flex items-start justify-between gap-4 mb-4 landscape:mb-2"
+      initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.4 }}>
+      <div>
+        <h1 className="text-[24px] sm:text-[28px] font-black text-[#e8edf5] leading-none mb-1.5"
+          style={{ fontFamily:'Syne,sans-serif' }}>Quiz</h1>
+        <div className="flex items-center gap-2 flex-wrap text-xs" style={{ fontFamily:'DM Sans,sans-serif' }}>
+          <span className="text-slate-500">Round #{activeRound._id}</span>
+          <span className="text-slate-700">·</span>
+          <span className="text-slate-500">{answered}/{questions.length} answered</span>
         </div>
+      </div>
+      <AnimatePresence>
+        {answered > 0 && (
+          <motion.div className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold text-[#2DFF9A]"
+            style={{ background:'rgba(249,115,22,0.1)', border:'1px solid rgba(249,115,22,0.2)', fontFamily:'Syne,sans-serif' }}
+            initial={{ opacity:0, scale:0.7 }} animate={{ opacity:1, scale:1 }}
+            transition={{ type:'spring', stiffness:400, damping:20 }}>
+            {answered} submitted ✓
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+
+    {/* PROGRESS */}
+    {questions.length > 0 && (
+      <motion.div className="mb-4 landscape:mb-3" initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.12 }}>
+        <div className="flex justify-between text-[11px] mb-2 text-slate-600">
+          <span className="flex items-center gap-1.5" style={{ fontFamily:'DM Sans,sans-serif' }}>
+            {!allDone && <motion.span className="w-1.5 h-1.5 rounded-full inline-block bg-[#2DFF9A]"
+              animate={{ scale:[1,0.6,1], opacity:[1,0.4,1] }} transition={{ duration:1.5, repeat:Infinity }}/>}
+            {allDone ? '🎉 All done!' : `Q ${Math.min(answered+1,questions.length)} of ${questions.length}`}
+          </span>
+          <span className={`font-bold ${progress>0?'text-[#2DFF9A]':''}`}
+            style={{ fontFamily:'Syne,sans-serif' }}>{Math.round(progress)}%</span>
+        </div>
+        <div className="h-[5px] rounded-full overflow-hidden" style={{ background:'rgba(255,255,255,0.05)' }}>
+          <motion.div className="h-full rounded-full"
+            style={{
+              background: allDone ? 'linear-gradient(90deg,#22c55e,#4ade80)' : 'linear-gradient(90deg,#f97316,#fb923c)',
+              boxShadow: progress>0 ? `0 0 14px ${allDone?'rgba(34,197,94,0.55)':'rgba(249,115,22,0.5)'}` : '',
+            }}
+            initial={{ width:0 }} animate={{ width:`${progress}%` }}
+            transition={{ duration:0.65, ease:[0.22,1,0.36,1] }}/>
+        </div>
+        {/* Dot nav — hidden on tiny landscape to save vertical space */}
+        <div className="flex gap-1 mt-2 justify-center flex-wrap landscape:hidden sm:flex">
+          {questions.map((q,i) => {
+            const resp = getResponse(q.id)
+            const isActive = i === currentIndex
+            return (
+              <motion.button key={q.id} onClick={()=>goTo(i)} title={`Q${i+1}`}
+                className="border-none cursor-pointer p-0 rounded-full"
+                animate={{
+                  width: isActive?22:8, height:8,
+                  background: resp?'#f97316':isActive?'#fb923c':'rgba(255,255,255,0.12)',
+                  boxShadow: isActive?'0 0 10px rgba(249,115,22,0.55)':'none',
+                  opacity: resp?1:isActive?1:0.5,
+                }}
+                transition={{ duration:0.3, ease:[0.22,1,0.36,1] }}
+                whileHover={{ scaleY:1.6 }}/>
+            )
+          })}
+        </div>
+      </motion.div>
+    )}
+
+    {/* QUESTION CARD */}
+    {currentQuestion ? (
+      <div>
+        <AnimatePresence mode="wait">
+          <QuestionCard
+            key={`q-${currentQuestion.id}-${cardKey}`}
+            question={currentQuestion}
+            index={currentIndex}
+            total={questions.length}
+            response={currentResponse}
+            onSubmit={submitAnswer}
+            submitting={submitting}
+            isLastQuestion={isLast}
+          />
+        </AnimatePresence>
+
         <AnimatePresence>
-          {answered > 0 && (
-            <motion.div className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold text-[#2DFF9A]"
-              style={{ background:'rgba(249,115,22,0.1)', border:'1px solid rgba(249,115,22,0.2)', fontFamily:'Syne,sans-serif' }}
-              initial={{ opacity:0, scale:0.7 }} animate={{ opacity:1, scale:1 }} transition={{ type:'spring', stiffness:400, damping:20 }}>
-              {answered} submitted ✓
+          {currentResponse && (
+            <motion.div className="flex justify-end mt-2 landscape:mt-1.5"
+              initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}
+              transition={{ delay:0.08, duration:0.3 }}>
+              {isLast ? (
+                <motion.button onClick={finishRound} disabled={finishing}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm text-white focus:outline-none tracking-wide"
+                  style={{ background:'linear-gradient(135deg,#22c55e,#16a34a)', boxShadow:'0 6px 26px rgba(34,197,94,0.3)', fontFamily:'Syne,sans-serif' }}
+                  whileHover={{ y:-2 }} whileTap={{ scale:0.97 }}>
+                  {finishing ? <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"/> : '🏁'}
+                  Finish Round
+                </motion.button>
+              ) : (
+                <motion.button onClick={()=>goTo(currentIndex+1)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-[#2DFF9A] focus:outline-none tracking-wide"
+                  style={{ border:'1px solid rgba(249,115,22,0.3)', background:'rgba(249,115,22,0.08)', fontFamily:'Syne,sans-serif' }}
+                  whileHover={{ x:5 }} whileTap={{ scale:0.97 }}>
+                  Next Question →
+                </motion.button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+    ) : (
+      <motion.div className="rounded-[18px] p-10 landscape:p-6 text-center"
+        style={{ border:'1px solid rgba(255,255,255,0.08)', background:'#0e1420' }}
+        initial={{ opacity:0 }} animate={{ opacity:1 }}>
+        <div className="text-4xl mb-3">📭</div>
+        <h2 className="text-xl font-black text-[#e8edf5] mb-2" style={{ fontFamily:'Syne,sans-serif' }}>No questions yet</h2>
+        <p className="text-sm text-slate-500" style={{ fontFamily:'DM Sans,sans-serif' }}>The organizer hasn't added questions.</p>
       </motion.div>
+    )}
 
-      {/* PROGRESS */}
-      {questions.length > 0 && (
-        <motion.div className="mb-7" initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.12 }}>
-          <div className="flex justify-between text-[11px] mb-2 text-slate-600">
-            <span className="flex items-center gap-1.5" style={{ fontFamily:'DM Sans,sans-serif' }}>
-              {!allDone && <motion.span className="w-1.5 h-1.5 rounded-full inline-block bg-[#2DFF9A]"
-                animate={{ scale:[1,0.6,1], opacity:[1,0.4,1] }} transition={{ duration:1.5, repeat:Infinity }}/>}
-              {allDone ? '🎉 All done!' : `Q ${Math.min(answered+1,questions.length)} of ${questions.length}`}
-            </span>
-            <span className={`font-bold ${progress>0?'text-[#2DFF9A]':''}`} style={{ fontFamily:'Syne,sans-serif' }}>{Math.round(progress)}%</span>
-          </div>
-          <div className="h-[5px] rounded-full overflow-hidden" style={{ background:'rgba(255,255,255,0.05)' }}>
-            <motion.div className="h-full rounded-full"
-              style={{ background:allDone?'linear-gradient(90deg,#22c55e,#4ade80)':'linear-gradient(90deg,#f97316,#fb923c)', boxShadow:progress>0?`0 0 14px ${allDone?'rgba(34,197,94,0.55)':'rgba(249,115,22,0.5)'}`:'' }}
-              initial={{ width:0 }} animate={{ width:`${progress}%` }} transition={{ duration:0.65, ease:[0.22,1,0.36,1] }}/>
-          </div>
-          <div className="flex gap-1 mt-2.5 justify-center flex-wrap">
-            {questions.map((q,i) => {
-              const resp = getResponse(q.id)
-              const isActive = i === currentIndex
-              return (
-                <motion.button key={q.id} onClick={()=>goTo(i)} title={`Q${i+1}`}
-                  className="border-none cursor-pointer p-0 rounded-full"
-                  animate={{ width:isActive?22:8, height:8, background:resp?'#f97316':isActive?'#fb923c':'rgba(255,255,255,0.12)', boxShadow:isActive?'0 0 10px rgba(249,115,22,0.55)':'none', opacity:resp?1:isActive?1:0.5 }}
-                  transition={{ duration:0.3, ease:[0.22,1,0.36,1] }} whileHover={{ scaleY:1.6 }}/>
-              )
-            })}
+    {/* ALL DONE */}
+    <AnimatePresence>
+      {allDone && (
+        <motion.div className="mt-4 rounded-[18px] p-5 landscape:p-4 text-center"
+          style={{ border:'1px solid rgba(249,115,22,0.22)', background:'rgba(249,115,22,0.04)' }}
+          initial={{ opacity:0, y:20, scale:0.96 }} animate={{ opacity:1, y:0, scale:1 }}
+          transition={{ delay:0.1, duration:0.5, ease:[0.22,1,0.36,1] }}>
+          <div className="text-3xl mb-2">🎉</div>
+          <h2 className="text-lg font-black text-[#e8edf5] mb-1" style={{ fontFamily:'Syne,sans-serif' }}>All questions answered!</h2>
+          <p className="text-sm text-slate-500 mb-4" style={{ fontFamily:'DM Sans,sans-serif' }}>
+            All {answered} answers submitted. Finish the round to lock in your score.
+          </p>
+          <div className="flex justify-center gap-3 flex-wrap">
+            <Btn onClick={finishRound}>🏁 Finish Round</Btn>
+            <Btn variant="secondary" onClick={()=>onNav('leaderboard')}>🏆 Leaderboard</Btn>
           </div>
         </motion.div>
       )}
+    </AnimatePresence>
 
-      {/* QUESTION */}
-      {currentQuestion ? (
-        <div>
-          <AnimatePresence mode="wait">
-            <QuestionCard
-              key={`q-${currentQuestion.id}-${cardKey}`}
-              question={currentQuestion}
-              index={currentIndex}
-              total={questions.length}
-              response={currentResponse}
-              onSubmit={submitAnswer}
-              submitting={submitting}
-              isLastQuestion={isLast}
-            />
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {currentResponse && (
-              <motion.div className="flex justify-end mt-3.5"
-                initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}
-                transition={{ delay:0.08, duration:0.3 }}>
-                {isLast ? (
-                  <motion.button onClick={finishRound} disabled={finishing}
-                    className="flex items-center gap-2 px-7 py-3 rounded-xl font-bold text-sm text-white focus:outline-none tracking-wide"
-                    style={{ background:'linear-gradient(135deg,#22c55e,#16a34a)', boxShadow:'0 6px 26px rgba(34,197,94,0.3)', fontFamily:'Syne,sans-serif' }}
-                    whileHover={{ y:-2, boxShadow:'0 10px 32px rgba(34,197,94,0.45)' }} whileTap={{ scale:0.97 }}>
-                    {finishing?<span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"/>:'🏁'}
-                    Finish Round
-                  </motion.button>
-                ) : (
-                  <motion.button onClick={()=>goTo(currentIndex+1)}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-[#2DFF9A] focus:outline-none tracking-wide"
-                    style={{ border:'1px solid rgba(249,115,22,0.3)', background:'rgba(249,115,22,0.08)', fontFamily:'Syne,sans-serif' }}
-                    whileHover={{ x:5 }} whileTap={{ scale:0.97 }}>
-                    Next Question →
-                  </motion.button>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      ) : (
-        <motion.div className="rounded-[18px] p-16 text-center"
-          style={{ border:'1px solid rgba(255,255,255,0.08)', background:'#0e1420' }}
-          initial={{ opacity:0 }} animate={{ opacity:1 }}>
-          <div className="text-4xl mb-3">📭</div>
-          <h2 className="text-xl font-black text-[#e8edf5] mb-2" style={{ fontFamily:'Syne,sans-serif' }}>No questions yet</h2>
-          <p className="text-sm text-slate-500" style={{ fontFamily:'DM Sans,sans-serif' }}>The organizer hasn't added questions.</p>
+    {/* ERROR TOAST */}
+    <AnimatePresence>
+      {error && (
+        <motion.div
+          className="fixed z-[9999] text-sm text-red-300 rounded-xl px-5 py-3 whitespace-nowrap"
+          style={{
+            bottom: 'max(env(safe-area-inset-bottom), 16px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: '#13151f',
+            border: '1px solid rgba(239,68,68,0.3)',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+            fontFamily: 'DM Sans,sans-serif',
+          }}
+          initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:20 }}>
+          ⚠️ {error}
         </motion.div>
       )}
-
-      {/* ALL DONE */}
-      <AnimatePresence>
-        {allDone && (
-          <motion.div className="mt-5 rounded-[18px] p-8 text-center"
-            style={{ border:'1px solid rgba(249,115,22,0.22)', background:'rgba(249,115,22,0.04)' }}
-            initial={{ opacity:0, y:20, scale:0.96 }} animate={{ opacity:1, y:0, scale:1 }}
-            transition={{ delay:0.1, duration:0.5, ease:[0.22,1,0.36,1] }}>
-            <div className="text-4xl mb-3">🎉</div>
-            <h2 className="text-xl font-black text-[#e8edf5] mb-1.5" style={{ fontFamily:'Syne,sans-serif' }}>All questions answered!</h2>
-            <p className="text-sm text-slate-500 mb-5" style={{ fontFamily:'DM Sans,sans-serif' }}>
-              All {answered} answers submitted. Finish the round to lock in your score.
-            </p>
-            <div className="flex justify-center gap-3">
-              <Btn onClick={finishRound}>🏁 Finish Round</Btn>
-              <Btn variant="secondary" onClick={()=>onNav('leaderboard')}>🏆 Leaderboard</Btn>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ERROR TOAST */}
-      <AnimatePresence>
-        {error && (
-          <motion.div className="fixed bottom-6 z-[9999] text-sm text-red-300 rounded-xl px-5 py-3 whitespace-nowrap"
-            style={{ left:'50%', x:'-50%', background:'#13151f', border:'1px solid rgba(239,68,68,0.3)', boxShadow:'0 10px 40px rgba(0,0,0,0.5)', fontFamily:'DM Sans,sans-serif' }}
-            initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:20 }}>
-            ⚠️ {error}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
+    </AnimatePresence>
+  </div>
+)}

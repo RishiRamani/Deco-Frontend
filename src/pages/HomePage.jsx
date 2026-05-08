@@ -14,7 +14,7 @@ const homeButtonStyle = {
 }
 
 export default function HomePage({ onNav, userRole, userAllowed, allowedLoading }) {
-  // ✅ Replaced Clerk's useAuth() — now reads from our custom AuthContext
+  
   const { isSignedIn, signOut } = useAuth()
 
   return (

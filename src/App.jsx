@@ -12,6 +12,7 @@ import WaitingPage from './pages/WaitingPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import EndPage from './pages/EndPage'
 import AdminPage from './pages/AdminPage'
+import RotateOverlay from './components/RotateOverlay'
 
 const DEFAULT_PAGE = 'home'
 const ROUTES = new Set(['home', 'about', 'registration', 'signin', 'round', 'waiting', 'leaderboard', 'end', 'admin'])
@@ -186,6 +187,7 @@ function AuthenticatedApp() {
 
   return (
     <>
+    <RotateOverlay />
       <Layout page={page} onNav={navigate} userRole={userRole} roundIntroActive={roundIntroActive}>
         {pages[page] || pages.home}
       </Layout>
