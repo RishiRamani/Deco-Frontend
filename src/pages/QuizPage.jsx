@@ -85,12 +85,12 @@ function LazyImg({ src, alt='', wrapClass='', imgClass='' }) {
 
 function QuestionImage({ src }) {
   return (
-    <motion.div className="rounded-2xl overflow-hidden mb-5 border border-white/8 bg-white/3"
+    <motion.div className="rounded-2xl overflow-hidden mb-5 landscape:mb-3 border border-white/8 bg-white/3"
       initial={{ opacity:0, y:10, filter:'blur(4px)' }}
       animate={{ opacity:1, y:0, filter:'blur(0px)' }}
       transition={{ duration:0.4, delay:0.08, ease:[0.22,1,0.36,1] }}
     >
-      <LazyImg src={src} wrapClass="min-h-[140px]" imgClass="w-full max-h-[300px] object-contain"/>
+      <LazyImg src={src} wrapClass="min-h-[140px] landscape:min-h-[100px]" imgClass="w-full landscape:max-h-[180px] max-h-[300px] object-contain"/>
     </motion.div>
   )
 }
@@ -122,7 +122,7 @@ function ImageOption({ displayLabel, src, isSelected, onClick, index, disabled }
           </motion.div>
         )}
       </AnimatePresence>
-      <LazyImg src={src} wrapClass="w-full min-h-[140px]" imgClass="w-full h-[140px] object-cover block"/>
+      <LazyImg src={src} wrapClass="w-full min-h-[140px] landscape:min-h-[100px]" imgClass="w-full landscape:h-[100px] h-[140px] object-cover block"/>
     </motion.button>
   )
 }
@@ -133,7 +133,7 @@ function ImageOption({ displayLabel, src, isSelected, onClick, index, disabled }
 function TextOption({ displayLabel, val, isSelected, onClick, index, disabled }) {
   return (
     <motion.button onClick={disabled?undefined:onClick}
-      className={`group relative w-full text-left px-4 py-3.5 rounded-xl flex items-center gap-3 overflow-hidden focus:outline-none transition-colors duration-200 ${disabled?'cursor-default':'cursor-pointer'} ${isSelected?'text-[#2DFF9A]/80':'text-slate-400 hover:text-slate-200'}`}
+      className={`group relative w-full text-left px-4 landscape:px-3 py-3.5 landscape:py-2.5 rounded-xl flex items-center gap-3 overflow-hidden focus:outline-none transition-colors duration-200 ${disabled?'cursor-default':'cursor-pointer'} ${isSelected?'text-[#2DFF9A]/80':'text-slate-400 hover:text-slate-200'}`}
       style={{ border: isSelected?'1px solid rgba(249,115,22,0.55)':'1px solid rgba(255,255,255,0.08)', background: isSelected?'rgba(249,115,22,0.1)':'rgba(255,255,255,0.03)', boxShadow: isSelected?'0 4px 20px rgba(249,115,22,0.14)':'none' }}
       initial={{ opacity:0, x:-16 }}
       animate={{ opacity:1, x:0 }}
@@ -147,7 +147,7 @@ function TextOption({ displayLabel, val, isSelected, onClick, index, disabled })
         style={{ background: isSelected?'rgba(249,115,22,0.3)':'rgba(255,255,255,0.06)', border: isSelected?'1px solid rgba(249,115,22,0.55)':'1px solid rgba(255,255,255,0.1)', fontFamily:'Syne,sans-serif' }}>
         {displayLabel}
       </span>
-      <span className="flex-1 text-sm leading-snug" style={{ fontFamily:'DM Sans,sans-serif' }}>{val}</span>
+      <span className="flex-1 text-sm landscape:text-xs leading-snug" style={{ fontFamily:'DM Sans,sans-serif' }}>{val}</span>
       <AnimatePresence>
         {isSelected && (
           <motion.span className="text-[#2DFF9A] text-base ml-auto flex-shrink-0"
@@ -161,7 +161,7 @@ function TextOption({ displayLabel, val, isSelected, onClick, index, disabled })
 
 function MixedOptions({ optionEntries, input, setInput, disabled }) {
   return (
-    <div className="grid grid-cols-2 gap-2.5 mb-5">
+    <div className="grid grid-cols-2 gap-2.5 landscape:gap-2 mb-5">
       {optionEntries.map(([key, val], i) => {
         const label = displayKey(key, i)
         const isImg = isImageUrl(val)
@@ -564,7 +564,7 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
 
   return (
     <motion.div ref={cardRef}
-      className="relative rounded-[18px] p-5 landscape:p-4 sm:p-7 overflow-visible"
+      className="relative rounded-[18px] p-5 landscape:p-3 sm:p-7 overflow-visible"
       style={{ border:`1px solid ${borderColor}`, background:'#0e1420', transition:'border-color 0.5s ease' }}
       initial={{ opacity:0, y:28, scale:0.97, filter:'blur(5px)' }}
       animate={{ opacity:1, y:0, scale:1, filter:'blur(0px)' }}
@@ -574,18 +574,18 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
       {confetti.map(c => <ConfettiBurst key={c.id} x={c.x} y={c.y} onDone={()=>setConfetti(p=>p.filter(x=>x.id!==c.id))}/>)}
 
       {/* Header */}
-      <div className="flex justify-between items-start gap-3 mb-5">
+      <div className="flex justify-between items-start gap-3 mb-5 landscape:mb-3">
         <div className="flex items-start gap-3 flex-1">
-          <motion.div className="flex-shrink-0 text-[11px] font-bold text-slate-500 bg-white/5 rounded-lg px-2.5 py-1 mt-0.5 tracking-widest"
+          <motion.div className="flex-shrink-0 text-[11px] landscape:text-[9px] font-bold text-slate-500 bg-white/5 rounded-lg px-2.5 py-1 mt-0.5 tracking-widest"
             style={{ fontFamily:'Syne,sans-serif' }} initial={{ opacity:0, scale:0.7 }} animate={{ opacity:1, scale:1 }} transition={{ delay:0.06 }}>
             {index+1}<span className="opacity-35">/{total}</span>
           </motion.div>
-          <motion.p className="text-[#e8edf5] text-[15px] leading-relaxed flex-1" style={{ fontFamily:'DM Sans,sans-serif' }}
+          <motion.p className="text-[#e8edf5] text-[15px] landscape:text-[13px] leading-relaxed flex-1" style={{ fontFamily:'DM Sans,sans-serif' }}
             initial={{ opacity:0, x:-8 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.09, duration:0.4 }}>
             {question.text}
           </motion.p>
         </div>
-        <motion.div className="flex-shrink-0 text-[11px] font-bold text-[#2DFF9A] px-3 py-1 rounded-full whitespace-nowrap"
+        <motion.div className="flex-shrink-0 text-[11px] landscape:text-[9px] font-bold text-[#2DFF9A] px-3 py-1 rounded-full whitespace-nowrap"
           style={{ background:'rgba(249,115,22,0.1)', border:'1px solid rgba(249,115,22,0.25)', fontFamily:'Syne,sans-serif' }}
           initial={{ opacity:0, scale:0.5 }} animate={{ opacity:1, scale:1 }} transition={{ type:'spring', stiffness:420, damping:18, delay:0.15 }}>
           +{question.reward} pts
@@ -670,7 +670,7 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
               )}
 
               <motion.button onClick={()=>handleSubmit()} disabled={!input||submitted||submitting===question.id}
-                className={`flex items-center gap-2.5 px-7 py-3 rounded-xl font-bold text-sm tracking-wide focus:outline-none ${input&&!submitted?'text-white cursor-pointer':'text-slate-600 cursor-not-allowed'}`}
+                className={`flex items-center gap-2.5 px-7 landscape:px-5 py-3 landscape:py-2 rounded-xl font-bold text-sm landscape:text-xs tracking-wide focus:outline-none ${input&&!submitted?'text-white cursor-pointer':'text-slate-600 cursor-not-allowed'}`}
                 style={{ background:input&&!submitted?'linear-gradient(135deg,#f97316,#ea580c)':'rgba(255,255,255,0.05)', boxShadow:input&&!submitted?'0 5px 20px rgba(249,115,22,0.28)':'none', fontFamily:'Syne,sans-serif' }}
                 initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.22 }}
                 whileHover={input&&!submitted?{ y:-2, boxShadow:'0 12px 32px rgba(249,115,22,0.42)' }:{}}
@@ -812,17 +812,17 @@ export default function QuizPage({ onNav }) {
   const isLast          = currentIndex === questions.length - 1
   const currentResponse = currentQuestion && getResponse(currentQuestion.id)
 
-  eturn (
+  return (
   <div className="w-full max-w-[700px] mx-auto px-3 xs:px-4 sm:px-6
-                  landscape:px-4 landscape:pb-4">
+                  landscape:px-4 landscape:pb-4 landscape:overflow-y-auto landscape:h-screen landscape:flex landscape:flex-col">
 
     {/* HEADER */}
     <motion.div className="flex items-start justify-between gap-4 mb-4 landscape:mb-2"
       initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.4 }}>
       <div>
-        <h1 className="text-[24px] sm:text-[28px] font-black text-[#e8edf5] leading-none mb-1.5"
+        <h1 className="text-[24px] sm:text-[28px] landscape:text-[20px] font-black text-[#e8edf5] leading-none mb-1.5"
           style={{ fontFamily:'Syne,sans-serif' }}>Quiz</h1>
-        <div className="flex items-center gap-2 flex-wrap text-xs" style={{ fontFamily:'DM Sans,sans-serif' }}>
+        <div className="flex items-center gap-2 flex-wrap text-xs landscape:text-[10px]" style={{ fontFamily:'DM Sans,sans-serif' }}>
           <span className="text-slate-500">Round #{activeRound._id}</span>
           <span className="text-slate-700">·</span>
           <span className="text-slate-500">{answered}/{questions.length} answered</span>
