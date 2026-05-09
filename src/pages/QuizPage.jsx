@@ -564,7 +564,9 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
 
   return (
     <motion.div ref={cardRef}
-      className="relative rounded-[18px] p-5 landscape:p-3 sm:p-7 overflow-visible"
+      className="relative rounded-[18px] p-5 landscape:p-3 sm:p-7
+           overflow-visible
+           landscape:max-h-[calc(100dvh-80px)] landscape:overflow-y-auto landscape:overscroll-contain"
       style={{ border:`1px solid ${borderColor}`, background:'#0e1420', transition:'border-color 0.5s ease' }}
       initial={{ opacity:0, y:28, scale:0.97, filter:'blur(5px)' }}
       animate={{ opacity:1, y:0, scale:1, filter:'blur(0px)' }}
@@ -639,7 +641,7 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
           {!isTrickQuestion && (
             <>
               {allImgOpts && (
-                <div className="grid grid-cols-2 gap-2.5 mb-5">
+                <div className="grid grid-cols-2 gap-2 landscape:gap-1.5 mb-3 landscape:mb-2">
                   {optionEntries.map(([key,val],i) => (
                     <ImageOption key={key} displayLabel={displayKey(key,i)} src={val}
                       isSelected={input===key} onClick={()=>setInput(input===key?'':key)} index={i} disabled={submitted}/>
@@ -647,7 +649,7 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
                 </div>
               )}
               {allTxtOpts && (
-                <div className="flex flex-col gap-2 mb-5">
+                <div className="flex flex-col gap-1.5 landscape:gap-1 mb-3 landscape:mb-2">
                   {optionEntries.map(([key,val],i) => (
                     <TextOption key={key} displayLabel={displayKey(key,i)} val={val}
                       isSelected={input===key} onClick={()=>setInput(input===key?'':key)} index={i} disabled={submitted}/>
@@ -669,19 +671,21 @@ function QuestionCard({ question, response, index, total, onSubmit, submitting, 
                 </motion.div>
               )}
 
-              <motion.button onClick={()=>handleSubmit()} disabled={!input||submitted||submitting===question.id}
-                className={`flex items-center gap-2.5 px-7 landscape:px-5 py-3 landscape:py-2 rounded-xl font-bold text-sm landscape:text-xs tracking-wide focus:outline-none ${input&&!submitted?'text-white cursor-pointer':'text-slate-600 cursor-not-allowed'}`}
-                style={{ background:input&&!submitted?'linear-gradient(135deg,#f97316,#ea580c)':'rgba(255,255,255,0.05)', boxShadow:input&&!submitted?'0 5px 20px rgba(249,115,22,0.28)':'none', fontFamily:'Syne,sans-serif' }}
-                initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.22 }}
-                whileHover={input&&!submitted?{ y:-2, boxShadow:'0 12px 32px rgba(249,115,22,0.42)' }:{}}
-                whileTap={input&&!submitted?{ scale:0.97 }:{}}
-              >
-                {submitting===question.id ? (
-                  <><span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"/>Submitting…</>
-                ) : submitted ? (
-                  <><span className="text-[#2DFF9A]">✓</span>Answer Submitted</>
-                ) : 'Submit Answer'}
-              </motion.button>
+              <div className="mt-2 landscape:mt-1.5">
+  <motion.button onClick={()=>handleSubmit()} disabled={!input||submitted||submitting===question.id}
+    className={`flex items-center gap-2.5 px-7 landscape:px-5 py-3 landscape:py-2 rounded-xl font-bold text-sm landscape:text-xs tracking-wide focus:outline-none ${input&&!submitted?'text-white cursor-pointer':'text-slate-600 cursor-not-allowed'}`}
+    style={{ background:input&&!submitted?'linear-gradient(135deg,#f97316,#ea580c)':'rgba(255,255,255,0.05)', boxShadow:input&&!submitted?'0 5px 20px rgba(249,115,22,0.28)':'none', fontFamily:'Syne,sans-serif' }}
+    initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.22 }}
+    whileHover={input&&!submitted?{ y:-2, boxShadow:'0 12px 32px rgba(249,115,22,0.42)' }:{}}
+    whileTap={input&&!submitted?{ scale:0.97 }:{}}
+  >
+    {submitting===question.id ? (
+      <><span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"/>Submitting…</>
+    ) : submitted ? (
+      <><span className="text-[#2DFF9A]">✓</span>Answer Submitted</>
+    ) : 'Submit Answer'}
+  </motion.button>
+</div>
             </>
           )}
         </>
@@ -814,7 +818,7 @@ export default function QuizPage({ onNav }) {
 
   return (
   <div className="w-full max-w-[700px] mx-auto px-3 xs:px-4 sm:px-6
-                  landscape:px-4 landscape:pb-4 landscape:overflow-y-auto landscape:h-screen landscape:flex landscape:flex-col">
+                  landscape:px-4 landscape:pb-4 landscape:overflow-y-auto landscape:max-h-[100dvh] landscape:flex landscape:flex-col">
 
     {/* HEADER */}
     <motion.div className="flex items-start justify-between gap-4 mb-4 landscape:mb-2"
