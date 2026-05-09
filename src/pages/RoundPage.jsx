@@ -133,6 +133,8 @@ function getPlayableUntil(round) {
 }
 
 function StageCharacter({ character, visible }) {
+  if (!character) return null
+
   const customStyles = character.customStyles || {}
   const borderRadiusClass = customStyles.borderRadiusClass || 'rounded-[3rem]'
   const borderColor = customStyles.borderColor || `${character.accent}66`
@@ -182,6 +184,19 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
 
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = useRef(null)
+  const audioFile = item.voiceFile || item.audioFile
+  const isVoiceItem = item.type === 'voiceMemo' || item.type === 'audio' || Boolean(audioFile)
+  const isBackgroundDialogue = !item.characterId
+  const dialogueTheme = isBackgroundDialogue
+    ? {
+        ...sceneTheme.dialogueBox,
+        ...(sceneTheme.backgroundDialogueBox || {}),
+        customStyles: {
+          ...(sceneTheme.dialogueBox?.customStyles || {}),
+          ...(sceneTheme.backgroundDialogueBox?.customStyles || {}),
+        },
+      }
+    : sceneTheme.dialogueBox
 
   const handlePlayAudio = (e) => {
     e.stopPropagation()
@@ -198,7 +213,7 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
 
   const handleAudioEnded = () => setIsPlaying(false)
 
-  const dialogueCustom = sceneTheme.dialogueBox?.customStyles || {}
+  const dialogueCustom = dialogueTheme?.customStyles || {}
   const speakerClass = dialogueCustom.speakerClass || 'text-xs uppercase tracking-[0.22em] text-slate-500'
   const textClass = dialogueCustom.textClass || 'mt-3 text-base leading-7 text-slate-900'
   const transcriptClass = dialogueCustom.transcriptClass || 'mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-7 text-slate-700 shadow-inner'
@@ -208,20 +223,20 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
   const voiceTextClass = dialogueCustom.voiceTextClass || 'text-xs font-medium uppercase tracking-[0.18em] text-slate-600'
   const voiceMemoBoxClass = dialogueCustom.voiceMemoBoxClass || 'relative w-full max-w-xl rounded-2xl p-4 sm:p-5 text-left scale-in'
   const normalBoxClass = dialogueCustom.normalBoxClass || 'relative w-full max-w-xl p-4 sm:p-5 text-left scale-in'
-  const bubbleContainerClass = sceneTheme.dialogueBox?.bubbleContainerClass || 'rounded-2xl'
-  const boxShadowClass = sceneTheme.dialogueBox?.boxShadow || 'shadow-[0_22px_70px_rgba(0,0,0,0.28)]'
-  const dialogueBackground = sceneTheme.dialogueBox?.background || '#ffffff'
+  const bubbleContainerClass = dialogueTheme?.bubbleContainerClass || 'rounded-2xl'
+  const boxShadowClass = dialogueTheme?.boxShadow || 'shadow-[0_22px_70px_rgba(0,0,0,0.28)]'
+  const dialogueBackground = dialogueTheme?.background || '#ffffff'
 
   const body = (
     <>
-      <div className={speakerClass}>{item.speaker}</div>
-      <p className={textClass}>{item.text}</p>
-      {item.type === 'voiceMemo' && (
+      {item.speaker && <div className={speakerClass}>{item.speaker}</div>}
+      {item.text && <p className={textClass}>{item.text}</p>}
+      {isVoiceItem && (
         <>
-          {item.voiceFile && (
+          {audioFile && (
             <div className={voicePlayerBgClass}>
               <button type="button" onClick={handlePlayAudio} className={playButtonClass}>
-                <span className="text-white font-bold">{isPlaying ? '⏸' : '▶'}</span>
+                <span className="text-white text-xs font-bold">{isPlaying ? 'II' : 'PLAY'}</span>
               </button>
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 <span className={voiceTextClass}>{isPlaying ? 'Playing voice memo' : 'Voice memo'}</span>
@@ -237,21 +252,21 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
               </div>
               <audio
                 ref={audioRef}
-                src={item.voiceFile}
+                src={audioFile}
                 onEnded={handleAudioEnded}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
               />
             </div>
           )}
-          <div className={transcriptClass}>{item.transcript}</div>
+          {item.transcript && <div className={transcriptClass}>{item.transcript}</div>}
         </>
       )}
       <div className={continueClass}>Click to continue</div>
     </>
   )
 
-  if (item.type === 'voiceMemo') {
+  if (isVoiceItem) {
     return (
       <button
         type="button"
@@ -259,8 +274,8 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
         className={`${voiceMemoBoxClass} ${boxShadowClass}`}
         style={{
           background: dialogueBackground,
-          border: sceneTheme.dialogueBox.border,
-          color: sceneTheme.dialogueBox.color,
+          border: dialogueTheme.border,
+          color: dialogueTheme.color,
           ...(dialogueCustom.voiceMemoBoxStyle || {}),
         }}
       >
@@ -276,8 +291,8 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
       className={`${normalBoxClass} ${bubbleContainerClass} ${boxShadowClass} landscape:!py-3 landscape:!px-4`}
       style={{
         background: dialogueBackground,
-        border: sceneTheme.dialogueBox.border,
-        color: sceneTheme.dialogueBox.color,
+        border: dialogueTheme.border,
+        color: dialogueTheme.color,
         ...(dialogueCustom.normalBoxStyle || {}),
       }}
     >
@@ -290,6 +305,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
   const [answer, setAnswer] = useState(previousAnswer || '')
   const options = useMemo(() => normalizeOptions(question?.options), [question?.options])
   const isLandscapeMobile = useIsLandscapeMobile()
+  const promptAudioFile = question?.audioFile || question?.voiceFile
 
   useEffect(() => {
     setAnswer(previousAnswer || '')
@@ -334,6 +350,12 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
       {question.link && (
         <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5">
           <img src={question.link} alt="" className="max-h-72 landscape:max-h-40 w-full object-cover" />
+        </div>
+      )}
+
+      {promptAudioFile && (
+        <div className="mt-5 rounded-[1.25rem] border border-white/10 bg-white/5 p-3">
+          <audio src={promptAudioFile} controls className="w-full" />
         </div>
       )}
 
@@ -592,10 +614,10 @@ export default function RoundPage({ onNav }) {
     : null
 
   const baseExperience = roundExperience || { sceneTheme, stageCharacters, roundNarrative, stages: [] }
-  const currentQuestionNumber = currentQuestion ? currentIndex + 1 : 1
+  const currentQuestionNumber = currentQuestion ? currentIndex + 1 : null
   const experience = resolveRoundStage(baseExperience, currentQuestionNumber)
   const effectiveSceneTheme = experience.sceneTheme
-  const effectiveStageCharacters = experience.stageCharacters
+  const effectiveStageCharacters = experience.stageCharacters || {}
   const effectiveRoundNarrative = experience.roundNarrative
 
   // Count answers for progress: DB responses + drafts (no double-count)
@@ -607,7 +629,9 @@ export default function RoundPage({ onNav }) {
   const progress = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0
 
   const preQuestionSequence = useMemo(() => {
-    if (!currentQuestion) return []
+    if (!currentQuestion) {
+      return resolveNarrativeSequence(effectiveRoundNarrative.preQuestion, {}, null)
+    }
     const introItems = currentIndex === 0 && answeredCount === 0
       ? resolveNarrativeSequence(effectiveRoundNarrative.preQuestion, {}, currentIndex + 1)
       : []
@@ -638,7 +662,8 @@ export default function RoundPage({ onNav }) {
   const hasActiveDialogue = Boolean(activeDialogue)
   const highlightedCharacter = activeDialogue?.characterId
   const isLastQuestion = currentIndex === questions.length - 1
-  const showQuestionCard = phase === 'question' && currentQuestion && !hasActiveDialogue
+  const dialogueCanOverlayQuestion = activeDialogue?.showWithQuestion || activeDialogue?.overlayQuestion
+  const showQuestionCard = phase === 'question' && currentQuestion && (!hasActiveDialogue || dialogueCanOverlayQuestion)
   const showAnswerReveal = phase === 'answer' && currentQuestion && currentResponse && !hasActiveDialogue
 
   // ─── SUBMIT ────────────────────────────────────────────────────────────────
@@ -715,8 +740,13 @@ export default function RoundPage({ onNav }) {
   return (
     <>
       {/* Experience Layer */}
-      <StageCharacter character={effectiveStageCharacters.curator} visible={highlightedCharacter === 'curator'} />
-      <StageCharacter character={effectiveStageCharacters.signal} visible={highlightedCharacter === 'signal'} />
+      {Object.entries(effectiveStageCharacters).map(([characterId, character]) => (
+        <StageCharacter
+          key={characterId}
+          character={character}
+          visible={!highlightedCharacter || highlightedCharacter === characterId}
+        />
+      ))}
 
       {/* Background */}
       <div
@@ -791,7 +821,7 @@ export default function RoundPage({ onNav }) {
           />
         ) : null}
       </>
-    ) : (
+    ) : !hasActiveDialogue ? (
       <Panel className="bg-emerald-300/10 text-center">
         <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">No questions</div>
         <div className="mt-4 text-2xl font-medium text-white">
@@ -803,7 +833,7 @@ export default function RoundPage({ onNav }) {
           </Btn>
         </div>
       </Panel>
-    )}
+    ) : null}
   </div>
 </div>
 

@@ -92,6 +92,21 @@ export const sceneTheme = {
       voiceTextClass: 'text-xs font-medium uppercase tracking-[0.18em] text-slate-600',
     },
   },
+  backgroundDialogueBox: {
+    width: 'min(52rem, 100%)',
+    background: 'linear-gradient(180deg, rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.78))',
+    border: '1px solid rgba(255,255,255,0.16)',
+    color: '#ffffff',
+    boxShadow: 'shadow-[0_28px_90px_rgba(0,0,0,0.42)]',
+    bubbleContainerClass: 'rounded-2xl',
+    customStyles: {
+      speakerClass: 'text-xs uppercase tracking-[0.24em] text-white/60',
+      textClass: 'mt-3 text-base leading-7 text-white',
+      continueClass: 'mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-white/45',
+      voiceTextClass: 'text-xs font-medium uppercase tracking-[0.18em] text-white/70',
+      voicePlayerBgClass: 'mt-4 flex items-center gap-3 rounded-xl border border-white/15 bg-white/10 p-3',
+    },
+  },
   questionBox: {
     width: 'min(40rem, 100%)',
     minHeight: '23rem',
@@ -223,7 +238,10 @@ function mergeDeep(target, source) {
 }
 
 const matchesStageForQuestion = (stage, questionNumber) => {
-  if (!stage || questionNumber == null) return false
+  if (!stage) return false
+
+  const hasQuestionMatcher = Array.isArray(stage.questionNumbers) || stage.questionRange
+  if (questionNumber == null) return !hasQuestionMatcher
 
   if (Array.isArray(stage.questionNumbers)) {
     return stage.questionNumbers.includes(questionNumber)
