@@ -2,7 +2,6 @@
   "stages": [
     {
       "id": "stage-1",
-      "questionRange": { "from": 1, "to": 2 },
       "sceneTheme": {
         "bodyElement": {
           "background": "url('/backgrounds/r1-stage1-bg.png') center/cover no-repeat fixed",
@@ -13,44 +12,39 @@
           "background": "rgba(0,0,0,0.4)"
         },
         "stage": {
-          "backgroundImage": "linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.9)), url('/backgrounds/r1-stage1-bg.png') center/cover no-repeat"
+          "backgroundImage": "none"
         },
         "dialogueBox": {
           "background": "#ffffff",
-          "bubbleImage": null,
-          "border": "1px solid rgba(45, 255, 154, 0.24)",
-          "color": "#111827"
+          "border": "1px solid rgba(45,255,154,0.24)",
+          "color": "#111827",
+          "bubbleContainerClass": "rounded-2xl",
+          "boxShadow": "shadow-[0_22px_70px_rgba(0,0,0,0.28)]",
+          "customStyles": {
+            "speakerClass": "text-xs uppercase tracking-[0.22em] text-slate-500",
+            "textClass": "mt-3 text-base leading-7 text-slate-900",
+            "continueClass": "mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-slate-400"
+          }
         },
-        "questionBox": {
-          "background": "linear-gradient(180deg, rgba(11, 31, 24, 0.94), rgba(0, 0, 0, 0.90))",
-          "border": "1px solid rgba(45, 255, 154, 0.15)",
-          "numberClass": "text-xs uppercase tracking-[0.3em] text-[#2DFF9A]/80",
-          "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white"
-        },
-        "answerRevealBox": {
-          "background": "linear-gradient(135deg, rgba(11, 31, 24, 0.96), rgba(45, 255, 154, 0.12))",
-          "border": "1px solid rgba(45, 255, 154, 0.24)"
+        "backgroundDialogueBox": {
+          "background": "linear-gradient(180deg, rgba(2,6,23,0.88), rgba(2,6,23,0.78))",
+          "border": "1px solid rgba(255,255,255,0.16)",
+          "color": "#ffffff",
+          "boxShadow": "shadow-[0_28px_90px_rgba(0,0,0,0.42)]",
+          "customStyles": {
+            "speakerClass": "text-xs uppercase tracking-[0.24em] text-white/60",
+            "textClass": "mt-3 text-base leading-7 text-white",
+            "continueClass": "mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-white/45"
+          }
         }
       },
       "stageCharacters": {
-        "curator": {
-          "name": "Captain America",
-          "accent": "#2DFF9A",
-          "image": "/characters/captain-america.png",
-          "size": "20rem",
-          "side": "left",
-          "style": { "bottom": "1rem", "left": "2rem" },
-          "customStyles": {
-            "borderColor": "#2DFF9A44"
-          }
-        },
-        "signal": {
+        "loki": {
           "name": "Loki",
           "accent": "#2DFF9A",
           "image": "/images/loki.png",
-          "size": "16rem",
-          "side": "right",
-          "style": { "bottom": "1rem", "right": "2rem" },
+          "size": "20rem",
+          "style": { "bottom": "1rem", "left": "50%", "transform": "translateX(-50%)" },
           "customStyles": {
             "borderColor": "#2DFF9A44"
           }
@@ -59,48 +53,160 @@
       "roundNarrative": {
         "preQuestion": [
           {
-            "id": "stage1-intro",
+            "id": "rift-detected",
             "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "signal",
-            "questionNumber": [1, 2],
-            "text": "The shield encodes the anomaly. A numerical breach is hidden in the recursion."
+            "speaker": "System",
+            "text": "RIFT DETECTED\nTEMPORAL LOOP IDENTIFIED\nSTABILITY: CRITICAL"
           },
           {
-            "id": "stage1-cap-intro",
-            "type": "dialogue",
-            "speaker": "Captain America",
-            "characterId": "curator",
-            "questionNumber": [1, 2],
-            "text": "This fight keeps resetting. We never win. The pattern's wrong."
-          }
-        ],
-        "duringQuestion": [
-          {
-            "id": "stage1-during-1",
+            "id": "loki-1",
             "type": "dialogue",
             "speaker": "Loki",
-            "characterId": "signal",
-            "questionNumber": [2],
-            "text": "Stage 1 active. Decode the first two branches before the shield destabilizes."
-          }
-        ],
-        "afterAnswer": [
+            "characterId": "loki",
+            "text": "Ah. There you are."
+          },
           {
-            "id": "stage1-after",
+            "id": "loki-2",
             "type": "dialogue",
-            "speaker": "Captain America",
-            "characterId": "curator",
-            "questionNumber": [1],
-            "text": "Nice work. The first barrier holds. Prepare for a deeper breach."
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "You're wondering if you've finally lost your mind. Hearing voices coming from inside your head."
+          },
+          {
+            "id": "loki-3",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "I assure you — if you had, I would summon someone else. Don't question it too much."
+          },
+          {
+            "id": "loki-4",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Oh, how rude of me. I haven't introduced myself."
+          },
+          {
+            "id": "loki-5",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "I'm Loki, God of Stories. Though I do go by the name God of Chaos too."
+          },
+          {
+            "id": "loki-6",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Now, you must be wondering why I might have summoned you here."
+          },
+          {
+            "id": "loki-7",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "You see, something is interfering with the natural flow of time. Not breaking it… no, that would be crude."
+          },
+          {
+            "id": "loki-8",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "I can see it. I can trace it. But I cannot reach it."
+          },
+          {
+            "id": "loki-9",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "You see, that something isn't allowing me to make any significant changes to fix the timeline."
+          },
+          {
+            "id": "loki-10",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Which brings me to you."
+          },
+          {
+            "id": "loki-11",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "No temporal signature worth noting. No interference pattern. You're invisible to it."
+          },
+          {
+            "id": "loki-12",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Congratulations. You are insignificant."
+          },
+          {
+            "id": "loki-13",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "For once, that's useful."
+          },
+          {
+            "id": "loki-14",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "I need someone who can move without being corrected. Someone who won't trigger whatever is rewriting things behind the scenes."
+          },
+          {
+            "id": "loki-15",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "That someone… appears to be you."
+          },
+          {
+            "id": "loki-16",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "But you'll need help. Not power. Power is loud. You need direction. Structure. Leadership."
+          },
+          {
+            "id": "loki-17",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Find Captain America."
+          },
+          {
+            "id": "loki-18",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Yes, I know. Of all people."
+          },
+          {
+            "id": "loki-19",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "He'll understand enough to take you seriously."
+          },
+          {
+            "id": "loki-20",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Do try to survive. It would be terribly inconvenient if my only advantage disappeared."
           }
         ],
+        "duringQuestion": [],
+        "afterAnswer": [],
         "finished": []
       }
     },
     {
       "id": "stage-2",
-      "questionRange": { "from": 3, "to": 4 },
+      "questionRange": { "from": 1 },
       "sceneTheme": {
         "bodyElement": {
           "background": "url('/backgrounds/r1-stage2-bg.png') center/cover no-repeat fixed",
@@ -111,94 +217,515 @@
           "background": "rgba(0,0,0,0.4)"
         },
         "stage": {
-          "backgroundImage": "linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.95)), url('/backgrounds/r1-stage2-bg.png') center/cover no-repeat"
+          "backgroundImage": "none"
         },
         "dialogueBox": {
           "background": "#ffffff",
-          "bubbleImage": null,
-          "border": "1px solid rgba(255, 102, 102, 0.24)",
-          "color": "#111827"
+          "border": "1px solid rgba(45,255,154,0.24)",
+          "color": "#111827",
+          "bubbleContainerClass": "rounded-2xl",
+          "boxShadow": "shadow-[0_22px_70px_rgba(0,0,0,0.28)]",
+          "customStyles": {
+            "speakerClass": "text-xs uppercase tracking-[0.22em] text-slate-500",
+            "textClass": "mt-3 text-base leading-7 text-slate-900",
+            "continueClass": "mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-slate-400"
+          }
+        },
+        "backgroundDialogueBox": {
+          "background": "linear-gradient(180deg, rgba(2,6,23,0.88), rgba(2,6,23,0.78))",
+          "border": "1px solid rgba(255,255,255,0.16)",
+          "color": "#ffffff",
+          "boxShadow": "shadow-[0_28px_90px_rgba(0,0,0,0.42)]",
+          "customStyles": {
+            "speakerClass": "text-xs uppercase tracking-[0.24em] text-white/60",
+            "textClass": "mt-3 text-base leading-7 text-white",
+            "continueClass": "mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-white/45"
+          }
         },
         "questionBox": {
-          "background": "linear-gradient(180deg, rgba(20, 12, 33, 0.94), rgba(0, 0, 0, 0.95))",
-          "border": "1px solid rgba(255, 102, 102, 0.18)",
-          "numberClass": "text-xs uppercase tracking-[0.3em] text-[#FF6B6B]/80",
-          "titleClass": "mt-3 max-w-2xl text-2xl font-bold text-white"
+          "background": "linear-gradient(180deg, rgba(11,31,24,0.94), rgba(0,0,0,0.90))",
+          "border": "1px solid rgba(45,255,154,0.15)",
+          "borderRadiusClass": "rounded-[2rem]",
+          "boxShadow": "shadow-[0_35px_100px_rgba(0,0,0,0.45)]",
+          "numberClass": "text-xs uppercase tracking-[0.3em] text-[#2DFF9A]/80",
+          "titleClass": "mt-3 max-w-2xl text-xl sm:text-2xl font-bold leading-relaxed text-white",
+          "optionClass": "rounded-[1.5rem] border px-4 py-4 text-left text-sm transition",
+          "minHeight": "23rem"
         },
         "answerRevealBox": {
-          "background": "linear-gradient(135deg, rgba(15, 8, 32, 0.96), rgba(255, 102, 102, 0.12))",
-          "border": "1px solid rgba(255, 102, 102, 0.24)"
+          "background": "linear-gradient(135deg, rgba(11,31,24,0.96), rgba(45,255,154,0.12))",
+          "border": "1px solid rgba(45,255,154,0.24)",
+          "borderRadiusClass": "rounded-[2rem]",
+          "boxShadow": "shadow-[0_35px_100px_rgba(45,255,154,0.15)]",
+          "labelClass": "text-xs uppercase tracking-[0.35em] text-[#2DFF9A]/70",
+          "answerClass": "mt-6 text-xl leading-8 text-white",
+          "questionClass": "mt-3 text-sm text-slate-300",
+          "minHeight": "14rem"
         }
       },
       "stageCharacters": {
-        "curator": {
-          "name": "Doctor Doom",
-          "accent": "#FF4444",
-          "image": "/characters/doctor-doom.png",
+        "loki": {
+          "name": "Loki",
+          "accent": "#2DFF9A",
+          "image": "/images/loki.png",
           "size": "20rem",
-          "side": "left",
           "style": { "bottom": "1rem", "left": "2rem" },
           "customStyles": {
-            "borderColor": "#FF444466",
-            "imageClass": "w-full h-full object-cover",
-            "imageStyle": { "objectPosition": "top" }
+            "borderColor": "#2DFF9A44"
           }
         },
-        "signal": {
-          "name": "DECO AI",
-          "accent": "#68D3FF",
-          "image": "/characters/deco-ai.png",
-          "size": "16rem",
-          "side": "right",
+        "captain": {
+          "name": "Captain America",
+          "accent": "#2DFF9A",
+          "image": "/characters/captain-america.png",
+          "size": "18rem",
           "style": { "bottom": "1rem", "right": "2rem" },
           "customStyles": {
-            "borderColor": "#68D3FF44",
-            "imageClass": "w-full h-full object-cover",
-            "imageStyle": { "objectPosition": "top" }
+            "borderColor": "#2DFF9A44"
           }
         }
       },
       "roundNarrative": {
         "preQuestion": [
           {
-            "id": "stage2-intro",
+            "id": "narration-scene2",
             "type": "dialogue",
-            "speaker": "Doctor Doom",
-            "characterId": "curator",
-            "questionNumber": [3, 4],
-            "text": "The anomaly has shifted. Stage 2 begins — the code is more corrupt now."
+            "speaker": "Narrator",
+            "text": "You follow Loki's directions and go into a city. It seems to be under attack, but not by an army. Distorted creatures flicker in and out of reality. People run… but some of them glitch. Repeating the same movement twice."
+          },
+          {
+            "id": "captain-1",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Civilian! Get back — this area isn't safe!"
+          },
+          {
+            "id": "captain-2",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "...Wait. You're not running. And you're not glitching either. How?"
+          },
+          {
+            "id": "captain-3",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "You're going to have to explain yourself fast. I've got about thirty seconds before those things reset."
+          },
+          {
+            "id": "captain-4",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "(Player explains — Loki sent them)"
+          },
+          {
+            "id": "captain-5",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Loki. Of course it's Loki."
+          },
+          {
+            "id": "captain-6",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "...Alright. I've learned not to dismiss things just because they sound impossible. Not after everything."
+          },
+          {
+            "id": "captain-7",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "This whole city has been stuck in a seventeen-minute loop. Every time the loop resets, the creatures get a little more solid. A little more real."
+          },
+          {
+            "id": "captain-8",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "And now they're bringing something else through with them."
+          },
+          {
+            "id": "loki-telepathic",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Antimatter contamination. Delightful. Reality is fraying badly enough that opposing states of matter are beginning to overlap."
+          },
+          {
+            "id": "loki-telepathic-2",
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "If one of those fractures collapses completely, this city ceases to be a city and becomes a cautionary tale."
+          },
+          {
+            "id": "captain-9",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "We've isolated three unstable sectors, but I don't know which one's about to blow first."
+          },
+          {
+            "id": "captain-10",
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Help me identify the right sector before containment fails."
           }
         ],
         "duringQuestion": [
           {
-            "id": "stage2-during-1",
+            "id": "q1-during",
+            "questionNumber": 1,
             "type": "dialogue",
-            "speaker": "DECO AI",
-            "characterId": "signal",
-            "questionNumber": [3, 4],
-            "text": "Keep moving. Use the previous answers to anticipate the next encoded branch."
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Captain America has isolated three unstable sectors. Identify which sector is on the verge of antimatter collapse."
+          },
+          {
+            "id": "q2-during",
+            "questionNumber": 2,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Distortion waves are destabilizing the city grid. Captain America's vibranium shield can act as a counter-resonance conductor if phase opposition is maintained."
+          },
+          {
+            "id": "narration-park",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Narrator",
+            "text": "You reach the park. The air feels wrong here — too still. Like the city is holding its breath."
+          },
+          {
+            "id": "captain-park-1",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "This is the place. Every reset passes through this fountain somehow."
+          },
+          {
+            "id": "captain-park-2",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "At first I thought the loop repeated every cycle. It doesn't."
+          },
+          {
+            "id": "captain-park-3",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "The pattern resets every four loops. Three stable. One corrupted. Then it starts over again."
+          },
+          {
+            "id": "loki-recursive",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Ah. A recursive fracture hidden inside a larger recursion. Subtle. I approve."
+          },
+          {
+            "id": "captain-park-4",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "The problem is the corruption changes fast. Too fast for me to track during combat."
+          },
+          {
+            "id": "captain-park-5",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "But if we identify the infected loop, we can find the fracture point feeding the reset."
+          },
+          {
+            "id": "loki-inconsistency",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Find the inconsistency. The timeline will do the rest."
+          },
+          {
+            "id": "captain-q4-1",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "...You sure that's the right one?"
+          },
+          {
+            "id": "captain-q4-2",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Because the loop's still holding together."
+          },
+          {
+            "id": "loki-q4-1",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Mm. Either you've found the fracture... or the timeline wants you to think you have."
+          },
+          {
+            "id": "captain-q4-3",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Check it again. Carefully."
+          },
+          {
+            "id": "loki-q4-2",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Reality rarely repeats perfectly. That's the problem with forcing perfection."
           }
         ],
         "afterAnswer": [
           {
-            "id": "stage2-after",
+            "id": "after-q1-1",
+            "questionNumber": 1,
             "type": "dialogue",
-            "speaker": "Doctor Doom",
-            "characterId": "curator",
-            "questionNumber": [3, 4],
-            "text": "Two more loops to break. Your next choice determines whether the shield stabilizes or shatters."
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "These things aren't just trapped in the loop anymore. They're interfering with the city's magnetic field."
+          },
+          {
+            "id": "after-q1-2",
+            "questionNumber": 1,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Every streetlight, every power relay — the whole grid's starting to destabilize."
+          },
+          {
+            "id": "loki-resonating",
+            "questionNumber": 1,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "The fractures are resonating through the infrastructure. Crude, but effective."
+          },
+          {
+            "id": "captain-vibranium",
+            "questionNumber": 1,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Banner once told me vibranium absorbs and redistributes energy differently than normal metals."
+          },
+          {
+            "id": "captain-shield",
+            "questionNumber": 1,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "If he's right, my shield might be able to suppress the distortion field — but only if the resonance stays phase-opposed."
+          },
+          {
+            "id": "loki-understood",
+            "questionNumber": 1,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "You understood approximately three more words of that sentence than I expected."
+          },
+          {
+            "id": "captain-enough",
+            "questionNumber": 1,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "I understood enough. I just need the correct synchronization pattern before this whole block collapses."
+          },
+          {
+            "id": "after-q2-1",
+            "questionNumber": 2,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "That's it. That actually worked."
+          },
+          {
+            "id": "after-q2-2",
+            "questionNumber": 2,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "...You did good. Really."
+          },
+          {
+            "id": "loki-touching",
+            "questionNumber": 2,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Yes, yes. Touching. Can we move on?"
+          },
+          {
+            "id": "captain-more-people",
+            "questionNumber": 2,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "We need more people. Whatever's causing this is bigger than a single city."
+          },
+          {
+            "id": "captain-tony-bruce",
+            "questionNumber": 2,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "I want Tony and Bruce in on this. Stark will complain the whole way but he'll show up. He always does."
+          },
+          {
+            "id": "captain-banner",
+            "questionNumber": 2,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "And Banner — if this gets physical, we're going to need the big guy."
+          },
+          {
+            "id": "captain-coordinate",
+            "questionNumber": 2,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "I'll coordinate from here. You two — go find Stark first. Last I heard he was running field tests somewhere in the Midwest."
+          },
+          {
+            "id": "loki-manual",
+            "questionNumber": 2,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "How delightfully manual. Off you go."
+          },
+          {
+            "id": "after-q3-1",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "...You sure that's the right one?"
+          },
+          {
+            "id": "after-q3-2",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Because the loop's still holding together."
+          },
+          {
+            "id": "loki-fracture",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Mm. Either you've found the fracture... or the timeline wants you to think you have."
+          },
+          {
+            "id": "captain-check-again",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "Check it again. Carefully."
+          },
+          {
+            "id": "loki-reality",
+            "questionNumber": 3,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Reality rarely repeats perfectly. That's the problem with forcing perfection."
+          },
+          {
+            "id": "resolution-1",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "That's it. That actually worked."
+          },
+          {
+            "id": "resolution-2",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "...You did good. Really."
+          },
+          {
+            "id": "loki-resolution",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "Yes, yes. Touching. Can we move on?"
+          },
+          {
+            "id": "captain-more-people-final",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "We need more people. Whatever's causing this is bigger than a single city."
+          },
+          {
+            "id": "captain-tony-bruce-final",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "I want Tony and Bruce in on this. Stark will complain the whole way but he'll show up. He always does."
+          },
+          {
+            "id": "captain-banner-final",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "And Banner — if this gets physical, we're going to need the big guy."
+          },
+          {
+            "id": "captain-coordinate-final",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Captain America",
+            "characterId": "captain",
+            "text": "I'll coordinate from here. You two — go find Stark first. Last I heard he was running field tests somewhere in the Midwest."
+          },
+          {
+            "id": "loki-manual-final",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "How delightfully manual. Off you go."
           }
         ],
-        "finished": [
-          {
-            "id": "stage2-finished",
-            "type": "dialogue",
-            "speaker": "DECO AI",
-            "characterId": "signal",
-            "questionNumber": 4,
-            "text": "The final sequence is complete. The shields hold... for now."
-          }
-        ]
+        "finished": []
       }
     }
   ]

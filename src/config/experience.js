@@ -256,6 +256,26 @@ const matchesStageForQuestion = (stage, questionNumber) => {
   return false
 }
 
+export const isIntroStage = (stage) =>
+  Boolean(stage) && !Array.isArray(stage.questionNumbers) && !stage.questionRange
+
+export const getIntroStages = (roundExperience) => {
+  if (!roundExperience || !Array.isArray(roundExperience.stages)) return []
+  return roundExperience.stages.filter(isIntroStage)
+}
+
+export function applyStageExperience(roundExperience, stage) {
+  if (!stage) return roundExperience
+
+  return {
+    ...roundExperience,
+    sceneTheme: mergeDeep(roundExperience.sceneTheme, stage.sceneTheme || {}),
+    stageCharacters: stage.stageCharacters || roundExperience.stageCharacters,
+    roundNarrative: mergeDeep(roundExperience.roundNarrative, stage.roundNarrative || {}),
+    currentStage: stage,
+  }
+}
+
 export function resolveRoundStage(roundExperience, questionNumber) {
   if (!roundExperience || !Array.isArray(roundExperience.stages)) {
     return roundExperience
@@ -266,13 +286,7 @@ export function resolveRoundStage(roundExperience, questionNumber) {
     return roundExperience
   }
 
-  return {
-    ...roundExperience,
-    sceneTheme: mergeDeep(roundExperience.sceneTheme, stage.sceneTheme || {}),
-    stageCharacters: mergeDeep(roundExperience.stageCharacters, stage.stageCharacters || {}),
-    roundNarrative: mergeDeep(roundExperience.roundNarrative, stage.roundNarrative || {}),
-    currentStage: stage,
-  }
+  return applyStageExperience(roundExperience, stage)
 }
 
 export function buildRoundExperience(roundConfig) {

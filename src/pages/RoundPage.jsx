@@ -4,6 +4,8 @@ import Timer from '../components/Timer'
 import { Alert, Btn, Input, Panel, Spinner } from '../components/UI'
 import {
   ROUND_JOIN_BUFFER_MS,
+  applyStageExperience,
+  getIntroStages,
   loadRoundExperience,
   resolveRoundStage,
   roundNarrative,
@@ -21,8 +23,6 @@ const FLASHBACK_IMAGES = [
   '/backgrounds/r2-stage2-bg.png',
   '/backgrounds/easteregg.png',
   '/backgrounds/r3-bg.png',
-  '/backgrounds/r3-space-bg.png',
-  '/backgrounds/test.png',
   '/backgrounds/final-round-bg.png',
   '/backgrounds/home-hero.png',
   '/backgrounds/r1-stage1-bg.png',
@@ -31,11 +31,12 @@ const FLASHBACK_IMAGES = [
   '/backgrounds/r2-stage2-bg.png',
   '/backgrounds/easteregg.png',
   '/backgrounds/r3-bg.png',
-  '/backgrounds/r3-space-bg.png',
-  '/backgrounds/test.png',
+
 ].reverse() // Reverse for time restoring back effect
 const FLASHBACK_DURATION = 8 // seconds
 const FLASHBACK_SOUND = '/voices/welldone.mp3' // assuming a sound file
+const DIALOGUE_TRANSITION_MS = 220
+const SCENE_TRANSITION_MS = 520
 
 // ─── localStorage helpers ─────────────────────────────────────────────────────
 function cacheKey(roundId) {
@@ -132,7 +133,18 @@ function getPlayableUntil(round) {
   return new Date(new Date(round.endsAt).getTime() - ROUND_JOIN_BUFFER_MS).toISOString()
 }
 
-function StageCharacter({ character, visible }) {
+function getQuestionKey(question, index = 0) {
+  return question?.id || question?._id || `question-${index}`
+}
+
+function resolveCharacterSlot(characterId, character, index) {
+  if (character?.side === 'left' || character?.side === 'right') return character.side
+  if (character?.style?.left != null) return 'left'
+  if (character?.style?.right != null) return 'right'
+  return index % 2 === 0 ? 'left' : 'right'
+}
+
+function StageCharacter({ character, visible, slot }) {
   if (!character) return null
 
   const customStyles = character.customStyles || {}
@@ -146,6 +158,9 @@ function StageCharacter({ character, visible }) {
   const imageStyle = customStyles.imageStyle || {}
 
   const characterWidth = `min(calc(${character.size} * 0.9), 26vw)`
+  const slotStyle = slot === 'right'
+    ? { right: 'clamp(0.75rem, 3vw, 2rem)' }
+    : { left: 'clamp(0.75rem, 3vw, 2rem)' }
 
   return (
     <div
@@ -156,7 +171,8 @@ function StageCharacter({ character, visible }) {
         borderColor: borderColor,
         width: characterWidth,
         aspectRatio: '1 / 1.1',
-        ...character.style,
+        bottom: character.style?.bottom || '1rem',
+        ...slotStyle,
       }}
     >
       {character.image ? (
@@ -179,7 +195,7 @@ function StageCharacter({ character, visible }) {
   )
 }
 
-function SceneDialogue({ item, onAdvance, sceneTheme }) {
+function SceneDialogue({ item, onAdvance, sceneTheme, visible = true }) {
   if (!item) return null
 
   const [isPlaying, setIsPlaying] = useState(false)
@@ -221,8 +237,8 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
   const voicePlayerBgClass = dialogueCustom.voicePlayerBgClass || 'mt-4 flex items-center gap-3 rounded-xl border border-[#2DFF9A]/20 bg-[#2DFF9A]/8 p-3'
   const playButtonClass = dialogueCustom.playButtonClass || 'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#0B1F18] text-[#2DFF9A] shadow-[0_0_18px_rgba(45,255,154,0.24)] hover:bg-[#123628] transition'
   const voiceTextClass = dialogueCustom.voiceTextClass || 'text-xs font-medium uppercase tracking-[0.18em] text-slate-600'
-  const voiceMemoBoxClass = dialogueCustom.voiceMemoBoxClass || 'relative w-full max-w-xl rounded-2xl p-4 sm:p-5 text-left scale-in'
-  const normalBoxClass = dialogueCustom.normalBoxClass || 'relative w-full max-w-xl p-4 sm:p-5 text-left scale-in'
+  const voiceMemoBoxClass = dialogueCustom.voiceMemoBoxClass || 'relative w-full max-w-xl rounded-2xl p-4 sm:p-5 text-left'
+  const normalBoxClass = dialogueCustom.normalBoxClass || 'relative w-full max-w-xl p-4 sm:p-5 text-left'
   const bubbleContainerClass = dialogueTheme?.bubbleContainerClass || 'rounded-2xl'
   const boxShadowClass = dialogueTheme?.boxShadow || 'shadow-[0_22px_70px_rgba(0,0,0,0.28)]'
   const dialogueBackground = dialogueTheme?.background || '#ffffff'
@@ -271,7 +287,9 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
       <button
         type="button"
         onClick={onAdvance}
-        className={`${voiceMemoBoxClass} ${boxShadowClass}`}
+        className={`${voiceMemoBoxClass} ${boxShadowClass} transition-all duration-200 ease-out ${
+          visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-3 scale-[0.98]'
+        }`}
         style={{
           background: dialogueBackground,
           border: dialogueTheme.border,
@@ -288,7 +306,9 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
     <button
       type="button"
       onClick={onAdvance}
-      className={`${normalBoxClass} ${bubbleContainerClass} ${boxShadowClass} landscape:!py-3 landscape:!px-4`}
+      className={`${normalBoxClass} ${bubbleContainerClass} ${boxShadowClass} landscape:!py-3 landscape:!px-4 transition-all duration-200 ease-out ${
+        visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-3 scale-[0.98]'
+      }`}
       style={{
         background: dialogueBackground,
         border: dialogueTheme.border,
@@ -301,15 +321,15 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
   )
 }
 
-function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, loading, previousAnswer, sceneTheme }) {
-  const [answer, setAnswer] = useState(previousAnswer || '')
+function QuestionCard({ question, questionKey, questionNumber, totalQuestions, onSubmit, loading, previousAnswer, sceneTheme }) {
   const options = useMemo(() => normalizeOptions(question?.options), [question?.options])
+  const [answer, setAnswer] = useState(previousAnswer || '')
   const isLandscapeMobile = useIsLandscapeMobile()
   const promptAudioFile = question?.audioFile || question?.voiceFile
 
   useEffect(() => {
     setAnswer(previousAnswer || '')
-  }, [previousAnswer, question?.id])
+  }, [previousAnswer, questionKey, options.length])
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -326,12 +346,13 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
   return (
     <form
       onSubmit={handleSubmit}
+      autoComplete="off"
       className={`${borderRadiusClass} p-4 sm:p-6 landscape:p-3 ${boxShadow} max-w-xl w-full backdrop-blur-md
                   landscape:max-h-[calc(100dvh-72px)] landscape:overflow-y-auto landscape:overscroll-contain`}
       style={{
         background: sceneTheme.questionBox.background,
         border: sceneTheme.questionBox.border,
-        minHeight: isLandscapeMobile ? 'unset' : sceneTheme.questionBox.minHeight,
+        minHeight: isLandscapeMobile ? 'unset' : sceneTheme.questionBox.compactMinHeight || 'auto',
       }}
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -384,6 +405,11 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
           </div>
         ) : (
           <input
+            key={`answer-input-${questionKey}`}
+            name={`answer-${questionKey}`}
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck="false"
             value={answer}
             onChange={(event) => setAnswer(event.target.value)}
             placeholder="Type your answer here..."
@@ -421,11 +447,34 @@ function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, o
         minHeight: isLandscapeMobile ? 'unset' : sceneTheme.answerRevealBox.minHeight,
       }}
     >
-      <div className={answerLabelClass}>Submitted Answer</div>
-      <div className={`${answerTextClass} landscape:text-lg`}>{submittedAnswer}</div>
-      <div className={questionTextClass}>{question.text}</div>
-      <div className="mt-5 landscape:mt-4">
-        {isLastQuestion ? <Btn onClick={onFinish}>Finish</Btn> : <Btn onClick={onContinue}>Next question</Btn>}
+      {isLastQuestion ? (
+        <>
+          <div className={answerLabelClass}>Round Complete</div>
+          <div className="mt-5 text-2xl sm:text-3xl font-black tracking-wide text-white">
+            Mission Accomplished
+          </div>
+          <div className="mt-3 max-w-sm text-sm leading-6 text-slate-300">
+            Well Played
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={answerLabelClass}>Submitted Answer</div>
+          <div className={`${answerTextClass} landscape:text-lg`}>{submittedAnswer}</div>
+          <div className={questionTextClass}>{question.text}</div>
+        </>
+      )}
+      <div className={isLastQuestion ? 'mt-8 landscape:mt-5' : 'mt-5 landscape:mt-4'}>
+        {isLastQuestion ? (
+          <Btn
+            onClick={onFinish}
+            className="px-10 py-5 text-base sm:text-lg tracking-[0.28em] border-[3px] shadow-[0_0_26px_rgba(45,255,154,0.28),0_26px_70px_rgba(0,0,0,0.45)] hover:scale-[1.03]"
+          >
+            Finish Round
+          </Btn>
+        ) : (
+          <Btn onClick={onContinue}>Next question</Btn>
+        )}
       </div>
     </div>
   )
@@ -447,7 +496,13 @@ export default function RoundPage({ onNav }) {
   const [sequenceIndex, setSequenceIndex] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [finishing, setFinishing] = useState(false)
+  const [resettingProgress, setResettingProgress] = useState(false)
   const finishTriggeredRef = useRef(false)
+  const dialogueTransitionRef = useRef(null)
+  const sceneTransitionRef = useRef(null)
+  const previousSceneRef = useRef(null)
+  const [dialogueVisible, setDialogueVisible] = useState(true)
+  const [sceneTransition, setSceneTransition] = useState(null)
   const [showFlashback, setShowFlashback] = useState(false)
 
   // ─── BODY STYLING ──────────────────────────────────────────────────────────
@@ -525,7 +580,15 @@ export default function RoundPage({ onNav }) {
       const loadedResponses = Array.isArray(responseResult) ? responseResult : []
 
       // Load cached drafts from localStorage, but remove any that are already in DB
-      const dbAnsweredIds = new Set(loadedResponses.map((r) => r.questionId))
+      const questionKeysById = new Map(loadedQuestions.flatMap((item, index) => {
+        const questionKey = getQuestionKey(item, index)
+        return [
+          [item.id, questionKey],
+          [item._id, questionKey],
+          [questionKey, questionKey],
+        ].filter(([key]) => key != null)
+      }))
+      const dbAnsweredIds = new Set(loadedResponses.map((r) => questionKeysById.get(r.questionId) || r.questionId))
       const cached = loadCache(roundIdentifier)
       const cleanedCache = Object.fromEntries(
         Object.entries(cached).filter(([qId]) => !dbAnsweredIds.has(qId))
@@ -536,10 +599,10 @@ export default function RoundPage({ onNav }) {
 
       // Combine DB responses + draft responses to find first unanswered question
       const allAnsweredIds = new Set([
-        ...loadedResponses.map((r) => r.questionId),
+        ...dbAnsweredIds,
         ...Object.keys(cleanedCache),
       ])
-      const firstPendingIndex = loadedQuestions.findIndex((item) => !allAnsweredIds.has(item.id))
+      const firstPendingIndex = loadedQuestions.findIndex((item, index) => !allAnsweredIds.has(getQuestionKey(item, index)))
 
       setQuestions(loadedQuestions)
       setResponses(loadedResponses)
@@ -561,6 +624,17 @@ export default function RoundPage({ onNav }) {
   useEffect(() => {
     boot()
   }, [boot])
+
+  useEffect(() => {
+    return () => {
+      if (dialogueTransitionRef.current) {
+        clearTimeout(dialogueTransitionRef.current)
+      }
+      if (sceneTransitionRef.current) {
+        clearTimeout(sceneTransitionRef.current)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (!loading && !round && !error) {
@@ -603,51 +677,97 @@ export default function RoundPage({ onNav }) {
   )
 
   // ─── DERIVED STATE ─────────────────────────────────────────────────────────
+  const resetRoundProgress = async () => {
+    if (!round || resettingProgress) return
+    setResettingProgress(true)
+    try {
+      const roundIdentifier = round.id || round.roundNumber || round._id
+      await api.post(`/api/round/${roundIdentifier}/reset-progress`)
+      ;[roundIdentifier, round.id, round.roundNumber, round._id].forEach((id) => {
+        if (id != null) clearCache(id)
+      })
+      finishTriggeredRef.current = false
+      setResponses([])
+      setDraftResponses({})
+      setCurrentIndex(0)
+      setPhase('question')
+      setSequenceIndex(0)
+      setDialogueVisible(true)
+      setError(null)
+      await boot()
+    } catch (err) {
+      setError(`Could not reset dev progress: ${err.message}`)
+    } finally {
+      setResettingProgress(false)
+    }
+  }
+
   const currentQuestion = questions[currentIndex]
+  const currentQuestionKey = getQuestionKey(currentQuestion, currentIndex)
 
   // currentResponse: prefer DB response, fall back to draft
   const currentResponse = currentQuestion
-    ? responses.find((r) => r.questionId === currentQuestion.id) ||
-      (draftResponses[currentQuestion.id]
-        ? { questionId: currentQuestion.id, submittedAnswer: draftResponses[currentQuestion.id] }
+    ? responses.find((r) => r.questionId === currentQuestionKey || r.questionId === currentQuestion.id || r.questionId === currentQuestion._id) ||
+      (draftResponses[currentQuestionKey]
+        ? { questionId: currentQuestionKey, submittedAnswer: draftResponses[currentQuestionKey] }
         : null)
     : null
 
   const baseExperience = roundExperience || { sceneTheme, stageCharacters, roundNarrative, stages: [] }
   const currentQuestionNumber = currentQuestion ? currentIndex + 1 : null
-  const experience = resolveRoundStage(baseExperience, currentQuestionNumber)
-  const effectiveSceneTheme = experience.sceneTheme
-  const effectiveStageCharacters = experience.stageCharacters || {}
-  const effectiveRoundNarrative = experience.roundNarrative
+  const questionExperience = resolveRoundStage(baseExperience, currentQuestionNumber)
 
   // Count answers for progress: DB responses + drafts (no double-count)
-  const dbAnsweredIds = new Set(responses.map((r) => r.questionId))
+  const questionKeysById = useMemo(() => new Map(questions.flatMap((item, index) => {
+    const questionKey = getQuestionKey(item, index)
+    return [
+      [item.id, questionKey],
+      [item._id, questionKey],
+      [questionKey, questionKey],
+    ].filter(([key]) => key != null)
+  })), [questions])
+  const dbAnsweredIds = new Set(responses.map((r) => questionKeysById.get(r.questionId) || r.questionId))
   const allAnsweredIds = new Set([...dbAnsweredIds, ...Object.keys(draftResponses)])
   const answeredCount = allAnsweredIds.size
   const totalQuestions = questions.length
   const playableUntil = round ? getPlayableUntil(round) : null
   const progress = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0
+  const shouldPlayIntroStages = currentIndex === 0 && answeredCount === 0
+
+  const introStageSequences = useMemo(() => {
+    if (!shouldPlayIntroStages) return []
+
+    return getIntroStages(baseExperience).flatMap((stage) => {
+      const stageExperience = applyStageExperience(baseExperience, stage)
+      return resolveNarrativeSequence(stageExperience.roundNarrative.preQuestion, {}, null).map((item) => ({
+        ...item,
+        __stageId: stage.id,
+      }))
+    })
+  }, [baseExperience, shouldPlayIntroStages])
 
   const preQuestionSequence = useMemo(() => {
     if (!currentQuestion) {
-      return resolveNarrativeSequence(effectiveRoundNarrative.preQuestion, {}, null)
+      return introStageSequences.length > 0
+        ? introStageSequences
+        : resolveNarrativeSequence(questionExperience.roundNarrative.preQuestion, {}, null)
     }
     const introItems = currentIndex === 0 && answeredCount === 0
-      ? resolveNarrativeSequence(effectiveRoundNarrative.preQuestion, {}, currentIndex + 1)
+      ? resolveNarrativeSequence(questionExperience.roundNarrative.preQuestion, {}, currentIndex + 1)
       : []
     const duringItems = resolveNarrativeSequence(
-      effectiveRoundNarrative.duringQuestion,
+      questionExperience.roundNarrative.duringQuestion,
       { questionNumber: currentIndex + 1, totalQuestions: questions.length },
       currentIndex + 1,
     )
-    return [...introItems, ...duringItems]
-  }, [currentIndex, currentQuestion, questions.length, answeredCount, effectiveRoundNarrative])
+    return [...introStageSequences, ...introItems, ...duringItems]
+  }, [currentIndex, currentQuestion, questions.length, answeredCount, questionExperience, introStageSequences])
 
   const postAnswerSequence = useMemo(() => {
     if (!currentResponse) return []
     const lastQuestionPhrase = currentIndex === questions.length - 1 ? 'This was the final answer.' : 'Onwards.'
     return resolveNarrativeSequence(
-      effectiveRoundNarrative.afterAnswer,
+      questionExperience.roundNarrative.afterAnswer,
       {
         submittedAnswer: currentResponse.submittedAnswer,
         isLastQuestion: currentIndex === questions.length - 1,
@@ -655,16 +775,63 @@ export default function RoundPage({ onNav }) {
       },
       currentIndex + 1,
     )
-  }, [currentIndex, currentResponse, questions.length, effectiveRoundNarrative])
+  }, [currentIndex, currentResponse, questions.length, questionExperience])
 
   const activeSequence = phase === 'answer' ? postAnswerSequence : preQuestionSequence
   const activeDialogue = sequenceIndex < activeSequence.length ? activeSequence[sequenceIndex] : null
+  const activeIntroStage = activeDialogue?.__stageId
+    ? getIntroStages(baseExperience).find((stage) => stage.id === activeDialogue.__stageId)
+    : null
+  const activeExperience = activeIntroStage
+    ? applyStageExperience(baseExperience, activeIntroStage)
+    : questionExperience
+  const effectiveSceneTheme = activeExperience.sceneTheme
+  const effectiveStageCharacters = activeExperience.stageCharacters || {}
+  const activeSceneKey = activeExperience.currentStage?.id || 'base'
   const hasActiveDialogue = Boolean(activeDialogue)
   const highlightedCharacter = activeDialogue?.characterId
+  const characterEntries = Object.entries(effectiveStageCharacters)
+  const visibleCharacterEntries =
+    highlightedCharacter && effectiveStageCharacters[highlightedCharacter]
+      ? [
+          [highlightedCharacter, effectiveStageCharacters[highlightedCharacter]],
+          ...characterEntries.filter(([characterId]) => characterId !== highlightedCharacter).slice(0, 1),
+        ]
+      : characterEntries.slice(0, 2)
   const isLastQuestion = currentIndex === questions.length - 1
   const dialogueCanOverlayQuestion = activeDialogue?.showWithQuestion || activeDialogue?.overlayQuestion
   const showQuestionCard = phase === 'question' && currentQuestion && (!hasActiveDialogue || dialogueCanOverlayQuestion)
   const showAnswerReveal = phase === 'answer' && currentQuestion && currentResponse && !hasActiveDialogue
+
+  useEffect(() => {
+    const previousScene = previousSceneRef.current
+    const nextScene = {
+      key: activeSceneKey,
+      bodyBackground: effectiveSceneTheme.bodyElement?.background,
+      frameBackground: effectiveSceneTheme.frame?.background,
+      stageBackground: effectiveSceneTheme.stage?.backgroundImage,
+      characterEntries: visibleCharacterEntries,
+    }
+
+    if (!previousScene) {
+      previousSceneRef.current = nextScene
+      return
+    }
+
+    if (previousScene.key !== activeSceneKey) {
+      setSceneTransition({ ...previousScene, visible: true })
+      if (sceneTransitionRef.current) clearTimeout(sceneTransitionRef.current)
+      requestAnimationFrame(() => {
+        setSceneTransition((value) => value ? { ...value, visible: false } : value)
+      })
+      sceneTransitionRef.current = setTimeout(() => {
+        setSceneTransition(null)
+        sceneTransitionRef.current = null
+      }, SCENE_TRANSITION_MS)
+    }
+
+    previousSceneRef.current = nextScene
+  }, [activeSceneKey, effectiveSceneTheme, visibleCharacterEntries])
 
   // ─── SUBMIT ────────────────────────────────────────────────────────────────
   // Saves to localStorage immediately so refresh restores the answer without
@@ -672,35 +839,48 @@ export default function RoundPage({ onNav }) {
   const submitAnswer = async (submittedAnswer) => {
     if (!currentQuestion || !round) return
     setSubmitting(true)
+    const submittedQuestion = currentQuestion
+    const submittedQuestionKey = currentQuestionKey
+    const submittedQuestionIndex = currentIndex
+    const wasLastQuestion = submittedQuestionIndex >= questions.length - 1
 
     // 1. Cache locally first — this survives a refresh
-    const updatedDrafts = { ...draftResponses, [currentQuestion.id]: submittedAnswer }
+    const updatedDrafts = { ...draftResponses, [submittedQuestionKey]: submittedAnswer }
     setDraftResponses(updatedDrafts)
     saveCache(round.id, updatedDrafts)
 
-    // 2. Optimistically move to answer-reveal phase
-    setPhase('answer')
+    // 2. Optimistically move forward without showing a confirmation card.
+    setDialogueVisible(true)
     setSequenceIndex(0)
     setError(null)
+    if (wasLastQuestion) {
+      setPhase('question')
+    } else {
+      setCurrentIndex((value) => Math.max(value, submittedQuestionIndex + 1))
+      setPhase('question')
+    }
 
     // 3. Submit to DB in background
     try {
       await api.post('/api/response', {
-        questionId: currentQuestion._id,
+        questionId: submittedQuestion._id,
         submittedAnswer,
       })
       // On success: add to DB responses and remove from drafts
-      const confirmedResponse = { questionId: currentQuestion.id, submittedAnswer }
+      const confirmedResponse = { questionId: submittedQuestionKey, submittedAnswer }
       setResponses((prev) => {
-        const withoutCurrent = prev.filter((item) => item.questionId !== currentQuestion.id)
+        const withoutCurrent = prev.filter((item) => item.questionId !== submittedQuestionKey)
         return [...withoutCurrent, confirmedResponse]
       })
       setDraftResponses((prev) => {
         const next = { ...prev }
-        delete next[currentQuestion.id]
+        delete next[submittedQuestionKey]
         saveCache(round.id, next)
         return next
       })
+      if (wasLastQuestion) {
+        await finishRound()
+      }
     } catch (err) {
       // DB failed but draft is still cached — user can refresh and reattempt
       setError(`Answer saved locally but failed to sync: ${err.message}. You can refresh to retry.`)
@@ -710,13 +890,22 @@ export default function RoundPage({ onNav }) {
   }
 
   const goNext = () => {
+    setDialogueVisible(true)
     setCurrentIndex((value) => Math.min(value + 1, questions.length - 1))
     setPhase('question')
     setSequenceIndex(0)
   }
 
   const advanceSequence = () => {
-    setSequenceIndex((value) => value + 1)
+    if (!dialogueVisible) return
+    setDialogueVisible(false)
+    dialogueTransitionRef.current = setTimeout(() => {
+      setSequenceIndex((value) => value + 1)
+      dialogueTransitionRef.current = null
+      requestAnimationFrame(() => {
+        setDialogueVisible(true)
+      })
+    }, DIALOGUE_TRANSITION_MS)
   }
 
   // ─── RENDER ────────────────────────────────────────────────────────────────
@@ -740,15 +929,34 @@ export default function RoundPage({ onNav }) {
   return (
     <>
       {/* Experience Layer */}
-      {Object.entries(effectiveStageCharacters).map(([characterId, character]) => (
+      {visibleCharacterEntries.map(([characterId, character], index) => (
         <StageCharacter
           key={characterId}
           character={character}
+          slot={resolveCharacterSlot(characterId, character, index)}
           visible={!highlightedCharacter || highlightedCharacter === characterId}
         />
       ))}
+      {sceneTransition?.characterEntries?.map(([characterId, character], index) => (
+        <div
+          key={`leaving-${sceneTransition.key}-${characterId}`}
+          className={`fixed inset-0 z-[5] pointer-events-none transition-opacity duration-500 ease-out ${
+            sceneTransition.visible ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <StageCharacter
+            character={character}
+            slot={resolveCharacterSlot(characterId, character, index)}
+            visible
+          />
+        </div>
+      ))}
 
       {/* Background */}
+      <div
+        className="fixed inset-0 -z-[60] pointer-events-none"
+        style={{ background: effectiveSceneTheme.bodyElement?.background }}
+      />
       <div
         className="fixed inset-0 -z-50 pointer-events-none"
         style={{ background: effectiveSceneTheme.frame.background }}
@@ -757,6 +965,26 @@ export default function RoundPage({ onNav }) {
         className="fixed inset-0 -z-40 pointer-events-none rounded-[2rem]"
         style={{ background: effectiveSceneTheme.stage.backgroundImage }}
       />
+      {sceneTransition && (
+        <div
+          className={`fixed inset-0 -z-[35] pointer-events-none transition-opacity duration-500 ease-out ${
+            sceneTransition.visible ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <div
+            className="absolute inset-0"
+            style={{ background: sceneTransition.bodyBackground }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: sceneTransition.frameBackground }}
+          />
+          <div
+            className="absolute inset-0 rounded-[2rem]"
+            style={{ background: sceneTransition.stageBackground }}
+          />
+        </div>
+      )}
 
       {/* Top HUD — floating overlay */}
       <div className="fixed top-0 left-0 right-0 z-30 pointer-events-none">
@@ -775,7 +1003,7 @@ export default function RoundPage({ onNav }) {
       </div>
     </div>
     {playableUntil && (
-      <div className="pointer-events-auto scale-90 sm:scale-100 origin-top-right">
+      <div className="pointer-events-auto flex flex-col items-end gap-2 scale-90 sm:scale-100 origin-top-right">
         <Timer targetTime={playableUntil} label="Time left"
           onExpire={() => finishRound({ silent: true })} />
       </div>
@@ -811,7 +1039,9 @@ export default function RoundPage({ onNav }) {
           />
         ) : showQuestionCard ? (
           <QuestionCard
+            key={currentQuestionKey}
             question={currentQuestion}
+            questionKey={currentQuestionKey}
             questionNumber={currentIndex + 1}
             totalQuestions={totalQuestions}
             onSubmit={submitAnswer}
@@ -847,6 +1077,7 @@ export default function RoundPage({ onNav }) {
         item={activeDialogue}
         onAdvance={advanceSequence}
         sceneTheme={effectiveSceneTheme}
+        visible={dialogueVisible}
       />
     </div>
   </div>
