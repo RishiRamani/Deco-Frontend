@@ -257,7 +257,7 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
     <button
       type="button"
       onClick={onAdvance}
-      className={`${normalBoxClass} ${bubbleContainerClass} ${boxShadowClass}`}
+      className={`${normalBoxClass} ${bubbleContainerClass} ${boxShadowClass} landscape:!py-3 landscape:!px-4`}
       style={{
         background: dialogueBackground,
         border: sceneTheme.dialogueBox.border,
@@ -303,7 +303,10 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex-1">
           <div className={questionNumberClass}>Question {questionNumber}</div>
-          <h2 className={questionTitleClass} style={{ whiteSpace: 'pre-line' }}>{question.text}</h2>
+          <h2
+  className={`${questionTitleClass} landscape:text-lg`}
+  style={{ whiteSpace: 'pre-line' }}
+>{question.text}</h2>
         </div>
         <div className="flex-shrink-0 rounded-full border border-[#2DFF9A]/20 bg-[#2DFF9A]/10 px-4 py-2 text-sm text-[#2DFF9A]">
           {question.reward} pts
@@ -312,13 +315,13 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
 
       {question.link && (
         <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5">
-          <img src={question.link} alt="" className="max-h-72 w-full object-cover" />
+          <img src={question.link} alt="" className="max-h-72 landscape:max-h-40 w-full object-cover" />
         </div>
       )}
 
       <div className="mt-6 space-y-4">
         {options.length > 0 ? (
-          <div className="grid gap-3">
+          <div className="grid gap-2 landscape:gap-1.5">
             {options.map((option) => (
               <button
                 key={option.key}
@@ -350,7 +353,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
         )}
       </div>
 
-      <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="mt-4 landscape:mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="text-sm text-slate-400">{totalQuestions - questionNumber} questions remain after this one.</div>
         <Btn type="submit" loading={loading} disabled={!answer.trim()} className="w-full sm:w-auto">
           Submit
@@ -369,7 +372,7 @@ function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, o
 
   return (
     <div
-      className={`flex flex-col items-center justify-center px-6 py-8 text-center ${borderRadiusClass} ${boxShadow} max-w-xl w-full backdrop-blur-md`}
+      className={`flex flex-col items-center justify-center px-5 py-6 landscape:py-4 text-center ${borderRadiusClass} ${boxShadow} max-w-xl w-full backdrop-blur-md`}
       style={{
         background: sceneTheme.answerRevealBox.background,
         border: sceneTheme.answerRevealBox.border,
@@ -377,9 +380,9 @@ function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, o
       }}
     >
       <div className={answerLabelClass}>Submitted Answer</div>
-      <div className={answerTextClass}>{submittedAnswer}</div>
+      <div className={`${answerTextClass} landscape:text-lg`}>{submittedAnswer}</div>
       <div className={questionTextClass}>{question.text}</div>
-      <div className="mt-8">
+      <div className="mt-5 landscape:mt-4">
         {isLastQuestion ? <Btn onClick={onFinish}>Finish</Btn> : <Btn onClick={onContinue}>Next question</Btn>}
       </div>
     </div>
