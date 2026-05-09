@@ -112,6 +112,22 @@ function resolveNarrativeSequence(sequence, vars, questionNumber) {
   return []
 }
 
+function useIsLandscapeMobile() {
+  const [val, setVal] = useState(false)
+  useEffect(() => {
+    const check = () =>
+      setVal(window.innerWidth < 1024 && window.innerWidth > window.innerHeight)
+    check()
+    window.addEventListener('resize', check)
+    window.addEventListener('orientationchange', check)
+    return () => {
+      window.removeEventListener('resize', check)
+      window.removeEventListener('orientationchange', check)
+    }
+  }, [])
+  return val
+}
+
 function getPlayableUntil(round) {
   return new Date(new Date(round.endsAt).getTime() - ROUND_JOIN_BUFFER_MS).toISOString()
 }
@@ -273,6 +289,7 @@ function SceneDialogue({ item, onAdvance, sceneTheme }) {
 function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, loading, previousAnswer, sceneTheme }) {
   const [answer, setAnswer] = useState(previousAnswer || '')
   const options = useMemo(() => normalizeOptions(question?.options), [question?.options])
+  const isLandscapeMobile = useIsLandscapeMobile()
 
   useEffect(() => {
     setAnswer(previousAnswer || '')
@@ -293,11 +310,12 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
   return (
     <form
       onSubmit={handleSubmit}
-      className={`${borderRadiusClass} p-4 sm:p-6 landscape:p-4 ${boxShadow} max-w-xl w-full backdrop-blur-md`}
+      className={`${borderRadiusClass} p-4 sm:p-6 landscape:p-3 ${boxShadow} max-w-xl w-full backdrop-blur-md
+                  landscape:max-h-[calc(100dvh-72px)] landscape:overflow-y-auto landscape:overscroll-contain`}
       style={{
         background: sceneTheme.questionBox.background,
         border: sceneTheme.questionBox.border,
-        minHeight: sceneTheme.questionBox.minHeight,
+        minHeight: isLandscapeMobile ? 'unset' : sceneTheme.questionBox.minHeight,
       }}
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -321,13 +339,13 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
 
       <div className="mt-6 space-y-4">
         {options.length > 0 ? (
-          <div className="grid gap-2 landscape:gap-1.5">
+          <div className="grid gap-2 landscape:gap-1">
             {options.map((option) => (
               <button
                 key={option.key}
                 type="button"
                 onClick={() => setAnswer(option.value)}
-                className={`${optionClass} ${
+                className={`${optionClass} landscape:!py-2 landscape:!px-3 ${
                   answer === option.value
                     ? 'border-[#2DFF9A]/40 bg-[#2DFF9A]/10 text-white'
                     : 'border-white/10 bg-white/5 text-slate-200 hover:bg-white/10'
@@ -337,7 +355,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
                   <span className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#0B1F18]/70 text-xs text-[#2DFF9A]">
                     {option.label}
                   </span>
-                  <span className="leading-7">{option.value}</span>
+                  <span className="leading-5 landscape:text-xs landscape:leading-5">{option.value}</span>
                 </div>
               </button>
             ))}
@@ -364,6 +382,7 @@ function QuestionCard({ question, questionNumber, totalQuestions, onSubmit, load
 }
 
 function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, onFinish, sceneTheme }) {
+  const isLandscapeMobile = useIsLandscapeMobile()
   const answerLabelClass = sceneTheme.answerRevealBox.labelClass || 'text-xs uppercase tracking-[0.35em] text-[#2DFF9A]/70'
   const answerTextClass = sceneTheme.answerRevealBox.answerClass || 'mt-6 text-xl leading-8 text-white'
   const questionTextClass = sceneTheme.answerRevealBox.questionClass || 'mt-3 text-sm text-slate-300'
@@ -372,11 +391,12 @@ function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, o
 
   return (
     <div
-      className={`flex flex-col items-center justify-center px-5 py-6 landscape:py-4 text-center ${borderRadiusClass} ${boxShadow} max-w-xl w-full backdrop-blur-md`}
+      className={`flex flex-col items-center justify-center px-5 py-6 landscape:py-3 text-center ${borderRadiusClass} ${boxShadow} max-w-xl w-full backdrop-blur-md
+                  landscape:max-h-[calc(100dvh-72px)] landscape:overflow-y-auto landscape:overscroll-contain`}
       style={{
         background: sceneTheme.answerRevealBox.background,
         border: sceneTheme.answerRevealBox.border,
-        minHeight: sceneTheme.answerRevealBox.minHeight,
+        minHeight: isLandscapeMobile ? 'unset' : sceneTheme.answerRevealBox.minHeight,
       }}
     >
       <div className={answerLabelClass}>Submitted Answer</div>
@@ -739,11 +759,15 @@ export default function RoundPage({ onNav }) {
 </div>
 
 {/* Main round content area — clears HUD via pt, scrollable on landscape */}
-<div className="relative z-40 flex min-h-screen items-center justify-center pointer-events-none
-                landscape:items-start landscape:pt-[60px]">
-  <div className="pointer-events-auto flex w-full max-w-full items-center justify-center
-                  overflow-y-auto px-3 sm:px-6 py-6 landscape:py-3
-                  min-h-screen landscape:min-h-0 landscape:max-h-[calc(100vh-60px)]">
+<div className="relative z-40 pointer-events-none
+                flex min-h-screen items-center justify-center
+                landscape:block landscape:pt-[64px]">
+  <div className="pointer-events-auto
+                  flex w-full max-w-full items-center justify-center
+                  px-3 sm:px-6 py-6 landscape:py-2
+                  min-h-screen
+                  landscape:min-h-0 landscape:h-[calc(100dvh-64px)]
+                  landscape:overflow-y-auto landscape:overscroll-contain">
     {currentQuestion ? (
       <>
         {showAnswerReveal ? (
