@@ -504,9 +504,9 @@ export default function RoundPage({ onNav }) {
   const [dialogueVisible, setDialogueVisible] = useState(true)
   const [sceneTransition, setSceneTransition] = useState(null)
   const [showFlashback, setShowFlashback] = useState(false)
-  const [characterSlots, setCharacterSlots] = useState({
-  left: null,
-  right: null,
+  const [slotOccupants, setSlotOccupants] = useState({
+    left: null,
+    right: null,
   })
 
   // ─── BODY STYLING ──────────────────────────────────────────────────────────
@@ -795,49 +795,26 @@ export default function RoundPage({ onNav }) {
   const hasActiveDialogue = Boolean(activeDialogue)
   const highlightedCharacter = activeDialogue?.characterId
   useEffect(() => {
-  if (!highlightedCharacter) return
+    if (!highlightedCharacter) return
 
-    setCharacterSlots((prev) => {
-      // Already visible
-      if (
-        prev.left === highlightedCharacter ||
-        prev.right === highlightedCharacter
-      ) {
-        return prev
-      }
+    const character = effectiveStageCharacters[highlightedCharacter]
+    const side = character?.side
 
-      // Empty left slot
-      if (!prev.left) {
-        return {
-          ...prev,
-          left: highlightedCharacter,
-        }
-      }
+    if (side !== 'left' && side !== 'right') return
 
-      // Empty right slot
-      if (!prev.right) {
-        return {
-          ...prev,
-          right: highlightedCharacter,
-        }
-      }
+    setSlotOccupants((prev) => ({
+      ...prev,
+      [side]: highlightedCharacter,
+    }))
+  }, [highlightedCharacter, effectiveStageCharacters])
 
-      // Replace oldest character
-      return {
-        left: prev.right,
-        right: highlightedCharacter,
-      }
-    })
-  }, [highlightedCharacter])
-
-  const characterEntries = Object.entries(effectiveStageCharacters)
   const visibleCharacterEntries = [
-    characterSlots.left && effectiveStageCharacters[characterSlots.left]
-      ? [characterSlots.left, effectiveStageCharacters[characterSlots.left]]
+    slotOccupants.left && effectiveStageCharacters[slotOccupants.left]
+      ? [slotOccupants.left, effectiveStageCharacters[slotOccupants.left]]
       : null,
 
-    characterSlots.right && effectiveStageCharacters[characterSlots.right]
-      ? [characterSlots.right, effectiveStageCharacters[characterSlots.right]]
+    slotOccupants.right && effectiveStageCharacters[slotOccupants.right]
+      ? [slotOccupants.right, effectiveStageCharacters[slotOccupants.right]]
       : null,
   ].filter(Boolean)
   const isLastQuestion = currentIndex === questions.length - 1
@@ -898,8 +875,7 @@ export default function RoundPage({ onNav }) {
     if (wasLastQuestion) {
       setPhase('answer')
     } else {
-      setCurrentIndex((value) => Math.max(value, submittedQuestionIndex + 1))
-      setPhase('question')
+      setPhase('answer')
     }
 
     // 3. Submit to DB in background
@@ -929,8 +905,10 @@ export default function RoundPage({ onNav }) {
   }
 
   const goNext = () => {
+    const nextIndex = Math.min(currentIndex + 1, questions.length - 1)
+
     setDialogueVisible(true)
-    setCurrentIndex((value) => Math.min(value + 1, questions.length - 1))
+    setCurrentIndex(nextIndex)
     setPhase('question')
     setSequenceIndex(0)
   }
@@ -968,15 +946,15 @@ export default function RoundPage({ onNav }) {
   return (
     <>
       {/* Experience Layer */}
-      {visibleCharacterEntries.map(([characterId, character], index) => (
+      {visibleCharacterEntries.map(([characterId, character]) => (
         <StageCharacter
           key={characterId}
           character={character}
-          slot={index === 0 ? 'left' : 'right'}
+          slot={character.side}
           visible={!highlightedCharacter || highlightedCharacter === characterId}
         />
       ))}
-      {sceneTransition?.characterEntries?.map(([characterId, character], index) => (
+      {sceneTransition?.characterEntries?.map(([characterId, character]) => (
         <div
           key={`leaving-${sceneTransition.key}-${characterId}`}
           className={`fixed inset-0 z-[5] pointer-events-none transition-opacity duration-500 ease-out ${
@@ -985,7 +963,7 @@ export default function RoundPage({ onNav }) {
         >
           <StageCharacter
             character={character}
-            slot={index === 0 ? 'left' : 'right'}
+            slot={character.side}
             visible
           />
         </div>

@@ -69,13 +69,12 @@
           "image": "/characters/chibiironman.png",
           "size": "20rem",
           "style": {
-            "bottom": "1rem",
-            "left": "50%",
-            "transform": "translateX(-50%)"
+            "bottom": "1rem"
           },
           "customStyles": {
             "borderColor": "#FEBF3C44"
-          }
+          },
+          "side": "left"
         },
         "loki": {
           "name": "Loki",
@@ -83,12 +82,12 @@
           "image": "/images/loki.png",
           "size": "20rem",
           "style": {
-            "bottom": "1rem",
-            "right": "2rem"
+            "bottom": "1rem"
           },
           "customStyles": {
             "borderColor": "#2DFF9A44"
-          }
+          },
+          "side": "right"
         },
         "ironman": {
           "name": "Iron Man",
@@ -96,13 +95,12 @@
           "image": "/characters/ironman-right.png",
           "size": "20rem",
           "style": {
-            "bottom": "1rem",
-            "left": "50%",
-            "transform": "translateX(-50%)"
+            "bottom": "1rem"
           },
           "customStyles": {
             "borderColor": "#FEBF3C44"
-          }
+          },
+          "side": "left"
         }
       },
       "roundNarrative": {
@@ -292,7 +290,7 @@
             "id": "r2-q1-during",
             "questionNumber": 1,
             "type": "dialogue",
-            "speaker": "Narrator",
+            "speaker": "System",
             "text": "FRIDAY://TRACE_ROUTE — LINK-LOCAL ADDRESS DETECTED. Residual device signature incomplete. Recover the ORIGINAL MAC address from the link-local IPv6 address."
           },
           {
@@ -313,7 +311,7 @@
             "id": "r2-q2-during",
             "questionNumber": 2,
             "type": "dialogue",
-            "speaker": "Narrator",
+            "speaker": "System",
             "text": "Both devices report MAC: AA:BB:CC:DD:EE:01. Identify the SPOOFED device."
           },
           {
@@ -324,17 +322,10 @@
             "text": "FRIDAY RECOVERY LOG\nS3CT0R://LOGIN FA1LED"
           },
           {
-            "id": "r2-q3-system",
-            "questionNumber": 3,
-            "type": "dialogue",
-            "speaker": "System",
-            "text": "FRIDAY RECOVERY LOG\nS3CT0R://LOGIN FA1LED"
-          },
-          {
             "id": "r2-q3-during",
             "questionNumber": 3,
             "type": "dialogue",
-            "speaker": "Narrator",
+            "speaker": "System",
             "text": "Cipher Type: VIGENERE. Signal corruption detected in payload. Remove non-original characters before decryption."
           },
           {
@@ -345,26 +336,78 @@
             "text": "FRIDAY://VOICE_AUTH\nWARNING: Speaker vocal profile mismatch detected."
           },
           {
-            "id": "r2-q4-system",
-            "questionNumber": 4,
-            "type": "dialogue",
-            "speaker": "System",
-            "text": "FRIDAY://VOICE_AUTH\nWARNING: Speaker vocal profile mismatch detected."
-          },
-          {
             "id": "r2-q4-during",
             "questionNumber": 4,
             "type": "dialogue",
-            "speaker": "Narrator",
+            "speaker": "System",
             "text": "Current voice frequency exceeds calibrated Stark baseline. Automatic transcription failed. Manual interpretation required. Listen to the corrupted audio transmission and recover the spoken command."
+          },
+          {
+            "id": "r2-q4-audio",
+            "questionNumber": 4,
+            "type": "voiceMemo",
+            "speaker": "FRIDAY",
+            "voiceFile": "/voices/chibiironman.mp3"
           }
         ],
-        "afterAnswer": [],
+        "afterAnswer": [
+          {
+            "id": "r2-after-q4-narration",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Narrator",
+            "text": "The lab hums. Energy ripples across Tony. He returns to full size, catching himself against the workbench."
+          },
+          {
+            "id": "r2-after-q4-ironman-1",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Iron Man",
+            "characterId": "ironman",
+            "text": "Okay. THAT is not an experience I need to repeat."
+          },
+          {
+            "id": "r2-after-q4-ironman-2",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Iron Man",
+            "characterId": "ironman",
+            "text": "Right. Suit up — metaphorically speaking, I'm already suited — we need Banner."
+          },
+          {
+            "id": "r2-after-q4-ironman-3",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Iron Man",
+            "characterId": "ironman",
+            "text": "Bruce has been off-grid, meditating somewhere in Nepal. Last coordinates FRIDAY has are three days old. But if DECO is escalating, she'll have found him by now."
+          },
+          {
+            "id": "r2-after-q4-ironman-4",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Iron Man",
+            "characterId": "ironman",
+            "text": "Which means he might not be having a great time."
+          },
+          {
+            "id": "r2-after-q4-loki",
+            "questionNumber": 4,
+            "type": "dialogue",
+            "speaker": "Loki",
+            "characterId": "loki",
+            "text": "He never is."
+          }
+        ],
         "finished": []
       }
     },
     {
-      "id": "stage-1b",
+      "id": "stage-2",
+      "questionRange": {
+        "from": 5,
+        "to": 6
+      },
       "sceneTheme": {
         "bodyElement": {
           "background": "url('/backgrounds/r2-stage2-bg.png') center/cover no-repeat fixed",
@@ -422,19 +465,18 @@
         }
       },
       "stageCharacters": {
-        "ironman-chibi": {
+        "ironman": {
           "name": "Iron Man",
           "accent": "#FEBF3C",
-          "image": "/characters/chibiironman.png",
+          "image": "/characters/ironman-right.png",
           "size": "20rem",
           "style": {
-            "bottom": "1rem",
-            "left": "50%",
-            "transform": "translateX(-50%)"
+            "bottom": "1rem"
           },
           "customStyles": {
             "borderColor": "#FEBF3C44"
-          }
+          },
+          "side": "left"
         },
         "loki": {
           "name": "Loki",
@@ -442,26 +484,12 @@
           "image": "/images/loki.png",
           "size": "20rem",
           "style": {
-            "bottom": "1rem",
-            "right": "2rem"
+            "bottom": "1rem"
           },
           "customStyles": {
             "borderColor": "#2DFF9A44"
-          }
-        },
-        "ironman": {
-          "name": "Iron Man",
-          "accent": "#FEBF3C",
-          "image": "/characters/ironman-right.png",
-          "size": "20rem",
-          "style": {
-            "bottom": "1rem",
-            "left": "50%",
-            "transform": "translateX(-50%)"
           },
-          "customStyles": {
-            "borderColor": "#FEBF3C44"
-          }
+          "side": "right"
         },
         "hulk": {
           "name": "Hulk",
@@ -469,12 +497,12 @@
           "image": "/characters/hulk.png",
           "size": "22rem",
           "style": {
-            "bottom": "1rem",
-            "right": "2rem"
+            "bottom": "1rem"
           },
           "customStyles": {
             "borderColor": "#0CBE6944"
-          }
+          },
+          "side": "right"
         },
         "bruce": {
           "name": "Bruce Banner",
@@ -482,64 +510,17 @@
           "image": "/characters/bruce-left.png",
           "size": "18rem",
           "style": {
-            "bottom": "1rem",
-            "right": "2rem"
+            "bottom": "1rem"
           },
           "customStyles": {
             "borderColor": "#0CBE6944"
-          }
+          },
+          "side": "right"
         }
       },
       "roundNarrative": {
         "preQuestion": [],
         "duringQuestion": [
-          {
-            "id": "r2-after-q4-narration",
-            "questionNumber": 5,
-            "type": "dialogue",
-            "speaker": "Narrator",
-            "text": "The lab hums. Energy ripples across Tony. He returns to full size, catching himself against the workbench."
-          },
-          {
-            "id": "r2-after-q4-ironman-1",
-            "questionNumber": 5,
-            "type": "dialogue",
-            "speaker": "Iron Man",
-            "characterId": "ironman",
-            "text": "Okay. THAT is not an experience I need to repeat."
-          },
-          {
-            "id": "r2-after-q4-ironman-2",
-            "questionNumber": 5,
-            "type": "dialogue",
-            "speaker": "Iron Man",
-            "characterId": "ironman",
-            "text": "Right. Suit up — metaphorically speaking, I'm already suited — we need Banner."
-          },
-          {
-            "id": "r2-after-q4-ironman-3",
-            "questionNumber": 5,
-            "type": "dialogue",
-            "speaker": "Iron Man",
-            "characterId": "ironman",
-            "text": "Bruce has been off-grid, meditating somewhere in Nepal. Last coordinates FRIDAY has are three days old. But if DECO is escalating, she'll have found him by now."
-          },
-          {
-            "id": "r2-after-q4-ironman-4",
-            "questionNumber": 5,
-            "type": "dialogue",
-            "speaker": "Iron Man",
-            "characterId": "ironman",
-            "text": "Which means he might not be having a great time."
-          },
-          {
-            "id": "r2-after-q4-loki",
-            "questionNumber": 5,
-            "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "loki",
-            "text": "He never is."
-          },
           {
             "id": "r2-s2-narration-1",
             "type": "dialogue",
@@ -686,6 +667,7 @@
             "id": "r2-s2-loki-right-question",
             "type": "dialogue",
             "speaker": "Loki",
+            "characterId": "loki",
             "text": "Finally. Someone asking the right question.",
             "questionNumber": 5
           },
@@ -743,121 +725,7 @@
             "type": "dialogue",
             "speaker": "Narrator",
             "text": "Target drone estimated width: 1.25m. Radar grid resolution: 5m × 5m. Objects outside the primary scan ring are unreliable. Study the radar grid and identify the probable drone coordinates."
-          }
-        ],
-        "afterAnswer": [],
-        "finished": []
-      },
-      "questionRange": {
-        "from": 5,
-        "to": 5
-      }
-    },
-    {
-      "id": "stage-2",
-      "questionRange": {
-        "from": 6
-      },
-      "sceneTheme": {
-        "bodyElement": {
-          "background": "url('/backgrounds/r2-stage2-bg.png') center/cover no-repeat fixed",
-          "gridPattern": "none",
-          "gridPatternOpacity": 0
-        },
-        "frame": {
-          "background": "rgba(0,0,0,0.3)"
-        },
-        "stage": {
-          "backgroundImage": "none"
-        },
-        "dialogueBox": {
-          "background": "#ffffff",
-          "border": "1px solid rgba(254,191,60,0.28)",
-          "color": "#111827",
-          "bubbleContainerClass": "rounded-2xl",
-          "boxShadow": "shadow-[0_22px_70px_rgba(0,0,0,0.28)]",
-          "customStyles": {
-            "speakerClass": "text-xs uppercase tracking-[0.22em] text-slate-500",
-            "textClass": "mt-3 text-base leading-7 text-slate-900",
-            "continueClass": "mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-slate-400"
-          }
-        },
-        "backgroundDialogueBox": {
-          "background": "linear-gradient(180deg, rgba(2,6,23,0.88), rgba(2,6,23,0.78))",
-          "border": "1px solid rgba(255,255,255,0.16)",
-          "color": "#ffffff",
-          "boxShadow": "shadow-[0_28px_90px_rgba(0,0,0,0.42)]",
-          "customStyles": {
-            "speakerClass": "text-xs uppercase tracking-[0.24em] text-white/60",
-            "textClass": "mt-3 text-base leading-7 text-white",
-            "continueClass": "mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-white/45"
-          }
-        },
-        "questionBox": {
-          "background": "linear-gradient(180deg, rgba(26,34,54,0.94), rgba(15,23,42,0.90))",
-          "border": "1px solid rgba(254,191,60,0.2)",
-          "borderRadiusClass": "rounded-[2rem]",
-          "boxShadow": "shadow-[0_35px_100px_rgba(0,0,0,0.45)]",
-          "numberClass": "text-xs uppercase tracking-[0.3em] text-[#FEBF3C]/80",
-          "titleClass": "mt-3 max-w-2xl text-xl sm:text-2xl font-bold leading-relaxed text-white",
-          "optionClass": "rounded-[1.5rem] border px-4 py-4 text-left text-sm transition",
-          "minHeight": "23rem"
-        },
-        "answerRevealBox": {
-          "background": "linear-gradient(135deg, rgba(26,34,54,0.96), rgba(254,191,60,0.12))",
-          "border": "1px solid rgba(254,191,60,0.24)",
-          "borderRadiusClass": "rounded-[2rem]",
-          "boxShadow": "shadow-[0_35px_100px_rgba(254,191,60,0.15)]",
-          "labelClass": "text-xs uppercase tracking-[0.35em] text-[#FEBF3C]/70",
-          "answerClass": "mt-6 text-xl leading-8 text-white",
-          "questionClass": "mt-3 text-sm text-slate-300",
-          "minHeight": "14rem"
-        }
-      },
-      "stageCharacters": {
-        "ironman": {
-          "name": "Iron Man",
-          "accent": "#FEBF3C",
-          "image": "/characters/ironman-right.png",
-          "size": "20rem",
-          "style": {
-            "bottom": "1rem",
-            "left": "2rem"
           },
-          "customStyles": {
-            "borderColor": "#FEBF3C44"
-          }
-        },
-        "hulk": {
-          "name": "Hulk",
-          "accent": "#0CBE69",
-          "image": "/characters/hulk.png",
-          "size": "22rem",
-          "style": {
-            "bottom": "1rem",
-            "right": "2rem"
-          },
-          "customStyles": {
-            "borderColor": "#0CBE6944"
-          }
-        },
-        "bruce": {
-          "name": "Bruce Banner",
-          "accent": "#0CBE69",
-          "image": "/characters/bruce-left.png",
-          "size": "18rem",
-          "style": {
-            "bottom": "1rem",
-            "right": "2rem"
-          },
-          "customStyles": {
-            "borderColor": "#0CBE6944"
-          }
-        }
-      },
-      "roundNarrative": {
-        "preQuestion": [],
-        "duringQuestion": [
           {
             "id": "r2-s2-q2-during",
             "questionNumber": 6,
@@ -888,6 +756,7 @@
             "questionNumber": 6,
             "type": "dialogue",
             "speaker": "Loki",
+            "characterId": "loki",
             "text": "Rogers suggested Thor. I want to go on record as saying that was not my idea."
           },
           {
@@ -903,6 +772,7 @@
             "questionNumber": 6,
             "type": "dialogue",
             "speaker": "Loki",
+            "characterId": "loki",
             "text": "I have many records. Most of them sealed."
           }
         ],
