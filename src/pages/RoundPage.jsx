@@ -355,7 +355,7 @@ function QuestionCard({ question, questionKey, questionNumber, totalQuestions, o
         minHeight: isLandscapeMobile ? 'unset' : sceneTheme.questionBox.compactMinHeight || 'auto',
       }}
     >
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4 p-2">
         <div className="flex-1">
           <div className={questionNumberClass}>Question {questionNumber}</div>
           <h2

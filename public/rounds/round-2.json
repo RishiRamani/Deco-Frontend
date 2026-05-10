@@ -291,7 +291,8 @@
             "questionNumber": 1,
             "type": "dialogue",
             "speaker": "System",
-            "text": "FRIDAY://TRACE_ROUTE — LINK-LOCAL ADDRESS DETECTED. Residual device signature incomplete. Recover the ORIGINAL MAC address from the link-local IPv6 address."
+            "text": "FRIDAY://TRACE_ROUTE — LINK-LOCAL ADDRESS DETECTED. Residual device signature incomplete. Recover the ORIGINAL MAC address from the link-local IPv6 address.",
+            "titleClass": "mt-3 max-w-2xl text-xl sm:text-2xl font-bold leading-relaxed text-white"
           },
           {
             "id": "r2-after-q1-system",
