@@ -394,7 +394,7 @@ function QuestionCard({ question, questionKey, questionNumber, totalQuestions, o
                     : 'border-white/10 bg-white/5 text-slate-200 hover:bg-white/10'
                 }`}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-center gap-3">
                   <span className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#0B1F18]/70 text-xs text-[#2DFF9A]">
                     {option.label}
                   </span>
