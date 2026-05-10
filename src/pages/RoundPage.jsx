@@ -504,6 +504,10 @@ export default function RoundPage({ onNav }) {
   const [dialogueVisible, setDialogueVisible] = useState(true)
   const [sceneTransition, setSceneTransition] = useState(null)
   const [showFlashback, setShowFlashback] = useState(false)
+  const [characterSlots, setCharacterSlots] = useState({
+  left: null,
+  right: null,
+  })
 
   // ─── BODY STYLING ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -790,14 +794,52 @@ export default function RoundPage({ onNav }) {
   const activeSceneKey = activeExperience.currentStage?.id || 'base'
   const hasActiveDialogue = Boolean(activeDialogue)
   const highlightedCharacter = activeDialogue?.characterId
+  useEffect(() => {
+  if (!highlightedCharacter) return
+
+    setCharacterSlots((prev) => {
+      // Already visible
+      if (
+        prev.left === highlightedCharacter ||
+        prev.right === highlightedCharacter
+      ) {
+        return prev
+      }
+
+      // Empty left slot
+      if (!prev.left) {
+        return {
+          ...prev,
+          left: highlightedCharacter,
+        }
+      }
+
+      // Empty right slot
+      if (!prev.right) {
+        return {
+          ...prev,
+          right: highlightedCharacter,
+        }
+      }
+
+      // Replace oldest character
+      return {
+        left: prev.right,
+        right: highlightedCharacter,
+      }
+    })
+  }, [highlightedCharacter])
+
   const characterEntries = Object.entries(effectiveStageCharacters)
-  const visibleCharacterEntries =
-    highlightedCharacter && effectiveStageCharacters[highlightedCharacter]
-      ? [
-          [highlightedCharacter, effectiveStageCharacters[highlightedCharacter]],
-          ...characterEntries.filter(([characterId]) => characterId !== highlightedCharacter).slice(0, 1),
-        ]
-      : characterEntries.slice(0, 2)
+  const visibleCharacterEntries = [
+    characterSlots.left && effectiveStageCharacters[characterSlots.left]
+      ? [characterSlots.left, effectiveStageCharacters[characterSlots.left]]
+      : null,
+
+    characterSlots.right && effectiveStageCharacters[characterSlots.right]
+      ? [characterSlots.right, effectiveStageCharacters[characterSlots.right]]
+      : null,
+  ].filter(Boolean)
   const isLastQuestion = currentIndex === questions.length - 1
   const dialogueCanOverlayQuestion = activeDialogue?.showWithQuestion || activeDialogue?.overlayQuestion
   const showQuestionCard = phase === 'question' && currentQuestion && (!hasActiveDialogue || dialogueCanOverlayQuestion)
@@ -930,7 +972,7 @@ export default function RoundPage({ onNav }) {
         <StageCharacter
           key={characterId}
           character={character}
-          slot={resolveCharacterSlot(characterId, character, index)}
+          slot={index === 0 ? 'left' : 'right'}
           visible={!highlightedCharacter || highlightedCharacter === characterId}
         />
       ))}
@@ -943,7 +985,7 @@ export default function RoundPage({ onNav }) {
         >
           <StageCharacter
             character={character}
-            slot={resolveCharacterSlot(characterId, character, index)}
+            slot={index === 0 ? 'left' : 'right'}
             visible
           />
         </div>

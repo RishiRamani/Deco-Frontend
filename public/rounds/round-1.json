@@ -43,8 +43,9 @@
           "name": "Loki",
           "accent": "#2DFF9A",
           "image": "/images/loki.png",
+          "side": "left",
           "size": "20rem",
-          "style": { "bottom": "1rem", "left": "50%", "transform": "translateX(-50%)" },
+          "style": { "bottom": "1rem"},
           "customStyles": {
             "borderColor": "#2DFF9A44"
           }
@@ -266,20 +267,22 @@
       "stageCharacters": {
         "loki": {
           "name": "Loki",
+          "side": "left",
           "accent": "#2DFF9A",
           "image": "/images/loki.png",
           "size": "20rem",
-          "style": { "bottom": "1rem", "left": "2rem" },
+          "style": { "bottom": "1rem"},
           "customStyles": {
             "borderColor": "#2DFF9A44"
           }
         },
         "captain": {
           "name": "Captain America",
+          "side": "right",
           "accent": "#2DFF9A",
           "image": "/characters/captain-america-left.png",
           "size": "18rem",
-          "style": { "bottom": "1rem", "right": "2rem" },
+          "style": { "bottom": "1rem" },
           "customStyles": {
             "borderColor": "#2DFF9A44"
           }
