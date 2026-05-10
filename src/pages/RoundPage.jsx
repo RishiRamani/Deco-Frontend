@@ -854,7 +854,7 @@ export default function RoundPage({ onNav }) {
     setSequenceIndex(0)
     setError(null)
     if (wasLastQuestion) {
-      setPhase('question')
+      setPhase('answer')
     } else {
       setCurrentIndex((value) => Math.max(value, submittedQuestionIndex + 1))
       setPhase('question')
@@ -878,9 +878,6 @@ export default function RoundPage({ onNav }) {
         saveCache(round.id, next)
         return next
       })
-      if (wasLastQuestion) {
-        await finishRound()
-      }
     } catch (err) {
       // DB failed but draft is still cached — user can refresh and reattempt
       setError(`Answer saved locally but failed to sync: ${err.message}. You can refresh to retry.`)
