@@ -120,69 +120,84 @@ export default function LeaderboardPage() {
         </div>
 
         {entries.length === 0 ? (
-          <div className="py-20 text-center text-slate-400 text-lg">
-            {availableAt ? (
-              <div className="py-10 flex justify-center">
+          <div className="relative min-h-[620px] overflow-hidden">
 
-                <div className="relative w-full max-w-lg rounded-xl border border-[#2DFF9A]/20 bg-black/60 backdrop-blur-md px-6 py-6 shadow-[0_0_40px_rgba(45,255,154,0.08)]">
+            {/* ambient glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(45,255,154,0.05),transparent_60%)]" />
 
-                  {/* subtle glow */}
-                  <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle,rgba(45,255,154,0.12),transparent_70%)] opacity-40" />
+            {/* scanlines */}
+            <div className="pointer-events-none absolute inset-0 opacity-[0.025] bg-[linear-gradient(to_bottom,transparent,transparent_2px,white_3px)] bg-[length:100%_4px]" />
 
-                  {/* HEADER */}
+            {/* red atmospheric glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,0,0,0.04),transparent_35%)]" />
+
+            <div className="relative flex min-h-[620px] flex-col items-center justify-center px-8 text-center">
+
+              {/* title */}
+              <div
+                className="text-xs tracking-[0.7em] text-[#2DFF9A]/75 uppercase"
+                style={{ fontFamily: "Orbitron, sans-serif" }}
+              >
+                ACCESS RESTRICTED
+              </div>
+
+              {/* divider */}
+              <div className="mt-5 h-px w-48 bg-gradient-to-r from-transparent via-red-500/70 to-transparent" />
+
+              {/* lore */}
+              <p className="mt-10 max-w-3xl text-lg leading-10 text-slate-300/85">
+                Temporal records remain sealed. Synchronization with the
+                central timeline is incomplete — premature access may
+                destabilize recorded outcomes.
+              </p>
+
+              {/* timer section */}
+              <div className="mt-16">
+
+                <div
+                  className="mb-6 text-[10px] tracking-[0.5em] text-slate-500 uppercase"
+                  style={{ fontFamily: "Orbitron, sans-serif" }}
+                >
+                  Timeline Unlock In
+                </div>
+
+                <div className="relative inline-flex items-center justify-center">
+
+                  {/* massive ambient glow */}
+                  <div className="absolute inset-0 scale-150 blur-3xl bg-[#2DFF9A]/20" />
+
+                  {/* timer */}
                   <div
-                    className="text-xs tracking-[0.5em] text-[#2DFF9A]/70 mb-4 text-center"
-                    style={{ fontFamily: "Orbitron, sans-serif" }}
+                    className="relative text-6xl sm:text-7xl tracking-[0.22em] text-[#2DFF9A]"
+                    style={{
+                      fontFamily: "Orbitron, sans-serif",
+                      textShadow: "0 0 30px rgba(45,255,154,0.65)"
+                    }}
                   >
-                    ACCESS RESTRICTED
-                  </div>
-
-                  {/* LORE TEXT (bigger + readable) */}
-                  <div className="text-sm sm:text-base text-slate-300 leading-relaxed text-center max-w-md mx-auto">
-                    Temporal records remain sealed. Synchronization with the central timeline is incomplete —
-                    premature access may destabilize recorded outcomes.
-                  </div>
-
-                  {/* 🔥 TIMER ROW (FIXED ALIGNMENT) */}
-                  <div className="mt-6 flex items-center justify-center gap-6">
-
-                    {/* label */}
-                    <div className="text-xs tracking-[0.3em] text-slate-400">
-                      UNLOCK IN
-                    </div>
-
-                    {/* timer box */}
-                    <div className="relative">
-
-                      {/* subtle glow */}
-                      <div className="absolute inset-0 blur-2xl bg-[#2DFF9A]/15" />
-
-                      <div
-                        className="relative text-3xl sm:text-4xl font-semibold tracking-[0.15em] text-[#2DFF9A]"
-                        style={{
-                          fontFamily: "Orbitron, sans-serif",
-                          textShadow: "0 0 18px rgba(45,255,154,0.55)"
-                        }}
-                      >
-                        <Timer targetTime={availableAt} label="" />
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                  {/* FOOTER */}
-                  <div className="mt-5 text-[10px] text-slate-500 tracking-[0.25em] text-center">
-                    [ TIMELINE STABILIZATION IN PROGRESS ]
+                    <Timer targetTime={availableAt} label="" />
                   </div>
 
                 </div>
+
               </div>
-            ) : (
-              <div>
-                {infoMessage || 'No cumulative results available.'}
+
+              {/* stabilization bar */}
+              <div className="mt-14 h-[3px] w-80 overflow-hidden rounded-full bg-[#2DFF9A]/10">
+
+                <div className="h-full w-1/2 animate-pulse rounded-full bg-[#2DFF9A] shadow-[0_0_20px_rgba(45,255,154,0.95)]" />
+
               </div>
-            )}
+
+              {/* footer */}
+              <div
+                className="mt-10 text-[10px] tracking-[0.45em] text-slate-600 uppercase"
+                style={{ fontFamily: "Orbitron, sans-serif" }}
+              >
+                Timeline Stabilization In Progress
+              </div>
+
+            </div>
+
           </div>
         ) : (
           entries.map((entry) => {
