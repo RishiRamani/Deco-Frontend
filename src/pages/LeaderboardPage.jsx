@@ -52,9 +52,16 @@ export default function LeaderboardPage() {
 
   // ✅ UPDATED: credits with optional URLs
   const credits = [
-    { name: "Placeholder Name", url: "" },
-    { name: "Placeholder Name", url: "https://example.com" },
-    { name: "Placeholder Name" }
+    { name: "Akash Parashar", url: "https://www.linkedin.com/in/itsaakaash" },
+    { name: "Rachit Talwar", url: "https://www.linkedin.com/in/rachit-talwar-32013531a" },
+    { name: "Rishi Ramani",url: "https://www.linkedin.com/in/rishi-ramani-6635692b5" },
+    { name: "Arnav Jain", url: "https://github.com/arnvj220" },
+    { name: "Lipika Aggarwal", url: "https://www.linkedin.com/in/lipikaaggarwal/" },
+    { name: "Aditya Soin", url: "https://www.linkedin.com/in/aditya-soin-75970b277" },
+    { name: "Jiya Aggarwal", url: "https://www.linkedin.com/in/jiya-agrawal-24460537a" },
+    { name: "Vishesh Verma", url: "https://github.com/vishesh1111" },
+    { name: "Bhavay Mahore", url: "https://www.instagram.com/piilkox/" },
+    { name: "Harsh Anand",url:""}
   ]
 
   if (loading) {
@@ -145,13 +152,21 @@ export default function LeaderboardPage() {
                     </div>
 
                     {/* timer box */}
-                    <div className="px-5 py-2 rounded-lg bg-[#2DFF9A]/10 border border-[#2DFF9A]/30 shadow-[0_0_20px_rgba(45,255,154,0.25)]">
+                    <div className="relative">
+
+                      {/* subtle glow */}
+                      <div className="absolute inset-0 blur-2xl bg-[#2DFF9A]/15" />
+
                       <div
-                        className="text-xl sm:text-2xl font-semibold text-[#2DFF9A]"
-                        style={{ fontFamily: "monospace" }}   // 👈 different font
+                        className="relative text-3xl sm:text-4xl font-semibold tracking-[0.15em] text-[#2DFF9A]"
+                        style={{
+                          fontFamily: "Orbitron, sans-serif",
+                          textShadow: "0 0 18px rgba(45,255,154,0.55)"
+                        }}
                       >
                         <Timer targetTime={availableAt} label="" />
                       </div>
+
                     </div>
 
                   </div>

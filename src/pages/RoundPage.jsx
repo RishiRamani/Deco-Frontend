@@ -509,6 +509,8 @@ export default function RoundPage({ onNav }) {
     right: null,
   })
 
+  const audioRef = useRef(null)
+
   // ─── BODY STYLING ──────────────────────────────────────────────────────────
   useEffect(() => {
     const styleTag = document.getElementById('round-custom-body-style')
@@ -546,6 +548,33 @@ export default function RoundPage({ onNav }) {
       document.body.classList.remove('round-custom-mode')
     }
   }, [roundExperience?.sceneTheme?.bodyElement])
+
+  // ─── AMBIENCE MUSIC ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (showFlashback) return; // Don't start timer if flashback is already playing
+    
+    const timer = setTimeout(() => {
+      if (audioRef.current && !showFlashback) {
+        audioRef.current.play().catch(() => {}); // Ignore play errors
+      }
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, [showFlashback]);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    };
+  }, [])
+
+  useEffect(() => {
+    if (showFlashback && audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [showFlashback])
 
   // ─── BOOT ──────────────────────────────────────────────────────────────────
   const boot = useCallback(async () => {
@@ -1108,6 +1137,8 @@ export default function RoundPage({ onNav }) {
             onComplete={() => onNav('end')}
           />
         )}
+
+        <audio ref={audioRef} src="/voices/roundambience.mp3" preload="auto" loop />
 
     </>
   )

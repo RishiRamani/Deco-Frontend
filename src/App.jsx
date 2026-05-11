@@ -191,7 +191,7 @@ function AuthenticatedApp() {
       end: <EndPage onNav={navigate} />,
       admin:
         userRole === 'ORGANIZER' ? (
-          <AdminPage />
+          <AdminPage onNav={navigate} />
         ) : (
           <WaitingPage onNav={navigate} userRole={userRole} forcedMessage="Organizer access is required for the admin panel." />
         ),
@@ -202,9 +202,18 @@ function AuthenticatedApp() {
   return (
     <>
     <RotateOverlay />
-      <Layout page={page} onNav={navigate} userRole={userRole} roundIntroActive={roundIntroActive}>
-        {pages[page] || pages.home}
-      </Layout>
+      {page === 'admin' ? (
+  pages.admin
+) : (
+  <Layout
+    page={page}
+    onNav={navigate}
+    userRole={userRole}
+    roundIntroActive={roundIntroActive}
+  >
+    {pages[page] || pages.home}
+  </Layout>
+)}
       <CrackTransitionOverlay
         isActive={transitionToWaiting}
         onComplete={() => setTransitionToWaiting(false)}
