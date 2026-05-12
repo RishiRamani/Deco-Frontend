@@ -55,7 +55,7 @@ export default function LeaderboardPage() {
     { name: "Akash Parashar", url: "https://www.linkedin.com/in/itsaakaash" },
     { name: "Rachit Talwar", url: "https://www.linkedin.com/in/rachit-talwar-32013531a" },
     { name: "Rishi Ramani",url: "https://www.linkedin.com/in/rishi-ramani-6635692b5" },
-    { name: "Arnav Jain", url: "https://github.com/arnvj220" },
+    { name: "Arnav Jain", url: "https://www.linkedin.com/in/arnav-jain-820522322/" },
     { name: "Lipika Aggarwal", url: "https://www.linkedin.com/in/lipikaaggarwal/" },
     { name: "Aditya Soin", url: "https://www.linkedin.com/in/aditya-soin-75970b277" },
     { name: "Jiya Aggarwal", url: "https://www.linkedin.com/in/jiya-agrawal-24460537a" },
