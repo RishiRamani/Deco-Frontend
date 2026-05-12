@@ -256,11 +256,11 @@ export default function LeaderboardPage() {
           className="text-sm sm:text-base uppercase tracking-[0.6em] text-[#2DFF9A] mb-4 drop-shadow-[0_0_10px_rgba(45,255,154,0.6)]"
           style={{ fontFamily: "Orbitron, sans-serif" }}
         >
-          CREDITS
+          TIMELINE ARCHITECTS
         </div>
 
         <h2 className="text-xl sm:text-2xl font-medium text-slate-300 mb-12 tracking-wide">
-          Built by ACM Web Team
+          ACM Web Team
         </h2>
 
         <div className="max-w-md mx-auto space-y-5">
