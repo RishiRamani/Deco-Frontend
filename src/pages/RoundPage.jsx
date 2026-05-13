@@ -383,10 +383,15 @@ function QuestionCard({ question, questionKey, questionNumber, totalQuestions, o
     event.preventDefault()
     if (!answer.trim()) return
     onSubmit(answer)
-  }
+  } 
 
   const questionNumberClass = sceneTheme.questionBox.numberClass || 'text-xs uppercase tracking-[0.3em] text-[#2DFF9A]/80'
-  const questionTitleClass = sceneTheme.questionBox.titleClass || 'mt-3 max-w-2xl text-2xl font-medium text-white'
+  const questionTitleClass = sceneTheme.questionBox.titleClass || 'mt-4 max-w-2xl text-[2rem] leading-[1.25] font-black uppercase tracking-[0.04em] text-[#E8F6FF]'
+  const questionTitleStyle = {
+    ...(sceneTheme.questionBox.titleStyle || {}),
+    color: sceneTheme.questionBox.titleColor || undefined,
+    fontFamily: sceneTheme.questionBox.titleFontFamily || 'Oxanium, cursive',
+  }
   const optionClass = sceneTheme.questionBox.optionClass || 'rounded-[1.5rem] border px-4 py-4 text-left text-sm transition'
   const borderRadiusClass = sceneTheme.questionBox.borderRadiusClass || 'rounded-[2rem]'
   const boxShadow = sceneTheme.questionBox.boxShadow || 'shadow-[0_35px_100px_rgba(2,6,23,0.45)]'
@@ -395,38 +400,41 @@ function QuestionCard({ question, questionKey, questionNumber, totalQuestions, o
     <form
       onSubmit={handleSubmit}
       autoComplete="off"
-      className={`${borderRadiusClass} p-4 sm:p-6 landscape:p-3 ${boxShadow} max-w-xl w-full backdrop-blur-md
-                  landscape:max-h-[calc(100dvh-72px)] landscape:overflow-y-auto landscape:overscroll-contain`}
+      className={`${borderRadiusClass} p-4 sm:p-6 landscape:p-3 ${boxShadow} max-w-xl w-full max-h-[calc(100dvh-96px)] backdrop-blur-md flex flex-col overflow-hidden`}
       style={{
         background: sceneTheme.questionBox.background,
         border: sceneTheme.questionBox.border,
         minHeight: isLandscapeMobile ? 'unset' : sceneTheme.questionBox.compactMinHeight || 'auto',
       }}
     >
-      <div className="flex flex-wrap items-start justify-between gap-4 p-2">
-        <div className="flex-1">
-          <div className={questionNumberClass}>Question {questionNumber}</div>
-          <h2
-  className={`${questionTitleClass} landscape:text-lg`}
-  style={{ whiteSpace: 'pre-line' }}
->{question.text}</h2>
-        </div>
-        <div className="flex-shrink-0 rounded-full border border-[#2DFF9A]/20 bg-[#2DFF9A]/10 px-4 py-2 text-sm text-[#2DFF9A]">
-          {question.reward} pts
-        </div>
-      </div>
+      <div className="flex flex-col h-full overflow-hidden rounded-[2rem]">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-2 question-scroll">
+          <div className="flex flex-wrap items-start justify-between gap-4 p-2">
+            <div className="flex-1">
+              <div className={questionNumberClass}>Question {questionNumber}</div>
+              <h2
+                className={`${questionTitleClass} landscape:text-lg`}
+                style={{ whiteSpace: 'pre-line', ...questionTitleStyle }}
+              >
+                {question.text}
+              </h2>
+            </div>
+            <div className="flex-shrink-0 rounded-full border border-[#2DFF9A]/20 bg-[#2DFF9A]/10 px-4 py-2 text-sm text-[#2DFF9A]">
+              {question.reward} pts
+            </div>
+          </div>
 
-      {question.link && (
-        <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5">
-          <img src={question.link} alt="" className="max-h-72 landscape:max-h-40 w-full object-cover" />
-        </div>
-      )}
+          {question.link && (
+            <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5 h-[22rem] sm:h-[20rem]">
+              <img src={question.link} alt="" className="w-full h-full object-contain" />
+            </div>
+          )}
 
-      {promptAudioFile && (
-        <div className="mt-5 rounded-[1.25rem] border border-white/10 bg-white/5 p-3">
-          <audio src={promptAudioFile} controls className="w-full" />
-        </div>
-      )}
+          {promptAudioFile && (
+            <div className="mt-5 rounded-[1.25rem] border border-white/10 bg-white/5 p-3">
+              <audio src={promptAudioFile} controls className="w-full" />
+            </div>
+          )}
 
       <div className="mt-6 space-y-4">
         {options.length > 0 ? (
@@ -460,14 +468,16 @@ function QuestionCard({ question, questionKey, questionNumber, totalQuestions, o
             spellCheck="false"
             value={answer}
             onChange={(event) => setAnswer(event.target.value)}
-            placeholder="Type your answer here..."
+            placeholder="Type your answer here in CAPITAL LETTERS..."
             className="w-full rounded-[116px] border-2 border-[#2DFF9A]/30 bg-[#0B1F18] px-6 py-4 text-lg text-[#2DFF9A] outline-none transition placeholder:text-[#2DFF9A]/30 focus:border-[#2DFF9A]/60 focus:shadow-[0_0_30px_rgba(45,255,154,0.15)]"
             style={{ textShadow: '0 0 10px rgba(45, 255, 154, 0.3)' }}
           />
         )}
+          </div>
+        </div>
       </div>
 
-      <div className="mt-4 landscape:mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="mt-4 landscape:mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
         <div className="text-sm text-slate-400">{totalQuestions - questionNumber} questions remain after this one.</div>
         <Btn type="submit" loading={loading} disabled={!answer.trim()} className="w-full sm:w-auto">
           Submit
