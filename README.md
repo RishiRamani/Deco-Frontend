@@ -640,7 +640,8 @@ When each sequence runs:
 | `preQuestion` | At the very beginning of a round or questionless stage |
 | `duringQuestion` | Before the question card, unless overlaid |
 | `afterAnswer` | After a participant submits an answer |
-| `finished` | Defined in config, currently not central in RoundPage's main render path |
+| `postAnswer` | After the last answer is submitted, before the round finishes |
+| `finished` | Alias for `postAnswer` and used for final dialogue-only stages |
 
 ### Dialogue Item Fields
 

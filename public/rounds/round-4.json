@@ -114,7 +114,7 @@
         "thor": {
           "name": "Thor",
           "accent": "#A78BFA",
-          "image": "/characters/thor1.png",
+          "image": "/characters/thor-left.png",
           "size": "20rem",
           "style": {
             "bottom": "1rem"
@@ -552,21 +552,6 @@
         ],
         "afterAnswer": [
           {
-            "id": "r4-s2-after-q1-friday",
-            "questionNumber": 1,
-            "type": "dialogue",
-            "speaker": "System",
-            "text": "Key attempt ONE — DECRYPTION OUTPUT: RTCJICFNTIJYYCVZDU — SIGNAL INCOMPLETE. YOU MIGHT NOT BE ONTO SOMETHING."
-          },
-          {
-            "id": "r4-s2-after-q1-ironman",
-            "questionNumber": 1,
-            "type": "dialogue",
-            "speaker": "Iron Man",
-            "characterId": "ironman",
-            "text": "That's garbage. Look closer at the seal. There's something else in there."
-          },
-          {
             "id": "r4-s2-after-q1-narration",
             "questionNumber": 1,
             "type": "dialogue",
@@ -687,7 +672,7 @@
             "id": "r4-s3-narration-1",
             "questionNumber": 2,
             "type": "dialogue",
-            "speaker": "Narrator",
+            "speaker": "SYSTEM",
             "text": "FRIDAY maps three possible routes to the lower core. One has been altered."
           },
           {
@@ -973,7 +958,7 @@
             "type": "dialogue",
             "speaker": "Iron Man",
             "characterId": "ironman",
-            "text": "I've found the core. It's massive. She's built herself a proper palace in here."
+            "text": "That core it's massive. She's built herself a proper palace in here."
           },
           {
             "id": "r4-s4-after-q4-ironman-2",

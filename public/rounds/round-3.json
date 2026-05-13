@@ -4,7 +4,7 @@
       "id": "stage-1",
       "questionRange": {
         "from": 1,
-        "to": 4
+        "to": 3
       },
       "sceneTheme": {
         "bodyElement": {
@@ -142,20 +142,22 @@
           "side": "right"
         },
         "deco": {
-  "name": "DECO",
-  "accent": "#FF3C3C",
-  "image": "/characters/deco-ai.png",
-  "size": "20rem",
-  "style": {
-    "bottom": "1rem"
-  },
-  "customStyles": {
-    "borderColor": "#FF3C3C44",
-    "imageClass": "w-full h-full object-contain",
-    "imageStyle": { "padding": "0.5rem" }
-  },
-  "side": "right"
-}
+          "name": "DECO",
+          "accent": "#FF3C3C",
+          "image": "/characters/deco-ai.png",
+          "size": "20rem",
+          "style": {
+            "bottom": "1rem"
+          },
+          "customStyles": {
+            "borderColor": "#FF3C3C44",
+            "imageClass": "w-full h-full object-contain",
+            "imageStyle": {
+              "padding": "0.5rem"
+            }
+          },
+          "side": "right"
+        }
       },
       "roundNarrative": {
         "preQuestion": [
@@ -384,7 +386,173 @@
             "type": "dialogue",
             "speaker": "System",
             "text": "Thor's control field weakens upon direct impact. Maximum projectile range is required. Air resistance is negligible. Choose the optimal launch angle."
+          }
+        ],
+        "afterAnswer": [],
+        "finished": []
+      }
+    },
+    {
+      "id": "stage-2",
+      "questionRange": {
+        "from": 4,
+        "to": 4
+      },
+      "sceneTheme": {
+        "bodyElement": {
+          "background": "url('/backgrounds/r3-scene2-bg.png') center/cover no-repeat fixed",
+          "gridPattern": "none",
+          "gridPatternOpacity": 0
+        },
+        "frame": {
+          "background": "rgba(0,0,0,0.3)"
+        },
+        "stage": {
+          "backgroundImage": "none"
+        },
+        "dialogueBox": {
+          "background": "#ffffff",
+          "border": "1px solid rgba(254,191,60,0.28)",
+          "color": "#111827",
+          "bubbleContainerClass": "rounded-2xl",
+          "boxShadow": "shadow-[0_22px_70px_rgba(0,0,0,0.28)]",
+          "customStyles": {
+            "speakerClass": "text-xs uppercase tracking-[0.22em] text-slate-500",
+            "textClass": "mt-3 text-base leading-7 text-slate-900",
+            "continueClass": "mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-slate-400"
+          }
+        },
+        "backgroundDialogueBox": {
+          "background": "linear-gradient(180deg, rgba(2,6,23,0.88), rgba(2,6,23,0.78))",
+          "border": "1px solid rgba(255,255,255,0.16)",
+          "color": "#ffffff",
+          "boxShadow": "shadow-[0_28px_90px_rgba(0,0,0,0.42)]",
+          "customStyles": {
+            "speakerClass": "text-xs uppercase tracking-[0.24em] text-white/60",
+            "textClass": "mt-3 text-base leading-7 text-white",
+            "continueClass": "mt-4 text-right text-[11px] uppercase tracking-[0.22em] text-white/45"
+          }
+        },
+        "questionBox": {
+          "background": "linear-gradient(180deg, rgba(26,34,54,0.94), rgba(15,23,42,0.90))",
+          "border": "1px solid rgba(254,191,60,0.2)",
+          "borderRadiusClass": "rounded-[2rem]",
+          "boxShadow": "shadow-[0_35px_100px_rgba(0,0,0,0.45)]",
+          "numberClass": "text-xs uppercase tracking-[0.3em] text-[#FEBF3C]/80",
+          "titleClass": "mt-3 max-w-2xl text-xl sm:text-2xl font-bold leading-relaxed text-white",
+          "optionClass": "rounded-[1.5rem] border px-4 py-4 text-left text-sm transition",
+          "minHeight": "23rem"
+        },
+        "answerRevealBox": {
+          "background": "linear-gradient(135deg, rgba(26,34,54,0.96), rgba(254,191,60,0.12))",
+          "border": "1px solid rgba(254,191,60,0.24)",
+          "borderRadiusClass": "rounded-[2rem]",
+          "boxShadow": "shadow-[0_35px_100px_rgba(254,191,60,0.15)]",
+          "labelClass": "text-xs uppercase tracking-[0.35em] text-[#FEBF3C]/70",
+          "answerClass": "mt-6 text-xl leading-8 text-white",
+          "questionClass": "mt-3 text-sm text-slate-300",
+          "minHeight": "14rem"
+        }
+      },
+      "stageCharacters": {
+        "ironman": {
+          "name": "Iron Man",
+          "accent": "#FEBF3C",
+          "image": "/characters/ironman-right.png",
+          "size": "20rem",
+          "style": {
+            "bottom": "1rem"
           },
+          "customStyles": {
+            "borderColor": "#FEBF3C44"
+          },
+          "side": "left"
+        },
+        "captain-america": {
+          "name": "Captain America",
+          "accent": "#4A90D9",
+          "image": "/characters/captain-america-left.png",
+          "size": "20rem",
+          "style": {
+            "bottom": "1rem"
+          },
+          "customStyles": {
+            "borderColor": "#4A90D944"
+          },
+          "side": "right"
+        },
+        "thor": {
+          "name": "Thor",
+          "accent": "#A78BFA",
+          "image": "/characters/thor-left.png",
+          "size": "21rem",
+          "style": {
+            "bottom": "1rem"
+          },
+          "customStyles": {
+            "borderColor": "#A78BFA44"
+          },
+          "side": "right"
+        },
+        "thor-controlled": {
+          "name": "Thor",
+          "accent": "#FF3C3C",
+          "image": "/characters/thor-left.png",
+          "size": "21rem",
+          "style": {
+            "bottom": "1rem"
+          },
+          "customStyles": {
+            "borderColor": "#FF3C3C44"
+          },
+          "side": "right"
+        },
+        "loki": {
+          "name": "Loki",
+          "accent": "#2DFF9A",
+          "image": "/images/loki.png",
+          "size": "20rem",
+          "style": {
+            "bottom": "1rem"
+          },
+          "customStyles": {
+            "borderColor": "#2DFF9A44"
+          },
+          "side": "right"
+        },
+        "bruce": {
+          "name": "Bruce Banner",
+          "accent": "#0CBE69",
+          "image": "/characters/bruce-left.png",
+          "size": "18rem",
+          "style": {
+            "bottom": "1rem"
+          },
+          "customStyles": {
+            "borderColor": "#0CBE6944"
+          },
+          "side": "right"
+        },
+        "deco": {
+          "name": "DECO",
+          "accent": "#FF3C3C",
+          "image": "/characters/deco-ai.png",
+          "size": "20rem",
+          "style": {
+            "bottom": "1rem"
+          },
+          "customStyles": {
+            "borderColor": "#FF3C3C44",
+            "imageClass": "w-full h-full object-contain",
+            "imageStyle": {
+              "padding": "0.5rem"
+            }
+          },
+          "side": "right"
+        }
+      },
+      "roundNarrative": {
+        "preQuestion": [
           {
             "id": "r3-after-q3-narration",
             "questionNumber": 4,
@@ -479,7 +647,9 @@
             "speaker": "Loki",
             "characterId": "loki",
             "text": "Then solve it quickly. I would strongly prefer not to fight a thunder god twice."
-          },
+          }
+        ],
+        "duringQuestion": [
           {
             "id": "r3-q4-during",
             "questionNumber": 4,

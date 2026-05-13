@@ -16,22 +16,34 @@ import FlashbackTransition from '../components/FlashbackTransition'
 
 // Flashback transition config
 const FLASHBACK_IMAGES = [
-  '/backgrounds/home-hero.png',
   '/backgrounds/r1-stage1-bg.png',
   '/backgrounds/r1-stage2-bg.png',
+  '/backgrounds/r5.jpeg',
+  '/backgrounds/round 4-4.jpg',
   '/backgrounds/r2-stage1-bg.png',
+  '/backgrounds/r3-scene2-bg.png',
   '/backgrounds/r2-stage2-bg.png',
   '/backgrounds/easteregg.png',
+  '/backgrounds/round 4-3.jpg',
   '/backgrounds/r3-bg.png',
-  '/backgrounds/final-round-bg.png',
+  '/backgrounds/r3-scene2-bg.png',
+  '/backgrounds/round 4-2.jpg',
+  '/backgrounds/r1-stage2-bg.png',
+  '/backgrounds/r3-scene2-bg.png',
+  '/backgrounds/r5.jpeg',
   '/backgrounds/home-hero.png',
   '/backgrounds/r1-stage1-bg.png',
-  '/backgrounds/r1-stage2-bg.png',
-  '/backgrounds/r2-stage1-bg.png',
-  '/backgrounds/r2-stage2-bg.png',
-  '/backgrounds/easteregg.png',
   '/backgrounds/r3-bg.png',
-
+  '/backgrounds/r1-stage2-bg.png',
+  '/backgrounds/round 4-3.jpg',
+  '/backgrounds/r2-stage1-bg.png',
+  '/backgrounds/r5.jpeg',
+  '/backgrounds/r3-scene2-bg.png',
+  '/backgrounds/round 4-2.jpg',
+  '/backgrounds/home-hero.png',
+  '/backgrounds/r1-stage1-bg.png',
+  '/backgrounds/round 4-4.jpg',
+  '/backgrounds/r2-stage2-bg.png',
 ].reverse() // Reverse for time restoring back effect
 const FLASHBACK_DURATION = 8 // seconds
 const FLASHBACK_SOUND = '/voices/welldone.mp3' // assuming a sound file
@@ -111,6 +123,42 @@ function resolveNarrativeSequence(sequence, vars, questionNumber) {
     return formatNarrativeItems(sequence(vars), vars)
   }
   return []
+}
+
+function isStageStart(questionExperience, questionNumber) {
+  if (!questionExperience?.currentStage || questionNumber == null) {
+    return questionNumber === 1
+  }
+
+  const stage = questionExperience.currentStage
+  if (Array.isArray(stage.questionNumbers) && stage.questionNumbers.length > 0) {
+    return Math.min(...stage.questionNumbers) === questionNumber
+  }
+
+  if (stage.questionRange) {
+    const from = Number(stage.questionRange.from ?? 1)
+    return questionNumber === from
+  }
+
+  return questionNumber === 1
+}
+
+
+
+function matchesStageForQuestion(stage, questionNumber) {
+  if (!stage || questionNumber == null) return false
+
+  if (Array.isArray(stage.questionNumbers)) {
+    return stage.questionNumbers.includes(questionNumber)
+  }
+
+  if (stage.questionRange) {
+    const from = Number(stage.questionRange.from ?? 1)
+    const to = Number(stage.questionRange.to ?? Infinity)
+    return questionNumber >= from && questionNumber <= to
+  }
+
+  return false
 }
 
 function useIsLandscapeMobile() {
@@ -429,7 +477,7 @@ function QuestionCard({ question, questionKey, questionNumber, totalQuestions, o
   )
 }
 
-function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, onFinish, sceneTheme }) {
+function AnswerReveal({ question, submittedAnswer, isLastQuestion, hasFinalSequence, onContinue, onFinish, sceneTheme }) {
   const isLandscapeMobile = useIsLandscapeMobile()
   const answerLabelClass = sceneTheme.answerRevealBox.labelClass || 'text-xs uppercase tracking-[0.35em] text-[#2DFF9A]/70'
   const answerTextClass = sceneTheme.answerRevealBox.answerClass || 'mt-6 text-xl leading-8 text-white'
@@ -470,7 +518,7 @@ function AnswerReveal({ question, submittedAnswer, isLastQuestion, onContinue, o
             onClick={onFinish}
             className="px-10 py-5 text-base sm:text-lg tracking-[0.28em] border-[3px] shadow-[0_0_26px_rgba(45,255,154,0.28),0_26px_70px_rgba(0,0,0,0.45)] hover:scale-[1.03]"
           >
-            Finish Round
+            {hasFinalSequence ? 'Continue' : 'Finish Round'}
           </Btn>
         ) : (
           <Btn onClick={onContinue}>Next question</Btn>
@@ -785,16 +833,40 @@ export default function RoundPage({ onNav }) {
         ? introStageSequences
         : resolveNarrativeSequence(questionExperience.roundNarrative.preQuestion, {}, null)
     }
-    const introItems = currentIndex === 0 && answeredCount === 0
-      ? resolveNarrativeSequence(questionExperience.roundNarrative.preQuestion, {}, currentIndex + 1)
-      : []
+    const rawPreQuestionItems = resolveNarrativeSequence(
+      questionExperience.roundNarrative.preQuestion,
+      {},
+      currentIndex + 1,
+    )
+    const preQuestionItems = rawPreQuestionItems.filter((item) =>
+      item.questionNumber != null || isStageStart(questionExperience, currentIndex + 1),
+    )
     const duringItems = resolveNarrativeSequence(
       questionExperience.roundNarrative.duringQuestion,
       { questionNumber: currentIndex + 1, totalQuestions: questions.length },
       currentIndex + 1,
     )
-    return [...introStageSequences, ...introItems, ...duringItems]
-  }, [currentIndex, currentQuestion, questions.length, answeredCount, questionExperience, introStageSequences])
+    return [...introStageSequences, ...preQuestionItems, ...duringItems]
+  }, [currentIndex, currentQuestion, questions.length, questionExperience, introStageSequences])
+
+  const finalExperience = useMemo(() => {
+    if (questions.length === 0 || currentIndex !== questions.length - 1) return null
+
+    const currentQuestionNumber = currentIndex + 1
+    const currentStageId = questionExperience?.currentStage?.id
+    if (currentStageId && Array.isArray(baseExperience.stages)) {
+      const currentStageIndex = baseExperience.stages.findIndex((stage) => stage.id === currentStageId)
+      if (currentStageIndex >= 0) {
+        const nextStage = baseExperience.stages.slice(currentStageIndex + 1)
+          .find((stage) => matchesStageForQuestion(stage, currentQuestionNumber))
+        if (nextStage) {
+          return applyStageExperience(baseExperience, nextStage)
+        }
+      }
+    }
+
+    return questionExperience
+  }, [baseExperience, currentIndex, questionExperience, questions.length])
 
   const postAnswerSequence = useMemo(() => {
     if (!currentResponse) return []
@@ -810,14 +882,33 @@ export default function RoundPage({ onNav }) {
     )
   }, [currentIndex, currentResponse, questions.length, questionExperience])
 
-  const activeSequence = phase === 'answer' ? postAnswerSequence : preQuestionSequence
+  const finalSequence = useMemo(() => {
+    if (!currentResponse || currentIndex !== questions.length - 1 || !finalExperience) return []
+    return resolveNarrativeSequence(
+      finalExperience.roundNarrative.postAnswer || finalExperience.roundNarrative.finished,
+      {
+        submittedAnswer: currentResponse.submittedAnswer,
+        isLastQuestion: true,
+        lastQuestionPhrase: 'This was the final answer.',
+      },
+      null,
+    )
+  }, [currentIndex, currentResponse, finalExperience, questions.length])
+
+  const activeSequence = phase === 'finished'
+    ? finalSequence
+    : phase === 'answer'
+      ? postAnswerSequence
+      : preQuestionSequence
   const activeDialogue = sequenceIndex < activeSequence.length ? activeSequence[sequenceIndex] : null
   const activeIntroStage = activeDialogue?.__stageId
     ? getIntroStages(baseExperience).find((stage) => stage.id === activeDialogue.__stageId)
     : null
   const activeExperience = activeIntroStage
     ? applyStageExperience(baseExperience, activeIntroStage)
-    : questionExperience
+    : phase === 'finished'
+      ? finalExperience || questionExperience
+      : questionExperience
   const effectiveSceneTheme = activeExperience.sceneTheme
   const effectiveStageCharacters = activeExperience.stageCharacters || {}
   const activeSceneKey = activeExperience.currentStage?.id || 'base'
@@ -851,7 +942,18 @@ export default function RoundPage({ onNav }) {
   const showQuestionCard = phase === 'question' && currentQuestion && (!hasActiveDialogue || dialogueCanOverlayQuestion)
   const showAnswerReveal = phase === 'answer' && currentQuestion && currentResponse && !hasActiveDialogue
 
+  const startFinalSequence = useCallback(() => {
+    if (phase === 'finished' || finalSequence.length === 0) return false
+    setPhase('finished')
+    setSequenceIndex(0)
+    setDialogueVisible(true)
+    return true
+  }, [finalSequence.length, phase])
+
   useEffect(() => {
+    if (phase === 'finished' && finalSequence.length > 0 && sequenceIndex >= finalSequence.length) {
+      finishRound()
+    }
     const previousScene = previousSceneRef.current
     const nextScene = {
       key: activeSceneKey,
@@ -1079,8 +1181,9 @@ export default function RoundPage({ onNav }) {
             question={currentQuestion}
             submittedAnswer={currentResponse.submittedAnswer}
             isLastQuestion={isLastQuestion}
+            hasFinalSequence={finalSequence.length > 0}
             onContinue={goNext}
-            onFinish={() => finishRound()}
+            onFinish={() => startFinalSequence() || finishRound()}
             sceneTheme={effectiveSceneTheme}
           />
         ) : showQuestionCard ? (

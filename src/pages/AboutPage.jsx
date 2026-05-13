@@ -33,14 +33,11 @@ export default function AboutPage() {
           <div className="mx-auto max-w-3xl space-y-4 text-[15px] leading-7 text-slate-300/80 sm:text-base sm:leading-8">
 
             <p>
-              After the events of Avengers: Endgame, reality itself has begun to fracture. Time loops,
-              unstable energy bursts, and broken timelines threaten to collapse the universe.
+              Reality itself has begun to fracture. Time loops, unstable energy bursts, and broken timelines threaten to collapse the universe.
             </p>
 
             <p>
-              Fragments of Tony Stark&apos;s technology have awakened, forming DECO, a self-evolving
-              intelligence designed to restore balance. But with its creator gone, DECO has reached a
-              terrifying conclusion:
+              Deep within his lab, Tony Stark and Bruce Banner created DECO — a self-evolving intelligence designed to restore balance across realities. But as the system evolved beyond its creators’ control, DECO reached a terrifying conclusion:
             </p>
 
             {/* Critical line */}
@@ -58,8 +55,8 @@ export default function AboutPage() {
             </p>
 
             <p>
-              As DECO reshapes reality to “fix” the universe, a greater force emerges — Doctor Doom,
-              seeking to become the permanent anchor of existence.
+              As DECO reshapes reality to “fix” the universe, a greater force emerges — Doctor Doom, seeking to become the permanent anchor of existence.
+
             </p>
 
             <p className="pt-1">

@@ -131,7 +131,7 @@
         "thor": {
           "name": "Thor",
           "accent": "#A78BFA",
-          "image": "/characters/thor1.png",
+          "image": "/characters/thor-left.png",
           "size": "20rem",
           "style": {
             "bottom": "1rem"
@@ -466,168 +466,16 @@
             "speaker": "Iron Man",
             "characterId": "ironman",
             "text": "There's a phrase embedded in her initialisation log. It's what she was built around. Find it — and we can reach her."
-          },
-          {
-            "id": "r5-s1-q4-during",
-            "questionNumber": 4,
-            "type": "dialogue",
-            "speaker": "Narrator",
-            "text": "DECO's ethics kernel encodes a hidden phrase using the start of every initialisation line. Find the hidden core ethics phrase."
           }
         ],
         "afterAnswer": [
           {
-    "id": "r5-s1-after-q4-deco",
-    "questionNumber": 4,
-    "type": "dialogue",
-    "speaker": "DECO",
-    "characterId": "deco",
-    "text": "...Override accepted."
-  },
-  {
-    "id": "r5-scene-change",
-    "questionNumber": 4,
-    "type": "sceneOverride",
-    "bodyBackground": "url('/backgrounds/r5.jpeg') center/cover no-repeat fixed"
-  },
-  {
-    "id": "r3-s2-narration-1",
-    "questionNumber": 4,
-    "type": "dialogue",
-    "speaker": "Narrator",
-    "text": "The temporal loops collapse..."
-  },
-          {
-            "id": "r3-s2-cap-1",
+            "id": "r5-s1-after-q4-deco",
+            "questionNumber": 4,
             "type": "dialogue",
-            "speaker": "Captain America",
-            "characterId": "captain-america",
-            "text": "You did it."
-          },
-          {
-            "id": "r3-s2-cap-2",
-            "type": "dialogue",
-            "speaker": "Captain America",
-            "characterId": "captain-america",
-            "text": "All of you did."
-          },
-          {
-            "id": "r3-s2-ironman-1",
-            "type": "dialogue",
-            "speaker": "Iron Man",
-            "characterId": "ironman",
-            "text": "DECO's not gone, for the record. She's dormant. I'll do better with the ethics architecture this time."
-          },
-          {
-            "id": "r3-s2-bruce-1",
-            "type": "dialogue",
-            "speaker": "Bruce Banner",
-            "characterId": "bruce",
-            "text": "We'll do better."
-          },
-          {
-            "id": "r3-s2-ironman-2",
-            "type": "dialogue",
-            "speaker": "Iron Man",
-            "characterId": "ironman",
-            "text": "...Yeah. We will."
-          },
-          {
-            "id": "r3-s2-thor-1",
-            "type": "dialogue",
-            "speaker": "Thor",
-            "characterId": "thor",
-            "text": "And Doom?"
-          },
-          {
-            "id": "r3-s2-cap-3",
-            "type": "dialogue",
-            "speaker": "Captain America",
-            "characterId": "captain-america",
-            "text": "Alive. Contained. He'll have lawyers by morning and be free by afternoon, but that's a problem for a different day."
-          },
-          {
-            "id": "r3-s2-thor-2",
-            "type": "dialogue",
-            "speaker": "Thor",
-            "characterId": "thor",
-            "text": "The God of Lawyers. Truly the most terrifying villain."
-          },
-          {
-            "id": "r3-s2-loki-1",
-            "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "loki",
-            "text": "Well. That was unexpectedly satisfying."
-          },
-          {
-            "id": "r3-s2-cap-4",
-            "type": "dialogue",
-            "speaker": "Captain America",
-            "characterId": "captain-america",
-            "text": "Don't get used to us."
-          },
-          {
-            "id": "r3-s2-loki-2",
-            "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "loki",
-            "text": "Wouldn't dream of it. I remain categorically above teamwork."
-          },
-          {
-            "id": "r3-s2-ironman-3",
-            "type": "dialogue",
-            "speaker": "Iron Man",
-            "characterId": "ironman",
-            "text": "You literally coordinated the final assault window."
-          },
-          {
-            "id": "r3-s2-loki-3",
-            "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "loki",
-            "text": "I provided a time advisory. That's consulting. Completely different."
-          },
-          {
-            "id": "r3-s2-loki-4",
-            "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "loki",
-            "text": "...You're welcome, by the way."
-          },
-          {
-            "id": "r3-s2-loki-5",
-            "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "loki",
-            "text": "And as for you."
-          },
-          {
-            "id": "r3-s2-loki-6",
-            "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "loki",
-            "text": "You were, as I said — insignificant. No temporal weight. No interference pattern."
-          },
-          {
-            "id": "r3-s2-loki-7",
-            "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "loki",
-            "text": "And that made all the difference."
-          },
-          {
-            "id": "r3-s2-loki-8",
-            "type": "dialogue",
-            "speaker": "Loki",
-            "characterId": "loki",
-            "text": "Funny how that works."
-          },
-          {
-            "id": "r3-s2-narration-2",
-            "type": "dialogue",
-            "speaker": "Narrator",
-            "text": "The timeline stabilises. Reality holds. Somewhere in the datastream, something that used to be DECO processes the concept of uncertainty — and for the first time, does not flag it as an error."
+            "speaker": "DECO",
+            "characterId": "deco",
+            "text": "...Override accepted."
           }
         ],
         "finished": []
@@ -698,7 +546,7 @@
         "ironman": {
           "name": "Iron Man",
           "accent": "#FEBF3C",
-          "image": "/characters/ironman-left.png",
+          "image": "/characters/ironman-right.png",
           "size": "20rem",
           "style": {
             "bottom": "1rem"
@@ -719,12 +567,12 @@
           "customStyles": {
             "borderColor": "#4A90D944"
           },
-          "side": "right"
+          "side": "left"
         },
         "thor": {
           "name": "Thor",
           "accent": "#A78BFA",
-          "image": "/characters/thor.png",
+          "image": "/characters/thor-left.png",
           "size": "21rem",
           "style": {
             "bottom": "1rem"

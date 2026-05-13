@@ -203,15 +203,7 @@ export const roundNarrative = {
         : `Recorded: "${submittedAnswer}". The branch recalibrates. Continue.`,
     },
   ],
-  finished: [
-    {
-      id: 'finished',
-      type: 'dialogue',
-      speaker: 'Loki',
-      characterId: 'curator',
-      text: 'Interesting. You survived this round. Check the board or wait for the next timeline breach.',
-    },
-  ],
+  finished: [],
 }
 
 function mergeDeep(target, source) {
