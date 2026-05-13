@@ -114,7 +114,7 @@
         "thor": {
           "name": "Thor",
           "accent": "#A78BFA",
-          "image": "/characters/thor-right.png",
+          "image": "/characters/thor1.png",
           "size": "20rem",
           "style": {
             "bottom": "1rem"
@@ -905,7 +905,7 @@
         "thor": {
           "name": "Thor",
           "accent": "#A78BFA",
-          "image": "/characters/thor-right.png",
+          "image": "/characters/thor1.png",
           "size": "20rem",
           "style": {
             "bottom": "1rem"
