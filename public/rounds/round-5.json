@@ -286,7 +286,7 @@
             "type": "dialogue",
             "speaker": "Iron Man",
             "characterId": "ironman",
-            "text": "She's broadcasting a hidden command through the FRIDAY frequency. Tony believes DECO embedded a shutdown coordinate inside the signal using pulse intervals."
+            "text": "She's broadcasting a hidden command through the FRIDAY frequency. I believe DECO embedded a shutdown coordinate inside the signal using pulse intervals."
           },
           {
             "id": "r5-s1-ironman-5",
@@ -294,6 +294,14 @@
             "speaker": "Iron Man",
             "characterId": "ironman",
             "text": "Short pulse equals zero. Long pulse equals one. Read in groups of eight."
+          },
+          {
+            "id": "r5-q1-audio",
+            "questionNumber": 1,
+            "type": "voiceMemo",
+            "speaker": "DECO",
+            "characterId": "deco",
+            "voiceFile": "/voices/round5-q1.mp3"
           }
         ],
         "duringQuestion": [
