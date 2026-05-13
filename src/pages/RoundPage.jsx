@@ -154,7 +154,7 @@ function StageCharacter({ character, visible, slot }) {
   const nameClass = customStyles.nameClass || 'text-lg font-medium text-white'
   const nameBackgroundClass = customStyles.nameBackgroundClass || 'bg-transparent'
   const containerTransition = customStyles.containerTransition || 'transition duration-500'
-  const imageClass = customStyles.imageClass || 'w-full h-full object-cover'
+  const imageClass = customStyles.imageClass || 'w-[500px] h-full object-cover object-top'
   const imageStyle = customStyles.imageStyle || {}
 
   const characterWidth = `min(calc(${character.size} * 0.9), 26vw)`
